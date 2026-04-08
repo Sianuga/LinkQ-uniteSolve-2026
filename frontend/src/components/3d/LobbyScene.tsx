@@ -1,12 +1,6 @@
-import { Suspense, useMemo, useRef, useCallback, useState } from 'react';
-import { Canvas } from '@react-three/fiber';
-import {
-  OrbitControls,
-  PerformanceMonitor,
-  AdaptiveDpr,
-  Html,
-} from '@react-three/drei';
-// Post-processing removed for faster load — emissive materials provide glow
+import { Suspense, useMemo, useRef, useState, useEffect } from 'react';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { PerformanceMonitor, AdaptiveDpr, Html } from '@react-three/drei';
 import * as THREE from 'three';
 
 import LobbyLighting from '@/components/3d/LobbyLighting';
@@ -19,7 +13,7 @@ import type { AvatarType } from '@/types';
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-interface CharacterData {
+export interface CharacterData {
   userId: string;
   name: string;
   avatarType: AvatarType;
@@ -32,44 +26,98 @@ interface CharacterData {
 interface LobbySceneProps {
   characters: CharacterData[];
   selectedId: string | null;
+  focusIndex: number;
   onSelectCharacter: (id: string) => void;
 }
 
 /* ------------------------------------------------------------------ */
-/*  Geometry helpers                                                    */
+/*  Line layout — characters spaced in a row along X axis             */
 /* ------------------------------------------------------------------ */
 
-/** Compute semi-circle positions from -60 deg to +60 deg facing camera. */
-function useSemiCircleLayout(count: number, radius: number) {
+const CHARACTER_SPACING = 2.5; // distance between characters
+
+function useLineLayout(count: number) {
   return useMemo(() => {
-    if (count === 0) return [];
+    const totalWidth = (count - 1) * CHARACTER_SPACING;
+    const startX = -totalWidth / 2;
 
-    const startAngle = THREE.MathUtils.degToRad(-60);
-    const endAngle = THREE.MathUtils.degToRad(60);
-    const span = endAngle - startAngle;
-
-    return Array.from({ length: count }, (_, i) => {
-      // Spread evenly across the arc; single item goes to centre
-      const t = count === 1 ? 0.5 : i / (count - 1);
-      const angle = startAngle + t * span;
-
-      // Position on the semi-circle (XZ plane)
-      const x = Math.sin(angle) * radius;
-      const z = Math.cos(angle) * radius;
-
-      // Rotation so the character faces inward (toward the origin)
-      const rotationY = angle + Math.PI;
-
-      return {
-        position: [x, 0, z] as [number, number, number],
-        rotationY,
-      };
-    });
-  }, [count, radius]);
+    return Array.from({ length: count }, (_, i) => ({
+      position: [startX + i * CHARACTER_SPACING, 0, 0] as [number, number, number],
+      rotationY: 0, // all face camera
+    }));
+  }, [count]);
 }
 
 /* ------------------------------------------------------------------ */
-/*  Loading spinner (Canvas-friendly HTML overlay)                     */
+/*  Camera controller — smoothly follows focusIndex on X axis         */
+/* ------------------------------------------------------------------ */
+
+function CameraController({ focusIndex, characterCount }: { focusIndex: number; characterCount: number }) {
+  const { camera } = useThree();
+  const targetX = useRef(0);
+
+  useEffect(() => {
+    const totalWidth = (characterCount - 1) * CHARACTER_SPACING;
+    const startX = -totalWidth / 2;
+    targetX.current = startX + focusIndex * CHARACTER_SPACING;
+  }, [focusIndex, characterCount]);
+
+  useFrame(() => {
+    // Smooth lerp camera X toward the focused character
+    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX.current, 0.08);
+    camera.lookAt(targetX.current, 0.8, 0);
+  });
+
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Swipe handler — horizontal drag on the canvas to change focus     */
+/* ------------------------------------------------------------------ */
+
+function SwipeHandler({
+  characterCount,
+  onSwipe,
+}: {
+  characterCount: number;
+  onSwipe: (direction: 'left' | 'right') => void;
+}) {
+  const startX = useRef(0);
+  const dragging = useRef(false);
+
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const canvas = gl.domElement;
+
+    const onPointerDown = (e: PointerEvent) => {
+      startX.current = e.clientX;
+      dragging.current = true;
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (!dragging.current) return;
+      dragging.current = false;
+      const dx = e.clientX - startX.current;
+      if (Math.abs(dx) > 40) {
+        onSwipe(dx < 0 ? 'right' : 'left');
+      }
+    };
+
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointerup', onPointerUp);
+
+    return () => {
+      canvas.removeEventListener('pointerdown', onPointerDown);
+      canvas.removeEventListener('pointerup', onPointerUp);
+    };
+  }, [gl, onSwipe, characterCount]);
+
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Loading spinner                                                    */
 /* ------------------------------------------------------------------ */
 
 function CanvasLoader() {
@@ -86,49 +134,35 @@ function CanvasLoader() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Inner scene (rendered inside Canvas)                               */
+/*  Inner scene                                                        */
 /* ------------------------------------------------------------------ */
 
-interface InnerSceneProps {
+function InnerScene({
+  characters,
+  selectedId,
+  focusIndex,
+  onSelectCharacter,
+  onSwipe,
+}: {
   characters: CharacterData[];
   selectedId: string | null;
+  focusIndex: number;
   onSelectCharacter: (id: string) => void;
-}
-
-function InnerScene({ characters, selectedId, onSelectCharacter }: InnerSceneProps) {
-  const controlsRef = useRef<React.ComponentRef<typeof OrbitControls>>(null);
-  const [dprDegraded, setDprDegraded] = useState(false);
-
-  const layout = useSemiCircleLayout(characters.length, 2.5);
-
-  /* ------ Performance callbacks ------ */
-  const handlePerformanceIncline = useCallback(() => {
-    setDprDegraded(false);
-  }, []);
-
-  const handlePerformanceDecline = useCallback(() => {
-    setDprDegraded(true);
-  }, []);
-
-  /* ------ Whether to auto-rotate ------ */
-  const shouldAutoRotate = selectedId === null;
+  onSwipe: (dir: 'left' | 'right') => void;
+}) {
+  const layout = useLineLayout(characters.length);
 
   return (
     <>
-      {/* ---- Performance adaptive tools ---- */}
-      <PerformanceMonitor
-        onIncline={handlePerformanceIncline}
-        onDecline={handlePerformanceDecline}
-      />
+      <PerformanceMonitor />
       <AdaptiveDpr pixelated />
 
-      {/* ---- Lighting ---- */}
       <LobbyLighting />
-
-      {/* ---- Environment (floor, particles, fog, etc.) ---- */}
       <LobbyEnvironment />
 
-      {/* ---- Characters arranged in semi-circle ---- */}
+      <CameraController focusIndex={focusIndex} characterCount={characters.length} />
+      <SwipeHandler characterCount={characters.length} onSwipe={onSwipe} />
+
       {characters.map((char, i) => {
         const placement = layout[i];
         if (!placement) return null;
@@ -150,49 +184,56 @@ function InnerScene({ characters, selectedId, onSelectCharacter }: InnerScenePro
           />
         );
       })}
-
-      {/* ---- Camera controls ---- */}
-      <OrbitControls
-        ref={controlsRef}
-        autoRotate={shouldAutoRotate}
-        autoRotateSpeed={0.3}
-        enableZoom={false}
-        enablePan={false}
-        minPolarAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI / 2.5}
-        target={[0, 0.8, 0]}
-        enableDamping
-        dampingFactor={0.08}
-        touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE }}
-      />
-
-      {/* Post-processing removed for performance — emissive materials handle glow */}
     </>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Main exported component                                            */
+/*  Main export                                                        */
 /* ------------------------------------------------------------------ */
 
 export default function LobbyScene({
   characters,
   selectedId,
+  focusIndex,
   onSelectCharacter,
 }: LobbySceneProps) {
+  const [internalFocus, setInternalFocus] = useState(focusIndex);
+
+  useEffect(() => {
+    setInternalFocus(focusIndex);
+  }, [focusIndex]);
+
+  const handleSwipe = useMemo(
+    () => (dir: 'left' | 'right') => {
+      setInternalFocus((prev) => {
+        const next = dir === 'right' ? prev + 1 : prev - 1;
+        const clamped = Math.max(0, Math.min(characters.length - 1, next));
+        // Also select the character we swipe to
+        if (characters[clamped]) {
+          onSelectCharacter(characters[clamped].userId);
+        }
+        return clamped;
+      });
+    },
+    [characters, onSelectCharacter],
+  );
+
   return (
     <Canvas
       shadows
-      dpr={[1, 2]}
-      camera={{ position: [0, 3, 6], fov: 50 }}
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 2, 5], fov: 45 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      style={{ background: '#0a0a1a' }}
+      style={{ background: '#0a0a1a', touchAction: 'none' }}
     >
       <Suspense fallback={<CanvasLoader />}>
         <InnerScene
           characters={characters}
           selectedId={selectedId}
+          focusIndex={internalFocus}
           onSelectCharacter={onSelectCharacter}
+          onSwipe={handleSwipe}
         />
       </Suspense>
     </Canvas>
