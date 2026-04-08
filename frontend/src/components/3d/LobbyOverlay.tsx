@@ -414,7 +414,7 @@ export default function LobbyOverlay({
       {/* ============================================================== */}
       {/* TOP BAR                                                        */}
       {/* ============================================================== */}
-      <div className="pointer-events-auto flex items-center justify-between px-4 pt-[env(safe-area-inset-top,12px)]">
+      <div className="pointer-events-auto flex items-center justify-between rounded-b-2xl border-b border-border bg-white px-4 pb-3 pt-[max(env(safe-area-inset-top,12px),12px)] shadow-sm">
         {/* Back */}
         <button
           type="button"
