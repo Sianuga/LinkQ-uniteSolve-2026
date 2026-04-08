@@ -56,6 +56,7 @@ def mark_notification_read(
     for notif in user_notifs:
         if notif.get("id") == notification_id:
             notif["read"] = True
+            db.save_notification(notif)
             return NotificationResponse(**notif)
 
     raise HTTPException(

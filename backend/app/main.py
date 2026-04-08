@@ -34,14 +34,28 @@ async def lifespan(app: FastAPI):
         len(db.events),
     )
 
-    # 2. Pre-warm the embedding model so the first /match request is fast.
-    #    This is best-effort — if sentence-transformers or chromadb aren't
-    #    installed the service falls back to random scores anyway.
+    # 2. Pre-warm the embedding model and embed all users so match
+    #    requests return real cosine similarity scores immediately.
     try:
-        from app.services.matching import get_embedding_service
+        from app.services.matching import get_embedding_service, ensure_user_embedded
 
-        get_embedding_service()
+        svc = get_embedding_service()
         logger.info("Embedding service pre-warmed successfully")
+
+        # 3. Embed all users into ChromaDB (skip if already embedded)
+        if svc.model is not None and svc.collection is not None:
+            existing = svc.collection.count()
+            expected = len(db.users) * 4  # 4 semantic segments per user
+            if existing < expected:
+                logger.info(
+                    "Embedding %d users into ChromaDB (%d/%d segments exist)...",
+                    len(db.users), existing, expected,
+                )
+                for uid, user in db.users.items():
+                    ensure_user_embedded(uid, user)
+                logger.info("All users embedded (%d segments total)", svc.collection.count())
+            else:
+                logger.info("ChromaDB already has %d segments — skipping bulk embed", existing)
     except Exception:
         logger.warning("Embedding service pre-warm skipped (not available)")
 

@@ -39,6 +39,7 @@ def send_connection_request(body: ConnectionRequest, current_user: dict = Depend
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
     db.connections.append(connection)
+    db.save_connection(connection)
 
     # Create notification for receiver
     notif_id = f"notif_{uuid.uuid4().hex[:12]}"
@@ -52,6 +53,7 @@ def send_connection_request(body: ConnectionRequest, current_user: dict = Depend
         "reference_id": conn_id,
     }
     db.notifications.setdefault(body.target_user_id, []).append(notif)
+    db.save_notification(notif)
 
     return ConnectionResponse(**connection)
 
@@ -100,6 +102,7 @@ def update_connection(
                     detail=f"Connection is already {conn['status']}",
                 )
             conn["status"] = body.status
+            db.save_connection(conn)
 
             # Notify requester of acceptance
             if body.status == "ACCEPTED":
@@ -114,6 +117,7 @@ def update_connection(
                     "reference_id": connection_id,
                 }
                 db.notifications.setdefault(conn["requester_id"], []).append(notif)
+                db.save_notification(notif)
 
             return ConnectionResponse(**conn)
 

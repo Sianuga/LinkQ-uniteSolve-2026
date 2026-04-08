@@ -78,6 +78,7 @@ def create_group(
         "members": [user_id],
     }
     db.groups[group_id] = group
+    db.save_group(group_id)
     return GroupResponse(**group)
 
 
@@ -145,6 +146,7 @@ def join_group(
 
     members.append(user_id)
     group["members"] = members
+    db.save_group(group_id)
 
     return {"message": "Successfully joined the group", "group_id": group_id}
 

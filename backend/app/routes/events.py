@@ -85,6 +85,7 @@ def create_event(
     }
 
     db.events[event_id] = event
+    db.save_event(event_id)
 
     return EventResponse(**event)
 
@@ -134,6 +135,7 @@ def join_event(
         )
 
     event.setdefault("participants", []).append(user_id)
+    db.save_event(event_id)
 
     return {"message": "Successfully joined the event", "event_id": event_id}
 

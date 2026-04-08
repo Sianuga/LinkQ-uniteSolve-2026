@@ -140,6 +140,8 @@ def register(body: RegisterRequest) -> TokenResponse:
         "bio": "",
     }
 
+    db.save_user(user_id)
+
     token = create_access_token({"sub": user_id})
     return TokenResponse(token=token)
 
@@ -243,6 +245,8 @@ def update_me(
             # Embedding service not yet implemented — silently skip
             pass
 
+    db.save_user(user_id)
+
     return UserProfile(**_strip_password(user_doc))
 
 
@@ -275,6 +279,7 @@ def oauth_import(body: OAuthRequest) -> OAuthResponse:
             )
         user["university"] = university
         user["academic"]["courses"] = courses
+        db.save_user(body.user_id)
 
     return OAuthResponse(university=university, courses=courses)
 
@@ -307,6 +312,8 @@ def submit_onboarding(
 
     # Always mark onboarding as complete
     user_doc["onboarding_complete"] = True
+
+    db.save_user(user_id)
 
     # Trigger full embedding generation for all semantic segments
     all_segments = ["academic", "interests", "goals", "events", "skills", "availability"]

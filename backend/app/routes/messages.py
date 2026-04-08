@@ -72,7 +72,8 @@ def create_conversation(
 
     # Create new conversation
     conv_id = f"conv_{uuid.uuid4().hex[:12]}"
-    registry[conv_id] = {"participants": [user_id, body.other_user_id]}
+    registry[conv_id] = {"id": conv_id, "participants": [user_id, body.other_user_id]}
+    db.save_conversation(conv_id)
 
     return {"conversation_id": conv_id, "participants": [user_id, body.other_user_id]}
 
@@ -194,5 +195,6 @@ def send_message(
     }
 
     db.messages.setdefault(body.conversation_id, []).append(message)
+    db.save_message(body.conversation_id, message)
 
     return MessageResponse(**message)
