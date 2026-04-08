@@ -8,7 +8,7 @@ import * as THREE from "three";
 // Constants
 // ---------------------------------------------------------------------------
 
-const BG_COLOR = "#0a0a1a";
+const BG_COLOR = "#E8EEFB"; // Light blue-gray matching app background
 const PARTICLE_COUNT = 50;
 const PARTICLE_RADIUS = 5;
 const PARTICLE_HEIGHT = 4;
@@ -86,12 +86,11 @@ function FloatingParticles() {
       </bufferGeometry>
       <pointsMaterial
         size={0.03}
-        color="#93C5FD"
+        color="#3B82F6"
         transparent
-        opacity={0.6}
+        opacity={0.3}
         depthWrite={false}
         sizeAttenuation
-        blending={THREE.AdditiveBlending}
       />
     </points>
   );
@@ -178,33 +177,33 @@ function ReflectiveFloor() {
 
   return (
     <group>
-      {/* Main platform cylinder — top surface at y=0 */}
+      {/* Main platform cylinder — white/light, top surface at y=0 */}
       <mesh position-y={-MAIN_HEIGHT / 2} receiveShadow castShadow>
         <cylinderGeometry args={[MAIN_RADIUS, MAIN_RADIUS, MAIN_HEIGHT, SEGMENTS]} />
         <meshStandardMaterial
-          color={BG_COLOR}
-          metalness={0.8}
-          roughness={0.2}
+          color="#FFFFFF"
+          metalness={0.05}
+          roughness={0.6}
         />
       </mesh>
 
-      {/* Stepped base — slightly wider, sits below main cylinder */}
+      {/* Stepped base — light gray */}
       <mesh position-y={-MAIN_HEIGHT - BASE_HEIGHT / 2} receiveShadow>
         <cylinderGeometry args={[BASE_RADIUS, BASE_RADIUS, BASE_HEIGHT, SEGMENTS]} />
         <meshStandardMaterial
-          color="#06060f"
-          metalness={0.6}
-          roughness={0.35}
+          color="#E5E7EB"
+          metalness={0.05}
+          roughness={0.7}
         />
       </mesh>
 
-      {/* Glowing rim ring on top edge */}
+      {/* Blue accent rim ring on top edge */}
       <mesh ref={rimRef} position-y={0.005} rotation-x={-Math.PI / 2}>
         <ringGeometry args={[RIM_INNER, RIM_OUTER, SEGMENTS]} />
         <meshStandardMaterial
-          color="#000000"
+          color="#1E3A8A"
           emissive="#3B82F6"
-          emissiveIntensity={0.6}
+          emissiveIntensity={0.4}
           transparent
           opacity={0.9}
           toneMapped={false}
@@ -213,15 +212,15 @@ function ReflectiveFloor() {
         />
       </mesh>
 
-      {/* Subtle side glow — a slightly larger transparent cylinder hugging the edge */}
+      {/* Side accent — light blue tint */}
       <mesh position-y={-MAIN_HEIGHT / 2}>
         <cylinderGeometry args={[MAIN_RADIUS + 0.02, MAIN_RADIUS + 0.02, MAIN_HEIGHT, SEGMENTS, 1, true]} />
         <meshStandardMaterial
-          color="#0d0d2b"
-          metalness={0.5}
-          roughness={0.3}
+          color="#D4E0F7"
+          metalness={0.1}
+          roughness={0.5}
           transparent
-          opacity={0.7}
+          opacity={0.8}
         />
       </mesh>
     </group>
@@ -291,19 +290,19 @@ export default function LobbyEnvironment() {
     <>
       {/* Scene-level properties (fog + background) — attaches to scene */}
       <color attach="background" args={[BG_COLOR]} />
-      <fogExp2 attach="fog" args={[BG_COLOR, 0.03]} />
+      <fogExp2 attach="fog" args={[BG_COLOR, 0.02]} />
 
-      {/* Lighting — brighter to illuminate classroom */}
-      <ambientLight intensity={0.4} color="#ffffff" />
+      {/* Bright, clean lighting for light theme */}
+      <ambientLight intensity={0.7} color="#ffffff" />
       <directionalLight
-        position={[3, 6, 2]}
-        intensity={0.8}
+        position={[3, 8, 4]}
+        intensity={1.2}
         color="#ffffff"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <pointLight position={[0, 3, 0]} intensity={0.6} color="#3B82F6" distance={10} decay={2} />
+      <pointLight position={[0, 3, 0]} intensity={0.3} color="#93C5FD" distance={10} decay={2} />
 
       {/* Classroom disabled for now */}
       {/* <ClassroomModel /> */}

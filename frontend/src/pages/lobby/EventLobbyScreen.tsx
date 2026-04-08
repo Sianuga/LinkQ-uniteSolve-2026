@@ -77,7 +77,7 @@ function toSelectedCharacter(match: MatchCandidate) {
 
 function LobbyLoading() {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center bg-[#0a0a1a]">
+    <div className="flex h-full w-full flex-col items-center justify-center bg-background">
       <div className="h-8 w-8 animate-spin rounded-full border-3 border-blue-400 border-t-transparent mb-3" />
       <p className="animate-pulse text-sm font-medium text-white/70">
         Entering lobby...
@@ -102,7 +102,7 @@ function WebGLFallback({ error }: FallbackProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-dvh w-full flex-col bg-[#0a0a1a] text-white">
+    <div className="flex h-dvh w-full flex-col bg-background text-white">
       <div className="shrink-0 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
         <p className="mb-2 text-xs text-red-400">3D unavailable: {error.message}</p>
         <h1 className="text-lg font-bold">Event Lobby</h1>
@@ -167,7 +167,7 @@ export default function EventLobbyScreen() {
   );
 
   return (
-    <div className="h-dvh w-full relative overflow-hidden bg-[#0a0a1a]">
+    <div className="h-dvh w-full relative overflow-hidden bg-background">
       {/* 3D Scene */}
       <div className="absolute inset-0 h-full w-full">
         <ErrorBoundary FallbackComponent={WebGLFallback}>
@@ -200,7 +200,7 @@ export default function EventLobbyScreen() {
 
       {/* List view modal */}
       {showListView && (
-        <div className="absolute inset-0 z-50 flex flex-col bg-[#0a0a1a]/95 backdrop-blur-md">
+        <div className="absolute inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-md">
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
             <h2 className="text-lg font-bold text-white">All Participants</h2>

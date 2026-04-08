@@ -374,7 +374,7 @@ export default function LobbyScene({
       dpr={[1, 1.5]}
       camera={{ position: CAMERA_POS, fov: 60 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      style={{ background: '#0a0a1a', touchAction: 'none' }}
+      style={{ background: '#E8EEFB', touchAction: 'none' }}
     >
       <Suspense fallback={<CanvasLoader />}>
         <InnerScene

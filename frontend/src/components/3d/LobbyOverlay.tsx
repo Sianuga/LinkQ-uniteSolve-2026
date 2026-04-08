@@ -215,19 +215,15 @@ export default function LobbyOverlay({
           type="button"
           onClick={onBack}
           className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center
-                     rounded-full text-white transition-colors duration-150
-                     hover:bg-white/10 active:bg-white/20"
-          style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
+                     rounded-full text-text-primary transition-colors duration-150
+                     hover:bg-black/5 active:bg-black/10"
           aria-label="Go back"
         >
-          <ArrowLeft className="h-6 w-6 drop-shadow-md" />
+          <ArrowLeft className="h-6 w-6" />
         </button>
 
         {/* Title */}
-        <h1
-          className="flex-1 truncate px-2 text-center text-lg font-bold text-white"
-          style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}
-        >
+        <h1 className="flex-1 truncate px-2 text-center text-lg font-bold text-text-primary">
           {eventTitle}
         </h1>
 
@@ -236,11 +232,11 @@ export default function LobbyOverlay({
           type="button"
           onClick={onListView}
           className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center
-                     rounded-full text-white transition-colors duration-150
-                     hover:bg-white/10 active:bg-white/20"
+                     rounded-full text-text-primary transition-colors duration-150
+                     hover:bg-black/5 active:bg-black/10"
           aria-label="Toggle list view"
         >
-          <LayoutList className="h-6 w-6 drop-shadow-md" />
+          <LayoutList className="h-6 w-6" />
         </button>
       </div>
 
@@ -254,7 +250,7 @@ export default function LobbyOverlay({
       {/* ============================================================== */}
       {/* White frosted bottom panel */}
       <div
-        className="flex flex-col gap-2 rounded-t-2xl border-t border-white/20 bg-white/95 px-4 pb-[max(env(safe-area-inset-bottom,12px),16px)] pt-3 backdrop-blur-xl"
+        className="flex flex-col gap-2 rounded-t-2xl border-t border-border bg-white px-4 pb-[max(env(safe-area-inset-bottom,12px),16px)] pt-3 shadow-lg"
         style={{ WebkitBackdropFilter: 'blur(24px)' }}
       >
         {/* ---- Focused character name + match badge ---- */}
