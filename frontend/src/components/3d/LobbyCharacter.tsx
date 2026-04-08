@@ -576,19 +576,7 @@ export default function LobbyCharacter({
           <meshStandardMaterial color="#000" transparent opacity={0.18} />
         </mesh>
 
-        {/* Pedestal ring */}
-        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
-          <ringGeometry args={[0.5, 0.58, 48]} />
-          <meshStandardMaterial
-            color={preset.emissive}
-            emissive={preset.emissive}
-            emissiveIntensity={isFocused ? 0.8 : 0.2}
-            transparent
-            opacity={isFocused ? 0.9 : 0.3}
-            side={THREE.DoubleSide}
-            toneMapped={false}
-          />
-        </mesh>
+        {/* Subtle shadow disc on ground */}
 
         {/* Selected spotlight from above */}
         {isSelected && (

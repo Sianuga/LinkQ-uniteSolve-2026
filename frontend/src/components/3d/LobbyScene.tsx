@@ -36,17 +36,17 @@ export interface LobbySceneProps {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const CAMERA_POS: [number, number, number] = [0, 1.8, 6.5];
-const CAMERA_LOOKAT: [number, number, number] = [0, 0.6, 0];
-const ZOOM_POS: [number, number, number] = [0, 1.5, 4.0];
-const ZOOM_LOOKAT: [number, number, number] = [0, 0.8, 0];
+// Camera slightly below eye level, looking up — makes characters feel heroic
+const CAMERA_POS: [number, number, number] = [0, 1.2, 4.8];
+const CAMERA_LOOKAT: [number, number, number] = [0, 0.9, 0];
+const ZOOM_POS: [number, number, number] = [0, 1.1, 3.2];
+const ZOOM_LOOKAT: [number, number, number] = [0, 0.9, 0];
 
-/** Carousel slot positions — only 3 characters visible at a time.
- *  Side chars peek in from edges so user knows there's more to swipe. */
+/** Carousel slot positions — 3 chars visible, tighter spacing */
 const SLOTS = {
   center: { pos: [0, 0, 0] as [number, number, number], scale: 1.0 },
-  left: { pos: [-1.5, 0, -0.3] as [number, number, number], scale: 0.65 },
-  right: { pos: [1.5, 0, -0.3] as [number, number, number], scale: 0.65 },
+  left: { pos: [-1.3, 0, -0.2] as [number, number, number], scale: 0.75 },
+  right: { pos: [1.3, 0, -0.2] as [number, number, number], scale: 0.75 },
 };
 
 /* ------------------------------------------------------------------ */
@@ -374,7 +374,7 @@ export default function LobbyScene({
       dpr={[1, 1.5]}
       camera={{ position: CAMERA_POS, fov: 60 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      style={{ background: '#E8EEFB', touchAction: 'none' }}
+      style={{ background: '#F0F4FA', touchAction: 'none' }}
     >
       <Suspense fallback={<CanvasLoader />}>
         <InnerScene
