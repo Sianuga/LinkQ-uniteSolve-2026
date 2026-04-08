@@ -34,6 +34,9 @@ _collection = None
 try:
     from sentence_transformers import SentenceTransformer
     import chromadb
+    # Suppress noisy chromadb telemetry warnings
+    import os
+    os.environ.setdefault("ANONYMIZED_TELEMETRY", "false")
 except Exception:
     _HAS_ML = False
     logger.warning(
@@ -328,7 +331,7 @@ class EmbeddingService:
             logger.warning("Could not fetch embedding for %s", query_id)
             return 0.0
 
-        if not result_a["embeddings"] or len(result_a["embeddings"]) == 0:
+        if result_a["embeddings"] is None or len(result_a["embeddings"]) == 0:
             return 0.0
 
         query_embedding = result_a["embeddings"][0]

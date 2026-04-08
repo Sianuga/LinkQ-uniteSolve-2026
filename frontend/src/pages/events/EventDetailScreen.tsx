@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, MapPin, Clock, Users } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Users, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui';
 import { mockEvents } from '@/data/mockData';
 import type { EventCategory } from '@/types';
@@ -120,18 +120,37 @@ export default function EventDetailScreen() {
           </div>
         </div>
 
-        {/* ---- Action buttons ---- */}
-        <div className="flex gap-3 pt-1">
+        {/* ---- Join button ---- */}
+        <div className="pt-1">
           <Button
             variant={joined ? 'secondary' : 'primary'}
-            className="flex-1"
+            className="w-full"
             onClick={() => setJoined((prev) => !prev)}
           >
             {joined ? 'Joined \u2713' : 'Join Event'}
           </Button>
+        </div>
+
+        {/* ---- Match Me / I Have a Team ---- */}
+        <div className="flex gap-3 pt-2">
           <Link to={`/events/${event.id}/lobby`} className="flex-1">
-            <Button variant="secondary" className="w-full">
-              Enter Lobby
+            <Button
+              variant="primary"
+              size="lg"
+              className="w-full bg-gradient-to-r from-primary to-secondary text-white font-bold text-base shadow-md"
+            >
+              <Sparkles className="h-5 w-5" />
+              Match Me
+            </Button>
+          </Link>
+          <Link to={`/events/${event.id}/groups`} className="flex-1">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="w-full font-bold text-base"
+            >
+              <Users className="h-5 w-5" />
+              I Have a Team
             </Button>
           </Link>
         </div>
