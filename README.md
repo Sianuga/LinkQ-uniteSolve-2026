@@ -1,8 +1,8 @@
-# LinkQ — Student Event Connection Platform
+# NEXUS - Network for EXploration, Unity and Study
 
-Turn your calendar into your network. An event-centric platform connecting international students through shared academic events, courses, and interests.
+_Start anywhere. Belong everywhere._ 
 
-**Competition:** uniteSolve 2026
+A student platform that connects peers through shared academic contexts and events, enabling them to discover who’s attending, connect in advance, and form meaningful study groups. It is designed to support integration, especially for international and new students, by turning everyday campus activities into **opportunities for connection.** Made
 
 ## Quick Start
 
@@ -16,7 +16,7 @@ npm run dev
 
 Opens at `http://localhost:5173`. Use `demo@tu-darmstadt.de` with any password to skip onboarding and see the full app with mock data.
 
-### Backend (FastAPI + ChromaDB) — Coming Soon
+### Backend (FastAPI + ChromaDB)
 
 ```bash
 cd backend
