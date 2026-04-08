@@ -75,7 +75,7 @@ const EventLobby = lazy(() => import('@/pages/lobby/EventLobbyScreen'));
 
 // H — Utility
 const Notifications = lazy(() => import('@/pages/utility/NotificationsScreen'));
-const Settings = lazy(() => import('@/pages/utility/SettingsScreen').then(m => ({ default: m.SettingsScreen })));
+const Settings = lazy(() => import('@/pages/utility/SettingsScreen'));
 
 // ---------------------------------------------------------------------------
 // App — route tree

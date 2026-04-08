@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Plus, Users, UserPlus } from 'lucide-react';
-import { Button, Card } from '@/components/ui';
+import { ArrowLeft, Users } from 'lucide-react';
+import { Card } from '@/components/ui';
 import { mockGroups } from '@/data/mockData';
 import type { Group } from '@/types';
 
@@ -22,7 +22,9 @@ export default function EventGroupsScreen({
   eventId,
 }: EventGroupsScreenProps) {
   const params = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const resolvedEventId = eventId ?? params.id;
+  const isStandalone = !eventId; // Rendered via direct route, not as embedded tab
 
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
 
@@ -44,8 +46,22 @@ export default function EventGroupsScreen({
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Groups are formed through matchmaking — no manual create/join */}
+    <div className="flex flex-col gap-4 pb-24">
+      {/* Header — only when accessed directly (not as embedded tab) */}
+      {isStandalone && (
+        <div className="sticky top-0 z-20 flex items-center gap-3 bg-background px-4 py-3 border-b border-border">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-highlight"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-5 w-5 text-text-primary" />
+          </button>
+          <h2 className="text-lg font-semibold text-text-primary">Event Groups</h2>
+        </div>
+      )}
+
       <p className="text-xs text-text-secondary text-center px-4">
         Groups are formed through the Match Me feature. Browse existing teams below.
       </p>
