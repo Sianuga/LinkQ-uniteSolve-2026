@@ -269,7 +269,7 @@ export const mockUsers: User[] = [
   },
   {
     id: 'user_007',
-    name: 'THE ORANGE',
+    name: 'Miracle the Crazy Nigerian',
     email: 'emmanuel.okafor@stud.tu-darmstadt.de',
     university: 'TU Darmstadt',
     program: 'M.Sc. IT Security',
@@ -645,7 +645,7 @@ export const mockNotifications: Notification[] = [
     id: 'notif_003',
     type: 'new_match',
     title: 'New Match!',
-    body: 'You and THE ORANGE share 3 interests. Say hi!',
+    body: 'You and Miracle the Crazy Nigerian share 3 interests. Say hi!',
     read: false,
     timestamp: '2026-04-07T22:15:00+02:00',
     link: '/users/user_007',
@@ -745,7 +745,7 @@ export const mockGroups: Group[] = [
     members: [
       { id: 'user_001', name: 'Akira Tanaka', university: 'TU Darmstadt', program: 'M.Sc. Computer Science', avatar: 'anime_girl' },
       { id: 'user_009', name: 'Yusuf Demir', university: 'TU Darmstadt', program: 'B.Sc. Computer Science', avatar: 'bland_normal_guy' },
-      { id: 'user_007', name: 'THE ORANGE', university: 'TU Darmstadt', program: 'M.Sc. IT Security', avatar: 'buff_arnold' },
+      { id: 'user_007', name: 'Miracle the Crazy Nigerian', university: 'TU Darmstadt', program: 'M.Sc. IT Security', avatar: 'buff_arnold' },
     ],
   },
   {
@@ -821,7 +821,7 @@ export const mockMatches: MatchCandidate[] = [
   },
   {
     user_id: 'user_007',
-    name: 'THE ORANGE',
+    name: 'Miracle the Crazy Nigerian',
     avatar: 'buff_arnold',
     match_score: 0.78,
     shared: { events: 2, interests: 2 },

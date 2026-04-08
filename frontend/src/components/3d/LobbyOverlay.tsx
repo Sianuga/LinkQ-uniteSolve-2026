@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion';
 import {
   ArrowLeft,
@@ -45,6 +45,7 @@ export interface LobbyOverlayProps {
   onFocusDot: (index: number) => void;
   onChat?: () => void;
   onSettings?: () => void;
+  onEmote?: (emoji: string) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -156,35 +157,192 @@ function CarouselDots({
   );
 }
 
-/** Action buttons (bottom-right): chat, emote (decorative), settings */
+/* ------------------------------------------------------------------ */
+/*  Emote picker                                                       */
+/* ------------------------------------------------------------------ */
+
+const EMOTE_LIST = [
+  '\u{1F44B}', // wave
+  '\u{1F389}', // party
+  '\u{1F525}', // fire
+  '\u{2764}\u{FE0F}', // heart
+  '\u{1F602}', // joy
+  '\u{1F91D}', // handshake
+  '\u{1F4AA}', // flex
+  '\u{1F393}', // grad cap
+  '\u{2B50}', // star
+] as const;
+
+const emotePickerVariants = {
+  hidden: { opacity: 0, scale: 0.85 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: 'spring', damping: 22, stiffness: 400 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.85,
+    transition: { duration: 0.15, ease: 'easeIn' },
+  },
+};
+
+const emoteNotifVariants = {
+  hidden: { opacity: 0, y: -12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.2, ease: 'easeOut' },
+  },
+  exit: {
+    opacity: 0,
+    y: -12,
+    transition: { duration: 0.2, ease: 'easeIn' },
+  },
+};
+
+/** Floating emote notification pill at the top of the screen */
+function EmoteNotification({ emoji }: { emoji: string | null }) {
+  return (
+    <AnimatePresence>
+      {emoji && (
+        <motion.div
+          key={emoji + Date.now()}
+          variants={emoteNotifVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className="pointer-events-none absolute left-1/2 top-16 z-30 -translate-x-1/2
+                     rounded-full bg-white/95 px-4 py-2 shadow-lg backdrop-blur-md
+                     border border-border"
+        >
+          <span className="text-sm font-semibold text-text-primary">
+            {emoji} sent!
+          </span>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/** 3x3 grid popup with emote buttons */
+function EmotePicker({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (emoji: string) => void;
+  onClose: () => void;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close on click outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    }
+    // Defer listener to avoid closing immediately from the same click
+    const id = requestAnimationFrame(() => {
+      document.addEventListener('mousedown', handleClick);
+    });
+    return () => {
+      cancelAnimationFrame(id);
+      document.removeEventListener('mousedown', handleClick);
+    };
+  }, [onClose]);
+
+  return (
+    <motion.div
+      ref={containerRef}
+      variants={emotePickerVariants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      style={{ transformOrigin: 'bottom right' }}
+      className="absolute bottom-full right-0 mb-2 grid grid-cols-3 gap-1
+                 rounded-2xl border border-border bg-white p-2 shadow-lg"
+    >
+      {EMOTE_LIST.map((emoji) => (
+        <button
+          key={emoji}
+          type="button"
+          onClick={() => onSelect(emoji)}
+          className="flex h-11 w-11 items-center justify-center rounded-xl text-xl
+                     transition-colors hover:bg-highlight active:scale-95"
+          aria-label={`Send ${emoji}`}
+        >
+          {emoji}
+        </button>
+      ))}
+    </motion.div>
+  );
+}
+
+/** Action buttons (bottom-right): chat, emote, settings */
 function MiscIcons({
   onChat,
   onSettings,
+  onEmote,
 }: {
   onChat?: () => void;
   onSettings?: () => void;
+  onEmote?: (emoji: string) => void;
 }) {
+  const [showEmotes, setShowEmotes] = useState(false);
+
+  const handleEmoteSelect = useCallback(
+    (emoji: string) => {
+      setShowEmotes(false);
+      onEmote?.(emoji);
+    },
+    [onEmote],
+  );
+
   const items = [
     { Icon: MessageCircle, label: 'Open messages', onClick: onChat },
-    { Icon: Smile, label: 'Emote', onClick: undefined },
+    {
+      Icon: Smile,
+      label: 'Emote',
+      onClick: () => setShowEmotes((prev) => !prev),
+    },
     { Icon: Settings, label: 'Open settings', onClick: onSettings },
   ] as const;
 
   return (
     <div className="flex items-center gap-2">
       {items.map(({ Icon, label, onClick }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={onClick}
-          className="flex h-10 w-10 items-center justify-center rounded-full
-                     bg-highlight text-text-secondary hover:bg-border transition-colors"
-          aria-label={label}
-          aria-hidden={!onClick}
-          tabIndex={onClick ? 0 : -1}
-        >
-          <Icon className="h-[18px] w-[18px]" />
-        </button>
+        <div key={label} className="relative">
+          <button
+            type="button"
+            onClick={onClick}
+            className={`flex h-10 w-10 items-center justify-center rounded-full
+                       transition-colors ${
+                         label === 'Emote' && showEmotes
+                           ? 'bg-primary text-white'
+                           : 'bg-highlight text-text-secondary hover:bg-border'
+                       }`}
+            aria-label={label}
+            aria-expanded={label === 'Emote' ? showEmotes : undefined}
+          >
+            <Icon className="h-[18px] w-[18px]" />
+          </button>
+
+          {/* Emote picker popup (only on the Smile button) */}
+          {label === 'Emote' && (
+            <AnimatePresence>
+              {showEmotes && (
+                <EmotePicker
+                  onSelect={handleEmoteSelect}
+                  onClose={() => setShowEmotes(false)}
+                />
+              )}
+            </AnimatePresence>
+          )}
+        </div>
       ))}
     </div>
   );
@@ -208,8 +366,33 @@ export default function LobbyOverlay({
   onFocusDot,
   onChat,
   onSettings,
+  onEmote,
 }: LobbyOverlayProps) {
   const focused = characters[focusIndex] ?? null;
+
+  /* ---- Emote notification state ---- */
+  const [emoteNotif, setEmoteNotif] = useState<string | null>(null);
+  const emoteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEmote = useCallback(
+    (emoji: string) => {
+      // Clear any existing timer
+      if (emoteTimerRef.current) clearTimeout(emoteTimerRef.current);
+      // Show notification
+      setEmoteNotif(emoji);
+      emoteTimerRef.current = setTimeout(() => setEmoteNotif(null), 2000);
+      // Notify parent
+      onEmote?.(emoji);
+    },
+    [onEmote],
+  );
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (emoteTimerRef.current) clearTimeout(emoteTimerRef.current);
+    };
+  }, []);
 
   /* ---- Drag-to-dismiss handler ---- */
   const handleDragEnd = useCallback(
@@ -223,6 +406,11 @@ export default function LobbyOverlay({
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col">
+      {/* ============================================================== */}
+      {/* EMOTE NOTIFICATION (floating pill at top)                      */}
+      {/* ============================================================== */}
+      <EmoteNotification emoji={emoteNotif} />
+
       {/* ============================================================== */}
       {/* TOP BAR                                                        */}
       {/* ============================================================== */}
@@ -305,7 +493,7 @@ export default function LobbyOverlay({
         {/* ---- Bottom row: party badge | misc icons ---- */}
         <div className="pointer-events-auto flex items-center justify-between">
           <PartyBadge count={partyCount} capacity={partyCapacity} />
-          <MiscIcons onChat={onChat} onSettings={onSettings} />
+          <MiscIcons onChat={onChat} onSettings={onSettings} onEmote={handleEmote} />
         </div>
       </div>
 

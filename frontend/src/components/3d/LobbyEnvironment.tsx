@@ -63,41 +63,51 @@ const bgFragmentShader = /* glsl */ `
 
   void main() {
     vec2 uv = vUv;
-    // Aspect-correct coordinates
-    vec2 p = uv * 4.0;
+    vec2 p = uv * 3.0; // Larger cells, more visible
 
-    // Layer 1: Voronoi cells — soft organic shapes
-    float v = voronoi(p + uTime * 0.02);
-    float v2 = voronoi(p * 1.5 + vec2(5.0) + uTime * 0.015);
+    // Voronoi cells
+    float v = voronoi(p + uTime * 0.03);
+    float v2 = voronoi(p * 1.8 + vec2(5.0) + uTime * 0.02);
 
-    // Layer 2: Perlin noise for soft variation
-    float n = noise(p * 2.0 + uTime * 0.05) * 0.5 + 0.5;
-    float n2 = noise(p * 0.8 - uTime * 0.03) * 0.5 + 0.5;
+    // Perlin noise
+    float n = noise(p * 1.5 + uTime * 0.06) * 0.5 + 0.5;
+    float n2 = noise(p * 0.6 - uTime * 0.04) * 0.5 + 0.5;
 
-    // Combine: voronoi edges + noise clouds
-    float pattern = smoothstep(0.0, 0.08, v) * 0.3 + v * 0.2;
-    pattern += smoothstep(0.0, 0.1, v2) * 0.15;
-    pattern += n * 0.15 + n2 * 0.1;
+    // Colors
+    vec3 white = vec3(0.96, 0.97, 0.99);
+    vec3 blue = vec3(0.118, 0.227, 0.541);       // #1E3A8A
+    vec3 lightBlue = vec3(0.576, 0.773, 0.992);   // #93C5FD
+    vec3 midBlue = vec3(0.231, 0.510, 0.965);     // #3B82F6
 
-    // Base white
-    vec3 white = vec3(0.96, 0.97, 0.98);
-    // Subtle academic blue accent
-    vec3 blue = vec3(0.118, 0.227, 0.541); // #1E3A8A
-    vec3 lightBlue = vec3(0.576, 0.773, 0.992); // #93C5FD
+    // Voronoi edge factors — thicker, more visible edges
+    float edge1 = 1.0 - smoothstep(0.0, 0.12, v);
+    float edge2 = 1.0 - smoothstep(0.0, 0.15, v2);
 
-    // Mix: mostly white, with very subtle blue in voronoi edges
-    float edgeFactor = 1.0 - smoothstep(0.0, 0.06, v);
-    float edgeFactor2 = 1.0 - smoothstep(0.0, 0.08, v2);
+    // Radial gradient: center is lighter, edges are more blue
+    float radial = length(uv - 0.5);
+    float gradientBlue = smoothstep(0.1, 0.7, radial);
 
+    // Start with white
     vec3 color = white;
-    // Add subtle blue veins at voronoi cell boundaries
-    color = mix(color, lightBlue, edgeFactor * 0.12);
-    color = mix(color, blue, edgeFactor2 * 0.04);
-    // Add very soft blue clouds from noise
-    color = mix(color, lightBlue, n * 0.04);
 
-    // Slight radial vignette (center brighter)
-    float vignette = 1.0 - length(vUv - 0.5) * 0.3;
+    // Strong blue gradient toward edges
+    color = mix(color, lightBlue, gradientBlue * 0.35);
+    color = mix(color, midBlue, gradientBlue * gradientBlue * 0.15);
+
+    // Visible blue veins at voronoi boundaries
+    color = mix(color, lightBlue, edge1 * 0.4);
+    color = mix(color, midBlue, edge2 * 0.2);
+
+    // Blue noise clouds — clearly visible
+    color = mix(color, lightBlue, n * 0.15);
+    color = mix(color, midBlue, n2 * n2 * 0.1);
+
+    // Bright spots inside some cells
+    float cellBright = smoothstep(0.3, 0.6, v) * n;
+    color = mix(color, white, cellBright * 0.2);
+
+    // Slight vignette
+    float vignette = 1.0 - radial * 0.25;
     color *= vignette;
 
     gl_FragColor = vec4(color, 1.0);

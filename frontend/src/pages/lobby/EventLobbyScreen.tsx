@@ -196,7 +196,7 @@ export default function EventLobbyScreen() {
         onDismiss={() => setSelectedCharacterId(null)}
         onListView={() => setShowListView(true)}
         onFocusDot={(i) => setFocusIndex(i)}
-        onChat={() => navigate('/messages')}
+        onChat={() => navigate('/messages/conv_001')}
         onSettings={() => navigate('/settings')}
       />
 
