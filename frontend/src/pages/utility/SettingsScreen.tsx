@@ -69,7 +69,7 @@ function Divider() {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function SettingsScreen() {
+export default function SettingsScreen() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 

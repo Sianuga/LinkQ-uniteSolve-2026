@@ -74,8 +74,8 @@ export function SplashScreen() {
           {/* Logo / App name */}
           <motion.div variants={childVariants} className="mb-4">
             <h1 className="text-6xl font-extrabold tracking-tight text-white sm:text-7xl">
-              Link
-              <span className="text-accent">Q</span>
+              Nex
+              <span className="text-accent">us</span>
             </h1>
           </motion.div>
 

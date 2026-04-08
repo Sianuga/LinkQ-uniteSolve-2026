@@ -71,7 +71,7 @@ const matchScoreMap: Record<string, number> = {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function ChatScreen() {
+export default function ChatScreen() {
   const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
 
