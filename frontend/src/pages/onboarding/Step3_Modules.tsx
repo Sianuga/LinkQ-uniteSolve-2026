@@ -35,7 +35,7 @@ export default function Step3_Modules() {
     setTimeout(() => setPhase('done'), 2200);
   };
 
-  const goNext = () => navigate('/onboarding/avatar');
+  const goNext = () => navigate('/onboarding/about');
 
   return (
     <div className="flex flex-col h-full">
@@ -266,7 +266,7 @@ export default function Step3_Modules() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent"
+          className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent"
         >
           <Button size="lg" className="w-full" onClick={goNext}>
             Continue

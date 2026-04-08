@@ -96,7 +96,7 @@ export default function Step5_Preferences() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <div className="text-center space-y-2 mb-6">
         <motion.div
@@ -341,7 +341,7 @@ export default function Step5_Preferences() {
       <div className="flex-1" />
 
       {/* Continue */}
-      <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent">
         {(selectedSlots.size > 0 || studyStyle) && (
           <div className="mb-2 flex items-center justify-center">
             <span className="inline-flex items-center gap-2 rounded-full bg-surface border border-border px-3 py-1.5 text-xs font-semibold text-text-primary">
@@ -362,7 +362,7 @@ export default function Step5_Preferences() {
       </div>
 
       {/* Reserve space so sticky footer never overlays content */}
-      <div aria-hidden className="h-28" />
+      <div aria-hidden className="h-24" />
     </div>
   );
 }

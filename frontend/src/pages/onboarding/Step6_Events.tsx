@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
 import type { EventCategory } from '@/types';
+import eventImage from '@/assets/event.png';
 
 /* ------------------------------------------------------------------ */
 /*  Fake event data                                                    */
@@ -40,7 +41,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 142,
     category: 'lecture',
     emoji: '\u{1F4BB}',
-    image_url: 'https://source.unsplash.com/featured/800x600?lecture-hall,university',
+    image_url: eventImage,
   },
   {
     id: 'evt_2',
@@ -51,7 +52,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 56,
     category: 'seminar',
     emoji: '\u{1F916}',
-    image_url: 'https://source.unsplash.com/featured/800x600?workshop,students,laptop',
+    image_url: eventImage,
   },
   {
     id: 'evt_3',
@@ -62,7 +63,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 230,
     category: 'hackathon',
     emoji: '\u{1F680}',
-    image_url: 'https://source.unsplash.com/featured/800x600?hackathon,programming,team',
+    image_url: eventImage,
   },
   {
     id: 'evt_4',
@@ -73,7 +74,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 85,
     category: 'social',
     emoji: '\u{1F389}',
-    image_url: 'https://source.unsplash.com/featured/800x600?friends,cafe,students',
+    image_url: eventImage,
   },
   {
     id: 'evt_5',
@@ -84,7 +85,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 38,
     category: 'seminar',
     emoji: '\u{1F9E0}',
-    image_url: 'https://source.unsplash.com/featured/800x600?seminar,university,classroom',
+    image_url: eventImage,
   },
   {
     id: 'evt_6',
@@ -95,7 +96,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 24,
     category: 'club',
     emoji: '\u{1F980}',
-    image_url: 'https://source.unsplash.com/featured/800x600?coding,meetup,developer',
+    image_url: eventImage,
   },
   {
     id: 'evt_7',
@@ -106,7 +107,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 310,
     category: 'social',
     emoji: '\u{1F4BC}',
-    image_url: 'https://source.unsplash.com/featured/800x600?career-fair,conference,people',
+    image_url: eventImage,
   },
   {
     id: 'evt_8',
@@ -117,7 +118,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 32,
     category: 'lecture',
     emoji: '\u{1F441}\u{FE0F}',
-    image_url: 'https://source.unsplash.com/featured/800x600?computer-vision,lab,university',
+    image_url: eventImage,
   },
   {
     id: 'evt_9',
@@ -128,7 +129,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 18,
     category: 'club',
     emoji: '\u{1F310}',
-    image_url: 'https://source.unsplash.com/featured/800x600?open-source,workspace,laptop',
+    image_url: eventImage,
   },
   {
     id: 'evt_10',
@@ -139,7 +140,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 12,
     category: 'seminar',
     emoji: '\u{1F4D0}',
-    image_url: 'https://source.unsplash.com/featured/800x600?study-group,library,students',
+    image_url: eventImage,
   },
 ];
 
@@ -326,7 +327,7 @@ export default function Step6_Events() {
         )}
 
         {/* Event grid */}
-        <div className="flex-1 overflow-y-auto pb-24 space-y-2.5">
+        <div className="flex-1 space-y-2.5">
           {filteredEvents.map((event, i) => {
             const isSelected = selectedEvents.has(event.id);
 
@@ -421,7 +422,7 @@ export default function Step6_Events() {
         </div>
 
         {/* Submit button */}
-        <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+        <div className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent">
           <Button
             size="lg"
             className="w-full"
@@ -436,7 +437,7 @@ export default function Step6_Events() {
         </div>
 
         {/* Reserve space so sticky footer never overlays content */}
-        <div aria-hidden className="h-28" />
+        <div aria-hidden className="h-24" />
       </div>
 
       {/* ---- Celebration overlay ---- */}

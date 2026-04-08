@@ -255,7 +255,28 @@ export default function Step4_About() {
 
       {/* Tab bar */}
       <div className="mb-5 -mx-4 px-4">
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+        {/* Mobile: dropdown selector */}
+        <div className="sm:hidden">
+          <label className="text-xs font-semibold text-text-secondary tracking-wide uppercase">
+            Section
+          </label>
+          <div className="mt-2 rounded-[var(--radius-lg)] border border-border bg-surface p-3 shadow-sm">
+            <select
+              value={activeTab}
+              onChange={(e) => setActiveTab(e.target.value as TabId)}
+              className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-3 text-base text-text-primary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+            >
+              {TABS.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.label}{tabCompletions[t.id] ? ' ✓' : ''}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Tablet/Desktop: chips */}
+        <div className="hidden sm:flex gap-2 overflow-x-auto scrollbar-hide py-1">
           {TABS.map((tab) => (
             <button
               key={tab.id}
@@ -290,7 +311,7 @@ export default function Step4_About() {
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto pb-6">
+      <div className="flex-1 pb-6">
         <AnimatePresence mode="wait">
           {activeTab === 'profile' && (
             <motion.div
@@ -503,11 +524,11 @@ export default function Step4_About() {
         </AnimatePresence>
 
         {/* Reserve space so sticky footer never overlays content */}
-        <div aria-hidden className="h-32" />
+        <div aria-hidden className="h-24" />
       </div>
 
       {/* Continue */}
-      <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent">
         {!canContinue && (
           <p className="text-xs text-text-secondary text-center mb-2">
             Complete Profile + add at least 1 Interest, Skill, or Goal to continue

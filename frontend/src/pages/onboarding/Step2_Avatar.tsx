@@ -128,7 +128,7 @@ export default function Step2_Avatar() {
       <div className="flex-1" />
 
       {/* Continue */}
-      <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent">
         <Button
           size="lg"
           className="w-full"
@@ -172,7 +172,6 @@ function AvatarCard({
       ].join(' ')}
       style={{
         borderColor: isSelected ? avatar.color : undefined,
-        ringColor: avatar.color,
         ['--tw-ring-color' as string]: avatar.color,
       }}
     >
