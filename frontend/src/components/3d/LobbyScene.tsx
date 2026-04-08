@@ -115,8 +115,7 @@ function SwipeHandler({
 
       if (absMx > 25 || absVx > 0.3) {
         const direction: 'left' | 'right' = mx < 0 ? 'right' : 'left';
-        const skip = absVx > 1.0 ? 2 : 1;
-        onSwipe(direction, skip);
+        onSwipe(direction, 1); // Always move exactly 1 character
         navigator.vibrate?.(10);
       }
     },
@@ -169,28 +168,46 @@ function CharacterSpotlight({ isFocused }: { isFocused: boolean }) {
 /*  AnimatedSlot — lerps position and scale each frame                 */
 /* ------------------------------------------------------------------ */
 
+// Off-screen entry positions for new characters sliding in
+const ENTRY_LEFT: [number, number, number] = [-4.0, 0, -0.5];
+const ENTRY_RIGHT: [number, number, number] = [4.0, 0, -0.5];
+
 function AnimatedSlot({
   targetPos,
   targetScale,
+  slot,
   children,
 }: {
   targetPos: readonly [number, number, number];
   targetScale: number;
+  slot: 'left' | 'center' | 'right';
   children: React.ReactNode;
 }) {
   const ref = useRef<THREE.Group>(null);
+  const initialized = useRef(false);
 
   useFrame(() => {
     if (!ref.current) return;
-    ref.current.position.x = lerp(ref.current.position.x, targetPos[0], 0.07);
-    ref.current.position.y = lerp(ref.current.position.y, targetPos[1], 0.07);
-    ref.current.position.z = lerp(ref.current.position.z, targetPos[2], 0.07);
-    const s = lerp(ref.current.scale.x, targetScale, 0.07);
+
+    // On first mount, snap to entry position (off-screen) so it slides in
+    if (!initialized.current) {
+      initialized.current = true;
+      const entry = slot === 'left' ? ENTRY_LEFT : slot === 'right' ? ENTRY_RIGHT : targetPos;
+      ref.current.position.set(entry[0], entry[1], entry[2]);
+      ref.current.scale.setScalar(targetScale * 0.5);
+    }
+
+    // Smooth lerp toward target — this creates the sliding animation
+    const speed = 0.08;
+    ref.current.position.x = lerp(ref.current.position.x, targetPos[0], speed);
+    ref.current.position.y = lerp(ref.current.position.y, targetPos[1], speed);
+    ref.current.position.z = lerp(ref.current.position.z, targetPos[2], speed);
+    const s = lerp(ref.current.scale.x, targetScale, speed);
     ref.current.scale.setScalar(s);
   });
 
   return (
-    <group ref={ref} position={[targetPos[0], targetPos[1], targetPos[2]]}>
+    <group ref={ref}>
       {children}
     </group>
   );
@@ -253,6 +270,7 @@ function CarouselGroup({
             key={char.userId}
             targetPos={slotDef.pos}
             targetScale={slotDef.scale}
+            slot={slot}
           >
             <LobbyCharacter
               userId={char.userId}
