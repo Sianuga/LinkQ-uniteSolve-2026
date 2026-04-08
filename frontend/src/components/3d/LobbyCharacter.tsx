@@ -388,7 +388,11 @@ function useClonedModel(path: string, targetHeight = 1.8) {
   const { scene } = useGLTF(path);
   const cloned = useMemo(() => {
     const c = scene.clone(true);
-    // Compute bounding box to center and scale the model
+
+    // Force-update world matrices so Box3 computes correctly
+    c.updateMatrixWorld(true);
+
+    // Compute world-space bounding box
     const box = new THREE.Box3().setFromObject(c);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
@@ -396,12 +400,18 @@ function useClonedModel(path: string, targetHeight = 1.8) {
     // Scale so the model is approximately targetHeight tall
     const currentHeight = size.y;
     const s = currentHeight > 0 ? targetHeight / currentHeight : 1;
-    c.scale.setScalar(s);
 
-    // Re-center: shift so the bottom sits at y=0 and x/z are centered
-    c.position.set(-center.x * s, -box.min.y * s, -center.z * s);
+    // Wrap in a container group so we can offset without fighting the scene graph
+    const wrapper = new THREE.Group();
+    wrapper.add(c);
 
-    return c;
+    // Scale the wrapper
+    wrapper.scale.setScalar(s);
+
+    // Offset the inner scene so center-bottom is at origin
+    c.position.set(-center.x, -box.min.y, -center.z);
+
+    return wrapper;
   }, [scene, targetHeight]);
   return <primitive object={cloned} />;
 }
@@ -466,9 +476,10 @@ const HEAD_Y: Record<AvatarType, number> = {
 // ---------------------------------------------------------------------------
 
 function scoreColor(score: number): string {
-  if (score >= 80) return '#22c55e';
-  if (score >= 60) return '#eab308';
-  if (score >= 40) return '#f97316';
+  const pct = score <= 1 ? score * 100 : score;
+  if (pct >= 80) return '#22c55e';
+  if (pct >= 60) return '#eab308';
+  if (pct >= 40) return '#f97316';
   return '#ef4444';
 }
 
@@ -530,7 +541,7 @@ function FloatingLabel({
             lineHeight: '18px',
           }}
         >
-          {matchScore}%
+          {matchScore <= 1 ? Math.round(matchScore * 100) : matchScore}%
         </span>
       </div>
     </Html>

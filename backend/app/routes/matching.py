@@ -100,8 +100,9 @@ async def find_matches(
         0,
         description="(groups only) How many people the group still needs",
     ),
-    current_user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ) -> MatchResponse:
+    current_user_id = current_user["id"]
     # ---- Validate event ----
     if event_id not in db.events:
         raise HTTPException(
