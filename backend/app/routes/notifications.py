@@ -1,4 +1,4 @@
-"""Notification routes for LinkQ API.
+"""Notification routes for Nexus API.
 
 Endpoints:
   GET    /notifications        -- list notifications for current user

@@ -1,4 +1,4 @@
--- LinkQ SQLite Schema
+-- Nexus SQLite Schema
 
 PRAGMA journal_mode=WAL;
 PRAGMA foreign_keys=ON;

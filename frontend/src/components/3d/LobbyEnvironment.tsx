@@ -12,8 +12,6 @@ const BG_COLOR = "#0a0a1a";
 const PARTICLE_COUNT = 50;
 const PARTICLE_RADIUS = 5;
 const PARTICLE_HEIGHT = 4;
-const FLOOR_WIDTH = 20;
-const FLOOR_DEPTH = 8;
 
 // ---------------------------------------------------------------------------
 // Floating Particles — pre-computed at module scope (pure)
@@ -104,13 +102,13 @@ function FloatingParticles() {
 // ---------------------------------------------------------------------------
 
 function FloorGridLines() {
-  const zOffsets = [-2.5, -0.8, 0.8, 2.5];
+  const zOffsets = [-1.5, -0.5, 0.5, 1.5];
 
   return (
     <group position-y={0.005}>
       {zOffsets.map((z) => (
         <mesh key={z} position={[0, 0, z]} rotation-x={-Math.PI / 2}>
-          <planeGeometry args={[FLOOR_WIDTH, 0.01]} />
+          <planeGeometry args={[6, 0.01]} />
           <meshBasicMaterial
             color="#1E3A8A"
             transparent
@@ -141,7 +139,7 @@ function GlowStrip() {
 
   return (
     <mesh ref={meshRef} rotation-x={-Math.PI / 2} position-y={0.01} position-z={0}>
-      <planeGeometry args={[FLOOR_WIDTH * 0.9, 0.04]} />
+      <planeGeometry args={[6, 0.04]} />
       <meshStandardMaterial
         color="#000000"
         emissive="#3B82F6"
@@ -169,9 +167,9 @@ function ReflectiveFloor() {
     mat.emissiveIntensity = 0.6 + 0.3 * Math.sin(t * 0.8);
   });
 
-  const MAIN_RADIUS = 6;
-  const MAIN_HEIGHT = 0.8;
-  const BASE_RADIUS = 6.5;
+  const MAIN_RADIUS = 3.5;
+  const MAIN_HEIGHT = 0.6;
+  const BASE_RADIUS = 4.0;
   const BASE_HEIGHT = 0.15;
   const RIM_INNER = MAIN_RADIUS - 0.06;
   const RIM_OUTER = MAIN_RADIUS + 0.06;

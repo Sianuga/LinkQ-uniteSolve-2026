@@ -1,5 +1,5 @@
 """
-LinkQ Matching Engine
+Nexus Matching Engine
 =====================
 Core matching service using ChromaDB for vector storage and sentence-transformers
 for semantic embedding. Combines cosine similarity on semantic segments with
@@ -157,7 +157,7 @@ class EmbeddingService:
         # Single collection with metadata filters (segment_type + user_id)
         if _collection is None:
             _collection = self.client.get_or_create_collection(
-                name="linkq_user_segments",
+                name="nexus_user_segments",
                 metadata={"hnsw:space": "cosine"},
             )
         self.collection = _collection

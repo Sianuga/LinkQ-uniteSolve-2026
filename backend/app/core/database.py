@@ -16,7 +16,7 @@ class Database:
 
     def load_seed_data(self) -> None:
         """Load seed data from data/seed/*.json if files exist."""
-        env_seed = os.environ.get("LINKQ_SEED_DIR", "")
+        env_seed = os.environ.get("NEXUS_SEED_DIR", "")
         candidates = [
             *([] if not env_seed else [Path(env_seed)]),   # explicit env var (only if set)
             Path(os.getcwd()).parent / "data" / "seed",    # run from backend/

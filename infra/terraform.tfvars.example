@@ -1,5 +1,5 @@
 aws_region        = "eu-central-1"
-project_name      = "linkq"
+project_name      = "nexus"
 ec2_instance_type = "t3.micro"
 ec2_key_name      = "your-key-pair-name"  # Must exist in AWS already
 ssh_cidr          = "YOUR.IP.HERE/32"     # Lock SSH to your IP

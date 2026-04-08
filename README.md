@@ -1,4 +1,4 @@
-# LinkQ — Student Event Connection Platform
+# Nexus — Student Event Connection Platform
 
 Turn your calendar into your network. An event-centric platform connecting international students through shared academic events, courses, and interests.
 
@@ -76,7 +76,7 @@ Opens at `http://localhost:5173`. Works with mock data if the backend isn't runn
 | State | Zustand + TanStack Query |
 | Backend | FastAPI (Python) |
 | Matching | ChromaDB + sentence-transformers (cosine similarity) |
-| API Spec | `likQ.postman_collection.json` |
+| API Spec | `nexus.postman_collection.json` |
 
 ## Project Structure
 

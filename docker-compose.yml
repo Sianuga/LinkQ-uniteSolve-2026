@@ -6,7 +6,7 @@ services:
     volumes:
       - ./data/seed:/data/seed:ro
     environment:
-      - LINKQ_SECRET_KEY=linkq-docker-secret-key
+      - NEXUS_SECRET_KEY=nexus-docker-secret-key
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 10s

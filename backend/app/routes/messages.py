@@ -1,4 +1,4 @@
-"""Messaging routes for LinkQ API.
+"""Messaging routes for Nexus API.
 
 Endpoints:
   GET   /conversations                   -- list conversations for current user

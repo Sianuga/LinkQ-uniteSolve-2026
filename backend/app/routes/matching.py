@@ -1,5 +1,5 @@
 """
-LinkQ Matching Routes (Enhanced)
+Nexus Matching Routes (Enhanced)
 ================================
 Full matching engine endpoints using ChromaDB + sentence-transformers for
 semantic similarity, combined with Jaccard on categorical data and

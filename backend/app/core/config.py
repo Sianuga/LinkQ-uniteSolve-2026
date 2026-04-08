@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    SECRET_KEY: str = "linkq-secret-key-change-in-production"
+    SECRET_KEY: str = "nexus-secret-key-change-in-production"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
     CHROMA_PERSIST_DIR: str = "./data/chroma"
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
 
     class Config:
-        env_prefix = "LINKQ_"
+        env_prefix = "NEXUS_"
 
 
 settings = Settings()

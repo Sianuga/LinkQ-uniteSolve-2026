@@ -1,5 +1,5 @@
 # ============================================================================
-# LinkQ Deploy — S3/CloudFront (frontend) + EC2/ECR (backend)
+# Nexus Deploy — S3/CloudFront (frontend) + EC2/ECR (backend)
 # ============================================================================
 # Trigger: push to main, or manual dispatch.
 #

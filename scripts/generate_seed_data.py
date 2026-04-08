@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-LinkQ Seed Data Generator
+Nexus Seed Data Generator
 =========================
-Generates realistic seed data for the LinkQ student event connection platform.
+Generates realistic seed data for the Nexus student event connection platform.
 
 Usage:
     cd backend && python ../scripts/generate_seed_data.py
@@ -799,7 +799,7 @@ def save(path: Path, name: str, data):
 
 def main():
     print("=" * 60)
-    print("  LinkQ Seed Data Generator")
+    print("  Nexus Seed Data Generator")
     print("=" * 60)
 
     users = generate_users(100)

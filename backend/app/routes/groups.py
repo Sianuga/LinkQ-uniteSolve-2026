@@ -1,4 +1,4 @@
-"""Group routes for LinkQ API.
+"""Group routes for Nexus API.
 
 Endpoints:
   POST  /groups?event_id=          -- create a group for an event

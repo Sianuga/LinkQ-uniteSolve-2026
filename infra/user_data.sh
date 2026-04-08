@@ -11,7 +11,7 @@ systemctl start docker
 usermod -aG docker ec2-user
 
 # --- Generate a persistent secret key (survives redeploys) ---
-SECRET_FILE="/home/ec2-user/.linkq_secret"
+SECRET_FILE="/home/ec2-user/.nexus_secret"
 if [ ! -f "$SECRET_FILE" ]; then
   openssl rand -hex 32 > "$SECRET_FILE"
   chown ec2-user:ec2-user "$SECRET_FILE"
@@ -25,7 +25,7 @@ set -ex
 REGION="${aws_region}"
 ECR_URL="${ecr_url}"
 CORS_ORIGIN="${cors_origin}"
-SECRET_KEY=$(cat /home/ec2-user/.linkq_secret)
+SECRET_KEY=$(cat /home/ec2-user/.nexus_secret)
 
 # Authenticate to ECR
 aws ecr get-login-password --region "$REGION" | docker login --username AWS --password-stdin "$ECR_URL"
@@ -34,16 +34,16 @@ aws ecr get-login-password --region "$REGION" | docker login --username AWS --pa
 docker pull "$ECR_URL:latest"
 
 # Stop old container (ignore if not running)
-docker stop linkq-backend 2>/dev/null || true
-docker rm linkq-backend 2>/dev/null || true
+docker stop nexus-backend 2>/dev/null || true
+docker rm nexus-backend 2>/dev/null || true
 
 # Start new container
 docker run -d \
-  --name linkq-backend \
+  --name nexus-backend \
   --restart unless-stopped \
   -p 8000:8000 \
-  -e LINKQ_SECRET_KEY="$SECRET_KEY" \
-  -e LINKQ_CORS_ORIGINS="$CORS_ORIGIN,http://localhost:5173,http://localhost:3000" \
+  -e NEXUS_SECRET_KEY="$SECRET_KEY" \
+  -e NEXUS_CORS_ORIGINS="$CORS_ORIGIN,http://localhost:5173,http://localhost:3000" \
   "$ECR_URL:latest"
 
 # Wait for health check
@@ -56,7 +56,7 @@ for i in $(seq 1 30); do
 done
 
 echo "ERROR: Backend failed health check after 60s"
-docker logs linkq-backend
+docker logs nexus-backend
 exit 1
 DEPLOY_SCRIPT
 

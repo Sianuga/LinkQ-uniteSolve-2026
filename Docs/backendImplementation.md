@@ -1,4 +1,4 @@
-# LinkQ Backend Implementation Plan
+# Nexus Backend Implementation Plan
 
 > Full implementation roadmap: SQLite persistence, ChromaDB vector store, seed data, missing endpoints, and frontend wiring.
 > Written 2026-04-08. Based on current codebase audit.
@@ -26,7 +26,7 @@
 
 | Component | File(s) | Status |
 |-----------|---------|--------|
-| **Config** | `app/core/config.py` | Done — Settings via pydantic-settings, env prefix `LINKQ_` |
+| **Config** | `app/core/config.py` | Done — Settings via pydantic-settings, env prefix `NEXUS_` |
 | **Security/JWT** | `app/core/security.py` | Done — bcrypt hashing, JWT encode/decode, `get_current_user` dependency |
 | **Pydantic Schemas** | `app/models/schemas.py` (284 lines) | Done — 30+ models covering all entities |
 | **Auth Routes** | `app/routes/auth.py` (322 lines) | Done — register, login, /me, PATCH /me, /oauth, /onboarding |
@@ -64,7 +64,7 @@
 ### Create `backend/app/main.py`
 
 ```python
-"""LinkQ API — entry point."""
+"""Nexus API — entry point."""
 
 from contextlib import asynccontextmanager
 
@@ -92,7 +92,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="LinkQ API",
+    title="Nexus API",
     description="Event-centric student networking platform",
     version="0.1.0",
     lifespan=lifespan,
@@ -174,7 +174,7 @@ sqlalchemy==2.0.30
 ### 3.2 Database Schema (`backend/app/core/schema.sql`)
 
 ```sql
--- LinkQ SQLite Schema
+-- Nexus SQLite Schema
 -- Run once to initialize the database.
 
 PRAGMA journal_mode=WAL;
@@ -341,7 +341,7 @@ Replace the current in-memory database with an async SQLite wrapper.
 
 ```python
 """
-LinkQ Database — async SQLite persistence layer.
+Nexus Database — async SQLite persistence layer.
 
 Usage:
     from app.core.database import get_db
@@ -356,7 +356,7 @@ import aiosqlite
 from pathlib import Path
 from typing import Any
 
-DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "linkq.db"
+DB_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "nexus.db"
 SCHEMA_PATH = Path(__file__).resolve().parent / "schema.sql"
 
 class Database:
@@ -999,7 +999,7 @@ data/seed/
 # scripts/generate_seed_data.py
 
 """
-Generate seed data for LinkQ.
+Generate seed data for Nexus.
 
 Usage:
     cd backend
@@ -1447,7 +1447,7 @@ const api = axios.create({
 
 // Attach JWT token to every request
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('linkq_token');
+  const token = localStorage.getItem('nexus_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -1459,7 +1459,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('linkq_token');
+      localStorage.removeItem('nexus_token');
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -1474,11 +1474,11 @@ export default api;
 ```typescript
 // Register
 const { data } = await api.post('/auth/register', { name, email, password });
-localStorage.setItem('linkq_token', data.token);
+localStorage.setItem('nexus_token', data.token);
 
 // Login
 const { data } = await api.post('/auth/login', { email, password });
-localStorage.setItem('linkq_token', data.token);
+localStorage.setItem('nexus_token', data.token);
 
 // Get current user
 const { data: user } = await api.get('/me');
@@ -1629,10 +1629,10 @@ backend/
         test_matching.py
         test_seed.py
     data/
-        linkq.db                      ← Created at runtime by SQLite
+        nexus.db                      ← Created at runtime by SQLite
         chroma/                       ← Created at runtime by ChromaDB
     requirements.txt                  (existing, add aiosqlite + test deps)
-    .gitignore                        ← Add data/linkq.db, data/chroma/
+    .gitignore                        ← Add data/nexus.db, data/chroma/
 
 scripts/
     generate_seed_data.py             ← Phase 5 (NEW)
@@ -1674,7 +1674,7 @@ Phase 2 (SQLite) is the largest change and touches every file — do it as a sin
 
 ```gitignore
 # Backend data (generated at runtime)
-backend/data/linkq.db
+backend/data/nexus.db
 backend/data/chroma/
 
 # Python

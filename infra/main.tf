@@ -1,5 +1,5 @@
 # ============================================================================
-# LinkQ Infrastructure — Brutal MVP Deployment
+# Nexus Infrastructure — Brutal MVP Deployment
 # ============================================================================
 # S3 + CloudFront (frontend)  |  EC2 + Docker (backend)  |  ECR (images)
 # No custom VPC, no ALB, no RDS, no Route53. Raw and simple.

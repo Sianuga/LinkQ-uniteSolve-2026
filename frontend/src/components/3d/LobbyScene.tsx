@@ -36,55 +36,50 @@ export interface LobbySceneProps {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const SPACING = 1.4;
+const CAMERA_POS: [number, number, number] = [0, 1.6, 4.5];
+const CAMERA_LOOKAT: [number, number, number] = [0, 0.8, 0];
+const ZOOM_POS: [number, number, number] = [0, 1.4, 3.0];
+const ZOOM_LOOKAT: [number, number, number] = [0, 0.9, 0];
 
-// Overview: camera far back to see all 5 characters on mobile portrait
-const OVERVIEW_POS: [number, number, number] = [0, 2.2, 12];
-const OVERVIEW_LOOKAT: [number, number, number] = [0, 0.8, 0];
-
-// Zoomed: camera close to focused character
-const ZOOM_DISTANCE = 3.0;
-const ZOOM_HEIGHT = 1.5;
-const ZOOM_LOOKAT_Y = 0.9;
+/** Carousel slot positions — only 3 characters visible at a time. */
+const SLOTS = {
+  center: { pos: [0, 0, 0.3] as [number, number, number], scale: 1.0 },
+  left: { pos: [-2.0, 0, -0.5] as [number, number, number], scale: 0.7 },
+  right: { pos: [2.0, 0, -0.5] as [number, number, number], scale: 0.7 },
+};
 
 /* ------------------------------------------------------------------ */
-/*  CameraController — overview (all chars visible) or zoom on select */
+/*  Utility                                                            */
 /* ------------------------------------------------------------------ */
 
-function CameraController({
-  selectedId,
-  focusIndex,
-  characterCount,
-}: {
-  selectedId: string | null;
-  focusIndex: number;
-  characterCount: number;
-}) {
+function lerp(a: number, b: number, t: number): number {
+  return a + (b - a) * t;
+}
+
+/* ------------------------------------------------------------------ */
+/*  CameraController — 2-state: overview or zoomed to center           */
+/* ------------------------------------------------------------------ */
+
+function CameraController({ selectedId }: { selectedId: string | null }) {
   const { camera } = useThree();
-  const targetPos = useRef(new THREE.Vector3(...OVERVIEW_POS));
-  const targetLookAt = useRef(new THREE.Vector3(...OVERVIEW_LOOKAT));
-  const currentPos = useRef(new THREE.Vector3(...OVERVIEW_POS));
-  const currentLookAt = useRef(new THREE.Vector3(...OVERVIEW_LOOKAT));
+  const targetPos = useRef(new THREE.Vector3(...CAMERA_POS));
+  const targetLookAt = useRef(new THREE.Vector3(...CAMERA_LOOKAT));
+  const currentPos = useRef(new THREE.Vector3(...CAMERA_POS));
+  const currentLookAt = useRef(new THREE.Vector3(...CAMERA_LOOKAT));
 
   useEffect(() => {
     if (selectedId) {
-      // Zoom in on the focused character
-      const totalWidth = (characterCount - 1) * SPACING;
-      const charX = -totalWidth / 2 + focusIndex * SPACING;
-      targetPos.current.set(charX, ZOOM_HEIGHT, ZOOM_DISTANCE);
-      targetLookAt.current.set(charX, ZOOM_LOOKAT_Y, 0);
+      targetPos.current.set(...ZOOM_POS);
+      targetLookAt.current.set(...ZOOM_LOOKAT);
     } else {
-      // Overview — see all characters
-      targetPos.current.set(...OVERVIEW_POS);
-      targetLookAt.current.set(...OVERVIEW_LOOKAT);
+      targetPos.current.set(...CAMERA_POS);
+      targetLookAt.current.set(...CAMERA_LOOKAT);
     }
-  }, [selectedId, focusIndex, characterCount]);
+  }, [selectedId]);
 
   useFrame(() => {
-    const speed = 0.06;
-    currentPos.current.lerp(targetPos.current, speed);
-    currentLookAt.current.lerp(targetLookAt.current, speed);
-
+    currentPos.current.lerp(targetPos.current, 0.06);
+    currentLookAt.current.lerp(targetLookAt.current, 0.06);
     camera.position.copy(currentPos.current);
     camera.lookAt(currentLookAt.current);
   });
@@ -93,19 +88,17 @@ function CameraController({
 }
 
 /* ------------------------------------------------------------------ */
-/*  SwipeHandler — horizontal drag on the canvas to change focus       */
+/*  SwipeHandler — horizontal drag on the canvas to cycle carousel     */
 /* ------------------------------------------------------------------ */
 
 function SwipeHandler({
   characterCount,
   focusIndex,
   onSwipe,
-  onOverscroll,
 }: {
   characterCount: number;
   focusIndex: number;
   onSwipe: (direction: 'left' | 'right', skip: number) => void;
-  onOverscroll: (offset: number) => void;
 }) {
   const { gl } = useThree();
 
@@ -114,17 +107,7 @@ function SwipeHandler({
       if (tap) return;
       if (last && Math.abs(mx) < 10 && elapsed < 300) return;
 
-      if (!last) {
-        const atStart = focusIndex === 0 && mx > 0;
-        const atEnd = focusIndex === characterCount - 1 && mx < 0;
-        if (atStart || atEnd) {
-          const rubberBand = Math.sign(mx) * Math.min(Math.abs(mx) / 200, 0.5);
-          onOverscroll(rubberBand);
-        }
-        return;
-      }
-
-      onOverscroll(0);
+      if (!last) return;
 
       const absMx = Math.abs(mx);
       const absVx = Math.abs(vx);
@@ -148,7 +131,7 @@ function SwipeHandler({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Per-character spotlight                                             */
+/*  Per-character spotlight — only visible on center (focused) char    */
 /* ------------------------------------------------------------------ */
 
 function CharacterSpotlight({ isFocused }: { isFocused: boolean }) {
@@ -159,7 +142,7 @@ function CharacterSpotlight({ isFocused }: { isFocused: boolean }) {
   useFrame(() => {
     if (!lightRef.current) return;
     const target = isFocused ? 2.5 : 0.4;
-    currentIntensity.current = THREE.MathUtils.lerp(currentIntensity.current, target, 0.08);
+    currentIntensity.current = lerp(currentIntensity.current, target, 0.08);
     lightRef.current.intensity = currentIntensity.current;
   });
 
@@ -182,11 +165,41 @@ function CharacterSpotlight({ isFocused }: { isFocused: boolean }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  LineupGroup — horizontal character lineup that slides to center    */
-/*  the focused character                                              */
+/*  AnimatedSlot — lerps position and scale each frame                 */
 /* ------------------------------------------------------------------ */
 
-function LineupGroup({
+function AnimatedSlot({
+  targetPos,
+  targetScale,
+  children,
+}: {
+  targetPos: readonly [number, number, number];
+  targetScale: number;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (!ref.current) return;
+    ref.current.position.x = lerp(ref.current.position.x, targetPos[0], 0.1);
+    ref.current.position.y = lerp(ref.current.position.y, targetPos[1], 0.1);
+    ref.current.position.z = lerp(ref.current.position.z, targetPos[2], 0.1);
+    const s = lerp(ref.current.scale.x, targetScale, 0.1);
+    ref.current.scale.setScalar(s);
+  });
+
+  return (
+    <group ref={ref} position={[targetPos[0], targetPos[1], targetPos[2]]}>
+      {children}
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  CarouselGroup — renders exactly 3 characters in left/center/right */
+/* ------------------------------------------------------------------ */
+
+function CarouselGroup({
   characters,
   focusIndex,
   selectedId,
@@ -197,31 +210,67 @@ function LineupGroup({
   selectedId: string | null;
   onSelect: (id: string) => void;
 }) {
-  // Characters in fixed positions — camera moves, not the group
-  const totalWidth = (characters.length - 1) * SPACING;
-  const startX = -totalWidth / 2;
+  const count = characters.length;
+
+  // Handle edge cases: 0, 1, or 2 characters
+  if (count === 0) return null;
+
+  // Compute which indices occupy the 3 slots (wrapping)
+  const prevIdx = (focusIndex - 1 + count) % count;
+  const currentIdx = focusIndex;
+  const nextIdx = (focusIndex + 1) % count;
+
+  // Build the slot assignments — deduplicate for small arrays
+  type SlotEntry = {
+    charIndex: number;
+    slot: 'left' | 'center' | 'right';
+  };
+  const slots: SlotEntry[] = [];
+
+  // Center is always present
+  slots.push({ charIndex: currentIdx, slot: 'center' });
+
+  // Only add left if it differs from center (covers count === 1)
+  if (prevIdx !== currentIdx) {
+    slots.push({ charIndex: prevIdx, slot: 'left' });
+  }
+
+  // Only add right if it differs from center AND from left (covers count <= 2)
+  if (nextIdx !== currentIdx && nextIdx !== prevIdx) {
+    slots.push({ charIndex: nextIdx, slot: 'right' });
+  }
 
   return (
     <group>
-      {characters.map((char, i) => (
-        <group key={char.userId} position={[startX + i * SPACING, 0, 0]}>
-          <LobbyCharacter
-            userId={char.userId}
-            name={char.name}
-            avatarType={char.avatarType}
-            matchScore={char.matchScore}
-            program={char.program}
-            tags={char.tags}
-            shared={char.shared}
-            position={[0, 0, 0]}
-            rotationY={0}
-            isSelected={char.userId === selectedId}
-            isFocused={i === focusIndex}
-            onClick={() => onSelect(char.userId)}
-          />
-          <CharacterSpotlight isFocused={i === focusIndex} />
-        </group>
-      ))}
+      {slots.map(({ charIndex, slot }) => {
+        const char = characters[charIndex];
+        const slotDef = SLOTS[slot];
+        const isFocused = slot === 'center';
+
+        return (
+          <AnimatedSlot
+            key={char.userId}
+            targetPos={slotDef.pos}
+            targetScale={slotDef.scale}
+          >
+            <LobbyCharacter
+              userId={char.userId}
+              name={char.name}
+              avatarType={char.avatarType}
+              matchScore={char.matchScore}
+              program={char.program}
+              tags={char.tags}
+              shared={char.shared}
+              position={[0, 0, 0]}
+              rotationY={0}
+              isSelected={char.userId === selectedId}
+              isFocused={isFocused}
+              onClick={() => onSelect(char.userId)}
+            />
+            <CharacterSpotlight isFocused={isFocused} />
+          </AnimatedSlot>
+        );
+      })}
     </group>
   );
 }
@@ -251,25 +300,21 @@ function InnerScene({
   characters,
   selectedId,
   focusIndex,
-  overscrollOffset,
   onSelectCharacter,
   onSwipe,
-  onOverscroll,
 }: {
   characters: CharacterData[];
   selectedId: string | null;
   focusIndex: number;
-  overscrollOffset: number;
   onSelectCharacter: (id: string) => void;
   onSwipe: (dir: 'left' | 'right', skip: number) => void;
-  onOverscroll: (offset: number) => void;
 }) {
   return (
     <>
       <PerformanceMonitor />
       <AdaptiveDpr pixelated />
 
-      <CameraController selectedId={selectedId} focusIndex={focusIndex} characterCount={characters.length} />
+      <CameraController selectedId={selectedId} />
 
       <LobbyLighting />
       <LobbyEnvironment />
@@ -278,10 +323,9 @@ function InnerScene({
         characterCount={characters.length}
         focusIndex={focusIndex}
         onSwipe={onSwipe}
-        onOverscroll={onOverscroll}
       />
 
-      <LineupGroup
+      <CarouselGroup
         characters={characters}
         focusIndex={focusIndex}
         selectedId={selectedId}
@@ -303,7 +347,6 @@ export default function LobbyScene({
   onFocusChange,
 }: LobbySceneProps) {
   const [internalFocus, setInternalFocus] = useState(focusIndex);
-  const [overscrollOffset, setOverscrollOffset] = useState(0);
 
   useEffect(() => {
     setInternalFocus(focusIndex);
@@ -312,25 +355,23 @@ export default function LobbyScene({
   const handleSwipe = useCallback(
     (dir: 'left' | 'right', skip: number) => {
       setInternalFocus((prev) => {
+        const count = characters.length;
+        if (count === 0) return prev;
         const delta = dir === 'right' ? skip : -skip;
-        const next = prev + delta;
-        const clamped = Math.max(0, Math.min(characters.length - 1, next));
-        onFocusChange?.(clamped);
-        return clamped;
+        // Wrap around instead of clamping — carousel is circular
+        const next = ((prev + delta) % count + count) % count;
+        onFocusChange?.(next);
+        return next;
       });
     },
     [characters.length, onFocusChange],
   );
 
-  const handleOverscroll = useCallback((offset: number) => {
-    setOverscrollOffset(offset);
-  }, []);
-
   return (
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: OVERVIEW_POS, fov: 55 }}
+      camera={{ position: CAMERA_POS, fov: 55 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       style={{ background: '#0a0a1a', touchAction: 'none' }}
     >
@@ -339,10 +380,8 @@ export default function LobbyScene({
           characters={characters}
           selectedId={selectedId}
           focusIndex={internalFocus}
-          overscrollOffset={overscrollOffset}
           onSelectCharacter={onSelectCharacter}
           onSwipe={handleSwipe}
-          onOverscroll={handleOverscroll}
         />
       </Suspense>
     </Canvas>

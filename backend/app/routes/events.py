@@ -1,4 +1,4 @@
-"""Event routes for LinkQ API."""
+"""Event routes for Nexus API."""
 
 from __future__ import annotations
 

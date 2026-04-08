@@ -1,5 +1,5 @@
 """
-LinkQ API — FastAPI entry point
+Nexus API — FastAPI entry point
 ================================
 Starts the server, loads seed data, registers all route modules,
 and configures CORS for the frontend dev servers.
@@ -48,7 +48,7 @@ async def lifespan(app: FastAPI):
     yield  # ---- app is running ----
 
     # --- Shutdown ----------------------------------------------------------
-    logger.info("LinkQ API shutting down")
+    logger.info("Nexus API shutting down")
 
 
 # ---------------------------------------------------------------------------
@@ -56,7 +56,7 @@ async def lifespan(app: FastAPI):
 # ---------------------------------------------------------------------------
 
 app = FastAPI(
-    title="LinkQ API",
+    title="Nexus API",
     version="0.1.0",
     description="Student Event Connection Platform — backend API",
     lifespan=lifespan,

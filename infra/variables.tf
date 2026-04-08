@@ -7,7 +7,7 @@ variable "aws_region" {
 variable "project_name" {
   description = "Project name used as prefix for all resources"
   type        = string
-  default     = "linkq"
+  default     = "nexus"
 }
 
 variable "ec2_instance_type" {

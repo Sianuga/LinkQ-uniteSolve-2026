@@ -1,12 +1,12 @@
 <mxfile host="65bd71144e">
-    <diagram id="linkq-arch" name="LinkQ Architecture">
+    <diagram id="nexus-arch" name="Nexus Architecture">
         <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
 
                 <!-- Title -->
-                <mxCell id="title" value="LinkQ — Architecture Overview" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1E3A8A;" parent="1" vertex="1">
+                <mxCell id="title" value="Nexus — Architecture Overview" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1E3A8A;" parent="1" vertex="1">
                     <mxGeometry x="400" y="15" width="500" height="35" as="geometry"/>
                 </mxCell>
 
