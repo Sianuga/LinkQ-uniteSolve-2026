@@ -1,19 +1,15 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Send } from 'lucide-react';
+import { ArrowLeft, Send, Sparkles } from 'lucide-react';
 import { Avatar } from '@/components/ui/Avatar';
 import {
   mockMessages,
   mockConversations,
   mockCurrentUser,
-  mockUsers,
 } from '@/data/mockData';
 import type { Message } from '@/types';
 
-// ---------------------------------------------------------------------------
-// Animation variants
-// ---------------------------------------------------------------------------
 const pageVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -31,15 +27,22 @@ const messageVariants = {
   },
 };
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
 function formatTime(iso: string): string {
   const date = new Date(iso);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
 
-/** Determines if a sender_id belongs to the current user. */
+function normalizeConversationId(id: string): string {
+  return id.replace(/_/g, '-');
+}
+
+function equivalentConversationIds(id?: string): string[] {
+  if (!id) return [];
+  const normalized = normalizeConversationId(id);
+  const underscored = normalized.replace(/-/g, '_');
+  return Array.from(new Set([id, normalized, underscored]));
+}
+
 function isCurrentUser(senderId: string): boolean {
   return (
     senderId === mockCurrentUser.id ||
@@ -48,66 +51,60 @@ function isCurrentUser(senderId: string): boolean {
   );
 }
 
-// ---------------------------------------------------------------------------
-// Shared-context map (keyed by participant id)
-// ---------------------------------------------------------------------------
 const sharedContextMap: Record<string, string> = {
-  'u-002': "You're both attending Distributed Systems",
-  'u-003': "You're both attending Spring Hackathon 2026",
-  'u-2': "You're both attending Spring Hackathon 2026",
-  'u-1': "You're both attending Intro to Machine Learning",
+  user_002: "You're both interested in language models",
+  user_003: "You're both attending Spring Hackathon 2026",
+  user_004: "You both care about computer vision",
+  user_005: "You both study distributed systems",
+  user_006: "You both work with machine learning",
+  user_009: "You both like hackathons and coding together",
 };
 
 const matchScoreMap: Record<string, number> = {
-  'u-002': 87,
-  'u-003': 72,
-  'u-2': 72,
-  'u-1': 87,
-  'u-004': 79,
-  'u-005': 65,
-  'u-006': 51,
+  user_002: 74,
+  user_003: 88,
+  user_004: 81,
+  user_005: 92,
+  user_006: 85,
+  user_009: 88,
 };
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
-export function ChatScreen() {
+export default function ChatScreen() {
   const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
-
-  // Find the conversation metadata
-  const conversation = useMemo(
-    () => mockConversations?.find((c) => c.id === conversationId),
+  const resolvedIds = useMemo(
+    () => equivalentConversationIds(conversationId),
     [conversationId],
+  );
+
+  const conversation = useMemo(
+    () => mockConversations.find((item) => resolvedIds.includes(item.id)),
+    [resolvedIds],
   );
   const participant = conversation?.participant;
 
-  // Messages state -- seeded from mock data
-  const initialMessages = useMemo(
-    () => (conversationId && mockMessages ? mockMessages[conversationId] ?? [] : []),
-    [conversationId],
-  );
+  const initialMessages = useMemo(() => {
+    for (const id of resolvedIds) {
+      const messages = mockMessages[id];
+      if (messages) return messages;
+    }
+    return [];
+  }, [resolvedIds]);
+
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputValue, setInputValue] = useState('');
 
-  // Scroll-to-bottom ref
   const bottomRef = useRef<HTMLDivElement>(null);
-  const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
-  // Auto-scroll on mount and when messages change
   useEffect(() => {
-    scrollToBottom();
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Derive match score and shared context from participant
   const participantId = participant?.id ?? '';
-  const matchScore = matchScoreMap[participantId] ?? 87;
+  const matchScore = matchScoreMap[participantId] ?? 80;
   const sharedContext =
-    sharedContextMap[participantId] ?? "You're both attending Distributed Systems";
+    sharedContextMap[participantId] ?? "You're both attending the same event";
 
-  // Handle send
   const handleSend = () => {
     const trimmed = inputValue.trim();
     if (!trimmed) return;
@@ -130,7 +127,6 @@ export function ChatScreen() {
     }
   };
 
-  // Fallback if conversation not found
   if (!participant) {
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-background px-6">
@@ -153,7 +149,6 @@ export function ChatScreen() {
       initial="hidden"
       animate="visible"
     >
-      {/* ---- Header ---- */}
       <div className="shrink-0 border-b border-border bg-surface shadow-sm">
         <div className="flex items-center gap-3 px-4 py-3">
           <button
@@ -169,33 +164,32 @@ export function ChatScreen() {
             name={participant.name}
             avatarType={participant.avatar}
             size="sm"
-            className="!h-8 !w-8 !border-0"
+            className="!border-0"
           />
 
-          <div className="flex flex-1 items-center gap-2 min-w-0">
-            <span className="truncate text-sm font-semibold text-text-primary">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-text-primary">
               {participant.name}
-            </span>
-            <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/15 px-2 py-0.5 text-[11px] font-semibold text-secondary">
-              {matchScore}% Match
-            </span>
+            </p>
+            <p className="truncate text-xs text-text-secondary">
+              {participant.program}
+            </p>
           </div>
+
+          <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/15 px-2 py-0.5 text-[11px] font-semibold text-secondary">
+            {matchScore}% Match
+          </span>
         </div>
 
-        {/* Shared context chip */}
         <div className="px-4 pb-3">
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-primary transition-colors hover:bg-accent/25"
-          >
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" />
-            {sharedContext}
-          </button>
+          <div className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-accent/15 px-3 py-1 text-xs font-medium text-primary">
+            <Sparkles className="h-3 w-3 shrink-0 text-secondary" />
+            <span className="truncate">{sharedContext}</span>
+          </div>
         </div>
       </div>
 
-      {/* ---- Message List ---- */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto bg-gradient-to-b from-background via-background to-highlight/20 px-4 py-4">
         <div className="flex flex-col gap-2">
           <AnimatePresence initial={false}>
             {messages.map((msg) => {
@@ -212,10 +206,10 @@ export function ChatScreen() {
                 >
                   <div
                     className={[
-                      'max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
+                      'max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm',
                       isOwn
                         ? 'rounded-br-md bg-secondary text-white'
-                        : 'rounded-bl-md bg-gray-100 text-text-primary',
+                        : 'rounded-bl-md bg-white text-text-primary',
                     ].join(' ')}
                   >
                     {msg.content}
@@ -233,7 +227,6 @@ export function ChatScreen() {
         </div>
       </div>
 
-      {/* ---- Input Bar ---- */}
       <div className="shrink-0 border-t border-border bg-surface px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
           <input
@@ -248,7 +241,7 @@ export function ChatScreen() {
             type="button"
             onClick={handleSend}
             disabled={!inputValue.trim()}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary text-white transition-all hover:bg-secondary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary text-white transition-all hover:bg-secondary/90 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Send message"
           >
             <Send className="h-[18px] w-[18px]" />

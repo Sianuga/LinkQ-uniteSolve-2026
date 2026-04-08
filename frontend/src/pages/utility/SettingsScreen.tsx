@@ -1,21 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ChevronRight, LogOut, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronRight, LogOut, Shield, Trash2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { Avatar } from '@/components/ui';
 
 // ---------------------------------------------------------------------------
 // Animation variants
 // ---------------------------------------------------------------------------
-const pageVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
 // ---------------------------------------------------------------------------
 // Toggle component
 // ---------------------------------------------------------------------------
@@ -69,7 +61,7 @@ function Divider() {
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
-export function SettingsScreen() {
+export default function SettingsScreen() {
   const navigate = useNavigate();
   const { user, logout } = useAuthStore();
 
@@ -93,9 +85,9 @@ export function SettingsScreen() {
   return (
     <motion.div
       className="flex min-h-dvh flex-col bg-background"
-      variants={pageVariants}
-      initial="hidden"
-      animate="visible"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
       {/* Header */}
       <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-border bg-surface px-4">
@@ -115,6 +107,27 @@ export function SettingsScreen() {
       {/* Content */}
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="mx-auto w-full max-w-lg py-6">
+          <div className="mb-6 rounded-[var(--radius-lg)] border border-border bg-surface px-4 py-5 shadow-sm">
+            <div className="flex items-center gap-4">
+              <Avatar
+                name={user?.name || 'Guest User'}
+                avatarType={user?.avatar}
+                size="md"
+              />
+              <div className="min-w-0">
+                <h2 className="truncate text-base font-semibold text-text-primary">
+                  {user?.name || 'Guest User'}
+                </h2>
+                <p className="truncate text-sm text-text-secondary">
+                  {user?.program || 'Complete your profile to personalize matches'}
+                </p>
+                <p className="truncate text-xs text-text-secondary/80">
+                  {user?.email || 'No email available'}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* ---- Account Section ---- */}
           <SectionHeader title="Account" />
           <div className="rounded-[var(--radius-md)] border border-border bg-surface">
@@ -170,6 +183,17 @@ export function SettingsScreen() {
             >
               <span className="text-sm text-text-primary">
                 Profile Visibility
+              </span>
+              <ChevronRight size={18} className="text-text-secondary" />
+            </button>
+            <div className="border-t border-border" />
+            <button
+              type="button"
+              className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-highlight"
+            >
+              <span className="inline-flex items-center gap-2 text-sm text-text-primary">
+                <Shield size={16} className="text-text-secondary" />
+                Data & Privacy
               </span>
               <ChevronRight size={18} className="text-text-secondary" />
             </button>

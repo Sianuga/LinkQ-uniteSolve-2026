@@ -10,8 +10,10 @@ import {
   MessageCircle,
   Heart,
   Users,
+  type LucideIcon,
 } from 'lucide-react';
 import { mockNotifications } from '@/data/mockData';
+import { Button } from '@/components/ui';
 import type { Notification, NotificationType } from '@/types';
 
 /* ------------------------------------------------------------------ */
@@ -20,7 +22,7 @@ import type { Notification, NotificationType } from '@/types';
 
 const typeConfig: Record<
   NotificationType,
-  { icon: React.ElementType; bg: string; fg: string }
+  { icon: LucideIcon; bg: string; fg: string }
 > = {
   connection_request: {
     icon: UserPlus,
@@ -83,36 +85,6 @@ function relativeTime(iso: string): string {
 /*  Animation variants                                                 */
 /* ------------------------------------------------------------------ */
 
-const pageVariants = {
-  initial: { opacity: 0, y: 16 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: 'easeOut' },
-  },
-  exit: { opacity: 0, y: -12, transition: { duration: 0.2 } },
-};
-
-const listVariants = {
-  animate: {
-    transition: { staggerChildren: 0.05 },
-  },
-};
-
-const itemVariants = {
-  initial: { opacity: 0, x: -16 },
-  animate: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.3, ease: 'easeOut' },
-  },
-  exit: {
-    opacity: 0,
-    x: 16,
-    transition: { duration: 0.2 },
-  },
-};
-
 /* ------------------------------------------------------------------ */
 /*  Notification item                                                  */
 /* ------------------------------------------------------------------ */
@@ -129,7 +101,10 @@ function NotificationItem({
 
   return (
     <motion.button
-      variants={itemVariants}
+      initial={{ opacity: 0, x: -16 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 16 }}
+      transition={{ duration: 0.25 }}
       whileTap={{ scale: 0.98 }}
       onClick={() => onTap(notification)}
       className={[
@@ -185,8 +160,13 @@ export default function NotificationsScreen() {
   const navigate = useNavigate();
   const [notifications, setNotifications] =
     useState<Notification[]>(mockNotifications);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
 
   const hasUnread = notifications.some((n) => !n.read);
+  const filteredNotifications =
+    activeFilter === 'unread'
+      ? notifications.filter((n) => !n.read)
+      : notifications;
 
   /* Mark all as read */
   const markAllRead = useCallback(() => {
@@ -214,10 +194,10 @@ export default function NotificationsScreen() {
   /* ---- Render ---- */
   return (
     <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.3 }}
       className="min-h-dvh bg-background flex flex-col"
     >
       {/* Header */}
@@ -244,9 +224,36 @@ export default function NotificationsScreen() {
         )}
       </header>
 
+      <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-3">
+        <button
+          type="button"
+          onClick={() => setActiveFilter('all')}
+          className={[
+            'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+            activeFilter === 'all'
+              ? 'bg-primary text-white'
+              : 'bg-highlight text-text-secondary hover:bg-border',
+          ].join(' ')}
+        >
+          All
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveFilter('unread')}
+          className={[
+            'rounded-full px-3 py-1.5 text-xs font-semibold transition-colors',
+            activeFilter === 'unread'
+              ? 'bg-primary text-white'
+              : 'bg-highlight text-text-secondary hover:bg-border',
+          ].join(' ')}
+        >
+          Unread
+        </button>
+      </div>
+
       {/* List */}
       <div className="flex-1 overflow-y-auto">
-        {notifications.length === 0 ? (
+        {filteredNotifications.length === 0 ? (
           /* Empty state */
           <div className="flex flex-col items-center justify-center py-24 px-6 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-highlight">
@@ -256,19 +263,30 @@ export default function NotificationsScreen() {
               You're all caught up!
             </h3>
             <p className="text-sm text-text-secondary max-w-[280px]">
-              No new notifications right now. Check back later.
+              {activeFilter === 'unread'
+                ? 'No unread notifications right now.'
+                : 'No new notifications right now. Check back later.'}
             </p>
+            {activeFilter === 'unread' && (
+              <Button
+                variant="secondary"
+                className="mt-5"
+                onClick={() => setActiveFilter('all')}
+              >
+                View all notifications
+              </Button>
+            )}
           </div>
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
               key="notification-list"
-              variants={listVariants}
-              initial="initial"
-              animate="animate"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ staggerChildren: 0.05 }}
               className="divide-y divide-border"
             >
-              {notifications.map((notification) => (
+              {filteredNotifications.map((notification) => (
                 <NotificationItem
                   key={notification.id}
                   notification={notification}

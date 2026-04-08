@@ -54,9 +54,9 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
       <div className="relative shrink-0">
         <Avatar
           src={participant.avatar_url}
-          alt={participant.name}
-          size={40}
-          fallback={participant.name}
+          name={participant.name}
+          avatarType={participant.avatar}
+          size="sm"
         />
         {/* Unread dot on avatar */}
         {unread && (

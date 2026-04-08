@@ -6,6 +6,7 @@ import {
   MessageCircle,
   Sparkles,
   UsersRound,
+  type LucideIcon,
 } from 'lucide-react';
 import { Avatar } from '@/components/ui';
 import type { Notification, NotificationType } from '@/types';
@@ -14,7 +15,7 @@ import type { Notification, NotificationType } from '@/types';
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-const iconMap: Record<NotificationType, React.ElementType> = {
+const iconMap: Record<NotificationType, LucideIcon> = {
   connection_request:  UserPlus,
   connection_accepted: UserCheck,
   event_reminder:      CalendarClock,
@@ -82,9 +83,8 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         {notification.avatar_url ? (
           <Avatar
             src={notification.avatar_url}
-            alt={notification.title}
-            size={40}
-            fallback={notification.title}
+            name={notification.title}
+            size="sm"
           />
         ) : (
           <div

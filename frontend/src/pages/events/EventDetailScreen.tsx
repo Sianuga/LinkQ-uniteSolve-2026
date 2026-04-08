@@ -121,15 +121,15 @@ export default function EventDetailScreen() {
         </div>
 
         {/* ---- Action buttons ---- */}
-        <div className="flex gap-3 pt-1">
+        <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
           <Button
             variant={joined ? 'secondary' : 'primary'}
-            className="flex-1"
+            className="w-full"
             onClick={() => setJoined((prev) => !prev)}
           >
             {joined ? 'Joined \u2713' : 'Join Event'}
           </Button>
-          <Link to={`/events/${event.id}/lobby`} className="flex-1">
+          <Link to={`/events/${event.id}/lobby`} className="w-full">
             <Button variant="secondary" className="w-full">
               Enter Lobby
             </Button>
