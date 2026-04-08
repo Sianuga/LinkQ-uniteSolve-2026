@@ -384,22 +384,30 @@ const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
 const BANANA_GUY_MODEL = '/models/cute_cat_in_cute_banana.glb';
 const NORMAL_GUY_MODEL = '/models/man_in_suit.glb';
 
+function useClonedModel(path: string, scale = 0.015) {
+  const { scene } = useGLTF(path);
+  const cloned = useMemo(() => {
+    const c = scene.clone(true);
+    // Reset any root-level transforms from Sketchfab export so the model
+    // sits at the parent group's position, not at the scene origin.
+    c.position.set(0, 0, 0);
+    c.rotation.set(0, 0, 0);
+    c.scale.setScalar(1);
+    return c;
+  }, [scene]);
+  return <primitive object={cloned} scale={scale} position={[0, 0, 0]} />;
+}
+
 function BuffArnoldGLB() {
-  const { scene } = useGLTF(BUFF_ARNOLD_MODEL);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
-  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
+  return useClonedModel(BUFF_ARNOLD_MODEL, 0.015);
 }
 
 function BananaGuyGLB() {
-  const { scene } = useGLTF(BANANA_GUY_MODEL);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
-  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
+  return useClonedModel(BANANA_GUY_MODEL, 0.015);
 }
 
 function NormalGuyGLB() {
-  const { scene } = useGLTF(NORMAL_GUY_MODEL);
-  const cloned = useMemo(() => scene.clone(true), [scene]);
-  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
+  return useClonedModel(NORMAL_GUY_MODEL, 0.015);
 }
 
 useGLTF.preload(BUFF_ARNOLD_MODEL);
