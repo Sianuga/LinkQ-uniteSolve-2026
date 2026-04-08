@@ -23,6 +23,6 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user, isOnboarded: user.onboarding_complete }),
       logout: () => set({ token: null, user: null, isAuthenticated: false, isOnboarded: false }),
     }),
-    { name: 'linkq-auth' }
+    { name: 'nexus-auth' }
   )
 );

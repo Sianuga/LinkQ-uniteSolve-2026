@@ -64,15 +64,12 @@ export function SplashScreen() {
           initial="hidden"
           animate="visible"
         >
-          {/* Mark + Name */}
-          <motion.div variants={childVariants} className="mb-5 flex items-center gap-3">
-            <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/10">
-              <div className="h-4 w-4 rounded-full bg-[#93C5FD]" />
-            </div>
-            <div className="text-left">
-              <div className="text-sm font-semibold tracking-wide text-white/80">LinkQ</div>
-              <div className="text-xs text-white/50">Event-first student networking</div>
-            </div>
+          {/* Logo / App name */}
+          <motion.div variants={childVariants} className="mb-4">
+            <h1 className="text-6xl font-extrabold tracking-tight text-white sm:text-7xl">
+              Nex
+              <span className="text-accent">us</span>
+            </h1>
           </motion.div>
 
           {/* Headline */}

@@ -115,7 +115,7 @@ export function RegisterScreen() {
               Create your account
             </h1>
             <p className="mt-2 text-sm text-text-secondary">
-              Join LinkQ and start connecting with fellow students
+              Join Nexus and start connecting with fellow students
             </p>
           </div>
 

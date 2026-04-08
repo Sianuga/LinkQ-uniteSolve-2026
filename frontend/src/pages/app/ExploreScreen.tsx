@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Calendar, Users, Sparkles } from 'lucide-react';
 import { EventCard, MatchCard } from '@/components/domain';
@@ -31,6 +32,7 @@ const CATEGORIES: CategoryChip[] = [
 /* ------------------------------------------------------------------ */
 
 export default function ExploreScreen() {
+  const navigate = useNavigate();
   const [activeView, setActiveView] = useState<ViewTab>('events');
   const [selectedCategory, setSelectedCategory] = useState<EventCategory | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,7 +181,7 @@ export default function ExploreScreen() {
                       layout
                       exit={{ opacity: 0, scale: 0.9 }}
                     >
-                      <EventCard event={event} variant="vertical" />
+                      <EventCard event={event} variant="vertical" onClick={() => navigate(`/events/${event.id}`)} />
                     </motion.div>
                   ))}
                 </AnimatePresence>

@@ -1,4 +1,4 @@
-"""Messaging routes for LinkQ API.
+"""Messaging routes for Nexus API.
 
 Endpoints:
   GET   /conversations                   -- list conversations for current user
@@ -27,6 +27,10 @@ class SendMessageBody(BaseModel):
     content: str
 
 
+class CreateConversationBody(BaseModel):
+    other_user_id: str
+
+
 # ---------------------------------------------------------------------------
 # Internal conversation registry
 # ---------------------------------------------------------------------------
@@ -42,15 +46,48 @@ def _registry() -> dict[str, dict]:
 
 
 # ---------------------------------------------------------------------------
+# POST /conversations -- create a 1:1 conversation
+# ---------------------------------------------------------------------------
+@router.post("/conversations", status_code=status.HTTP_201_CREATED)
+def create_conversation(
+    body: CreateConversationBody,
+    current_user: dict = Depends(get_current_user),
+):
+    """Create a 1:1 conversation. Returns existing if one already exists between these users."""
+    user_id = current_user["id"]
+
+    if body.other_user_id not in db.users:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    if body.other_user_id == user_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot create conversation with yourself")
+
+    registry = _registry()
+
+    # Check if conversation already exists
+    for cid, meta in registry.items():
+        participants = meta.get("participants", [])
+        if user_id in participants and body.other_user_id in participants:
+            return {"conversation_id": cid, "participants": participants}
+
+    # Create new conversation
+    conv_id = f"conv_{uuid.uuid4().hex[:12]}"
+    registry[conv_id] = {"participants": [user_id, body.other_user_id]}
+
+    return {"conversation_id": conv_id, "participants": [user_id, body.other_user_id]}
+
+
+# ---------------------------------------------------------------------------
 # GET /conversations -- list conversations for current user
 # ---------------------------------------------------------------------------
 @router.get("/conversations", response_model=list[ConversationSummary])
 def list_conversations(
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
     """Return conversations the current user participates in, newest first."""
+    user_id = current_user["id"]
 
     registry = _registry()
     results: list[dict] = []
@@ -89,11 +126,12 @@ def list_conversations(
 @router.get("/messages/{conversation_id}", response_model=list[MessageResponse])
 def get_messages(
     conversation_id: str,
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
     """Return messages for a conversation (oldest first, paginated)."""
+    user_id = current_user["id"]
 
     registry = _registry()
     meta = registry.get(conversation_id)
@@ -121,13 +159,14 @@ def get_messages(
 @router.post("/messages", response_model=MessageResponse, status_code=status.HTTP_201_CREATED)
 def send_message(
     body: SendMessageBody,
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Send a message to an existing conversation.
 
     If the conversation_id does not exist the endpoint returns 404.
     The sender must be a participant.
     """
+    user_id = current_user["id"]
 
     registry = _registry()
     meta = registry.get(body.conversation_id)

@@ -1,4 +1,4 @@
-"""Auth routes for LinkQ API.
+"""Auth routes for Nexus API.
 
 Router prefix: /auth  (register, login)
 Top-level routes: /me, /oauth, /onboarding

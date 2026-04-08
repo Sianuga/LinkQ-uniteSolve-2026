@@ -1,4 +1,4 @@
-"""Event routes for LinkQ API."""
+"""Event routes for Nexus API."""
 
 from __future__ import annotations
 
@@ -211,12 +211,10 @@ def get_event_matches(
             detail="You must join this event before viewing matches",
         )
 
-    candidates: list[MatchCandidate] = get_matches_for_event(
+    candidates = get_matches_for_event(
         user_id=user_id,
         event_id=event_id,
+        db=db,
     )
-
-    # Return sorted by match_score descending
-    candidates.sort(key=lambda c: c.match_score, reverse=True)
 
     return candidates

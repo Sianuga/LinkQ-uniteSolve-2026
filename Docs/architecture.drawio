@@ -1,0 +1,167 @@
+<mxfile host="65bd71144e">
+    <diagram id="nexus-arch" name="Nexus Architecture">
+        <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="700" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+
+                <!-- Title -->
+                <mxCell id="title" value="Nexus — Architecture Overview" style="text;html=1;fontSize=20;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1E3A8A;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="15" width="500" height="35" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== BROWSER ==================== -->
+                <mxCell id="browser" value="&lt;b&gt;User Browser&lt;/b&gt;" style="shape=mxgraph.mockup.containers.browserWindow;whiteSpace=wrap;html=1;fillColor=#E5E7EB;strokeColor=#6B7280;strokeWidth=1.5;fontSize=11;fontStyle=1;mainText=;recursiveResize=0;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="590" width="160" height="80" as="geometry"/>
+                </mxCell>
+
+                <!-- Browser → React -->
+                <mxCell id="e-browser" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#6B7280;strokeWidth=2;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" parent="1" source="browser" target="axios" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== FRONTEND GROUP ==================== -->
+                <mxCell id="fe-group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFF6FF;strokeColor=#93C5FD;strokeWidth=2;dashed=1;arcSize=6;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="70" width="340" height="490" as="geometry"/>
+                </mxCell>
+                <mxCell id="fe-label" value="Frontend  (localhost:5173)" style="text;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#1E3A8A;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="78" width="260" height="26" as="geometry"/>
+                </mxCell>
+
+                <!-- React App -->
+                <mxCell id="react" value="&lt;b&gt;React App&lt;/b&gt;&lt;br&gt;Vite + TypeScript&lt;br&gt;React Router v6 (28 screens)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E3A8A;strokeWidth=2;shadow=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="115" width="260" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- State -->
+                <mxCell id="state" value="&lt;b&gt;State Management&lt;/b&gt;&lt;br&gt;Zustand (UI) + TanStack Query (server)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1.5;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="200" width="260" height="50" as="geometry"/>
+                </mxCell>
+
+                <!-- 3D Lobby -->
+                <mxCell id="r3f" value="&lt;b&gt;3D Lobby&lt;/b&gt;&lt;br&gt;React Three Fiber&lt;br&gt;+ Drei (lazy-loaded)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="270" width="125" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- UI Layer -->
+                <mxCell id="ui" value="&lt;b&gt;UI Layer&lt;/b&gt;&lt;br&gt;Tailwind CSS&lt;br&gt;Framer Motion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="215" y="270" width="125" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- Forms -->
+                <mxCell id="forms" value="&lt;b&gt;Forms&lt;/b&gt;&lt;br&gt;React Hook Form + Zod" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="355" width="260" height="40" as="geometry"/>
+                </mxCell>
+
+                <!-- Axios -->
+                <mxCell id="axios" value="&lt;b&gt;Axios HTTP Client&lt;/b&gt;&lt;br&gt;Bearer token interceptor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DBEAFE;strokeColor=#1E3A8A;strokeWidth=2;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="420" width="220" height="50" as="geometry"/>
+                </mxCell>
+
+                <!-- FE internal arrows -->
+                <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#93C5FD;strokeWidth=1;" parent="1" source="react" target="state" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#93C5FD;strokeWidth=1;" parent="1" source="state" target="axios" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== REST API ARROW ==================== -->
+                <mxCell id="http-arrow" value="&lt;b&gt;REST API&lt;/b&gt;&lt;br&gt;HTTP / JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#1E3A8A;strokeWidth=3;fontSize=11;fontColor=#1E3A8A;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="axios" target="fastapi" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== BACKEND GROUP ==================== -->
+                <mxCell id="be-group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF3C7;strokeColor=#F59E0B;strokeWidth=2;dashed=1;arcSize=6;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="70" width="320" height="490" as="geometry"/>
+                </mxCell>
+                <mxCell id="be-label" value="Backend  (localhost:8000)" style="text;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#92400E;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="78" width="260" height="26" as="geometry"/>
+                </mxCell>
+
+                <!-- FastAPI -->
+                <mxCell id="fastapi" value="&lt;b&gt;FastAPI&lt;/b&gt;&lt;br&gt;Python async + CORS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#92400E;strokeWidth=2;shadow=1;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="115" width="250" height="55" as="geometry"/>
+                </mxCell>
+
+                <!-- Security -->
+                <mxCell id="security" value="&lt;b&gt;Security&lt;/b&gt; — JWT + Bearer tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="185" width="250" height="35" as="geometry"/>
+                </mxCell>
+
+                <!-- Routes -->
+                <mxCell id="routes" value="&lt;b&gt;Route Modules&lt;/b&gt;&lt;br&gt;auth · events · users · connections&lt;br&gt;groups · messages · notifications · match" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="235" width="250" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- Services -->
+                <mxCell id="services" value="&lt;b&gt;Services&lt;/b&gt;&lt;br&gt;Matching engine + Embedding" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="475" y="320" width="250" height="50" as="geometry"/>
+                </mxCell>
+
+                <!-- Embedding Model -->
+                <mxCell id="model" value="&lt;b&gt;all-MiniLM-L6-v2&lt;/b&gt;&lt;br&gt;sentence-transformers&lt;br&gt;384-dim embeddings" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;fillColor=#F3E8FF;strokeColor=#7C3AED;strokeWidth=1.5;fontSize=10;shadow=1;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="400" width="220" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- BE internal arrows -->
+                <mxCell id="e3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F59E0B;strokeWidth=1;" parent="1" source="fastapi" target="routes" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#F59E0B;strokeWidth=1;" parent="1" source="routes" target="services" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e-svc-model" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#7C3AED;strokeWidth=1.5;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="services" target="model" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== DATA LAYER GROUP ==================== -->
+                <mxCell id="data-group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#10B981;strokeWidth=2;dashed=1;arcSize=6;" parent="1" vertex="1">
+                    <mxGeometry x="860" y="70" width="280" height="490" as="geometry"/>
+                </mxCell>
+                <mxCell id="data-label" value="Data Layer" style="text;html=1;fontSize=13;fontStyle=1;align=center;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#065F46;" parent="1" vertex="1">
+                    <mxGeometry x="930" y="78" width="140" height="26" as="geometry"/>
+                </mxCell>
+
+                <!-- In-Memory DB -->
+                <mxCell id="memdb" value="&lt;b&gt;In-Memory Database&lt;/b&gt;&lt;br&gt;Python dicts (singleton)&lt;br&gt;&lt;br&gt;users · events · connections&lt;br&gt;groups · messages · notifications" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#FFFFFF;strokeColor=#065F46;strokeWidth=2;shadow=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="885" y="115" width="230" height="110" as="geometry"/>
+                </mxCell>
+
+                <!-- Seed JSON -->
+                <mxCell id="seed" value="&lt;b&gt;Seed JSON Files&lt;/b&gt;&lt;br&gt;data/seed/*.json&lt;br&gt;(loaded on startup)" style="shape=document;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=0.1;fillColor=#FFFFFF;strokeColor=#065F46;strokeWidth=1.5;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="910" y="265" width="180" height="65" as="geometry"/>
+                </mxCell>
+
+                <!-- ChromaDB -->
+                <mxCell id="chromadb" value="&lt;b&gt;ChromaDB&lt;/b&gt;&lt;br&gt;Vector store (in-process)&lt;br&gt;Cosine similarity on&lt;br&gt;segmented embeddings" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#FFFFFF;strokeColor=#065F46;strokeWidth=2;shadow=1;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="885" y="380" width="230" height="110" as="geometry"/>
+                </mxCell>
+
+                <!-- Seed → MemDB -->
+                <mxCell id="e-seed" value="loads on startup" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#065F46;strokeWidth=1.5;fontSize=9;fontColor=#065F46;entryX=0.5;entryY=1;entryDx=0;entryDy=-12;exitX=0.5;exitY=0;exitDx=0;exitDy=6.5;" parent="1" source="seed" target="memdb" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- Routes → MemDB -->
+                <mxCell id="e-be-db" value="read / write" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#065F46;strokeWidth=2;fontSize=10;fontColor=#065F46;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="routes" target="memdb" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- Services → ChromaDB -->
+                <mxCell id="e-chroma" value="embed + query" style="edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#065F46;strokeWidth=2;fontSize=10;fontColor=#065F46;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="services" target="chromadb" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+
+                <!-- ==================== LEGEND ==================== -->
+                <mxCell id="legend-box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#D1D5DB;strokeWidth=1;dashed=0;" parent="1" vertex="1">
+                    <mxGeometry x="860" y="590" width="280" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend-title" value="&lt;b&gt;MVP Note:&lt;/b&gt; In-memory DB (data lost on restart).&lt;br&gt;ChromaDB runs in-process. No external infra needed." style="text;html=1;fontSize=10;align=left;verticalAlign=middle;fillColor=none;strokeColor=none;fontColor=#6B7280;" parent="1" vertex="1">
+                    <mxGeometry x="870" y="595" width="260" height="55" as="geometry"/>
+                </mxCell>
+
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

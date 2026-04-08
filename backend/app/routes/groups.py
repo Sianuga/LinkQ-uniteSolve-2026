@@ -1,4 +1,4 @@
-"""Group routes for LinkQ API.
+"""Group routes for Nexus API.
 
 Endpoints:
   POST  /groups?event_id=          -- create a group for an event
@@ -57,9 +57,10 @@ def _event_exists(event_id: str) -> bool:
 def create_group(
     body: GroupCreate,
     event_id: str = Query(..., description="ID of the event this group belongs to"),
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Create a new group for an event.  The creator is added as the first member."""
+    user_id = current_user["id"]
 
     if not _event_exists(event_id):
         raise HTTPException(
@@ -110,7 +111,7 @@ def get_group(group_id: str):
 @router.post("/group/{group_id}", status_code=status.HTTP_200_OK)
 def join_group(
     group_id: str,
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Join an existing group.
 
@@ -119,6 +120,7 @@ def join_group(
       - Group is still looking for members
       - User is not already a member
     """
+    user_id = current_user["id"]
     group = db.groups.get(group_id)
     if not group:
         raise HTTPException(
