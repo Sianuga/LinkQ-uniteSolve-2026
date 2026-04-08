@@ -248,8 +248,8 @@ export default function LobbyEnvironment() {
       />
       <pointLight position={[0, 3, 0]} intensity={0.6} color="#3B82F6" distance={10} decay={2} />
 
-      {/* Classroom environment */}
-      <ClassroomModel />
+      {/* Classroom disabled for now */}
+      {/* <ClassroomModel /> */}
 
       {/* Floor (fallback if classroom doesn't cover it) */}
       <ReflectiveFloor />
