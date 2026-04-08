@@ -376,22 +376,30 @@ function AuraOrb({ index }: { index: number }) {
 // ---------------------------------------------------------------------------
 
 const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
+const BANANA_GUY_MODEL = '/models/cute_cat_in_cute_banana.glb';
+const NORMAL_GUY_MODEL = '/models/normal_guy.glb';
 
 function BuffArnoldGLB() {
   const { scene } = useGLTF(BUFF_ARNOLD_MODEL);
   const cloned = useMemo(() => scene.clone(true), [scene]);
+  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
+}
 
-  return (
-    <primitive
-      object={cloned}
-      scale={0.015}
-      position={[0, 0, 0]}
-      rotation={[0, 0, 0]}
-    />
-  );
+function BananaGuyGLB() {
+  const { scene } = useGLTF(BANANA_GUY_MODEL);
+  const cloned = useMemo(() => scene.clone(true), [scene]);
+  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
+}
+
+function NormalGuyGLB() {
+  const { scene } = useGLTF(NORMAL_GUY_MODEL);
+  const cloned = useMemo(() => scene.clone(true), [scene]);
+  return <primitive object={cloned} scale={0.015} position={[0, 0, 0]} />;
 }
 
 useGLTF.preload(BUFF_ARNOLD_MODEL);
+useGLTF.preload(BANANA_GUY_MODEL);
+useGLTF.preload(NORMAL_GUY_MODEL);
 
 // ---------------------------------------------------------------------------
 // Body router
@@ -408,15 +416,15 @@ function CharacterBody({
     case 'buff_arnold':
       return <BuffArnoldGLB />;
     case 'banana_guy':
-      return <BananaGuy mat={mat} />;
+      return <BananaGuyGLB />;
     case 'anime_girl':
       return <AnimeGirl mat={mat} />;
     case 'bland_normal_guy':
-      return <BlandNormalGuy mat={mat} />;
+      return <NormalGuyGLB />;
     case 'mystery_silhouette':
       return <MysterySilhouette mat={mat} />;
     default:
-      return <BlandNormalGuy mat={mat} />;
+      return <NormalGuyGLB />;
   }
 }
 
