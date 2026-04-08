@@ -201,31 +201,27 @@ const emoteNotifVariants = {
   },
 };
 
-/** Floating emote notification pill at the top of the screen */
+/** Big floating emoji that drifts up from center of the screen */
 function EmoteNotification({ emoji }: { emoji: string | null }) {
   return (
     <AnimatePresence>
       {emoji && (
         <motion.div
           key={emoji + Date.now()}
-          variants={emoteNotifVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          className="pointer-events-none absolute left-1/2 top-16 z-30 -translate-x-1/2
-                     rounded-full bg-white/95 px-4 py-2 shadow-lg backdrop-blur-md
-                     border border-border"
+          initial={{ opacity: 1, y: 0, scale: 1 }}
+          animate={{ opacity: 0, y: -200, scale: 1.8 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 2, ease: 'easeOut' }}
+          className="pointer-events-none absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
         >
-          <span className="text-sm font-semibold text-text-primary">
-            {emoji} sent!
-          </span>
+          <span className="text-6xl drop-shadow-lg">{emoji}</span>
         </motion.div>
       )}
     </AnimatePresence>
   );
 }
 
-/** 3x3 grid popup with emote buttons */
+/** Vertical emote panel — slides in from right side, mobile-friendly */
 function EmotePicker({
   onSelect,
   onClose,
@@ -233,52 +229,39 @@ function EmotePicker({
   onSelect: (emoji: string) => void;
   onClose: () => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  // Close on click outside
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        onClose();
-      }
-    }
-    // Defer listener to avoid closing immediately from the same click
-    const id = requestAnimationFrame(() => {
-      document.addEventListener('mousedown', handleClick);
-    });
-    return () => {
-      cancelAnimationFrame(id);
-      document.removeEventListener('mousedown', handleClick);
-    };
-  }, [onClose]);
-
   return (
-    <motion.div
-      ref={containerRef}
-      variants={emotePickerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      style={{ transformOrigin: 'bottom right' }}
-      className="absolute bottom-full right-0 mb-2 grid grid-cols-3 gap-1
-                 rounded-2xl border border-border bg-white p-2 shadow-lg"
-    >
-      {EMOTE_LIST.map((emoji) => (
-        <button
-          key={emoji}
-          type="button"
-          onClick={() => onSelect(emoji)}
-          className="flex h-11 w-11 items-center justify-center rounded-xl text-xl
-                     transition-colors hover:bg-highlight active:scale-95"
-          aria-label={`Send ${emoji}`}
-        >
-          {emoji}
-        </button>
-      ))}
-    </motion.div>
+    <>
+      {/* Scrim */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="pointer-events-auto absolute inset-0 z-20"
+        onClick={onClose}
+      />
+      {/* Vertical panel on the right edge */}
+      <motion.div
+        initial={{ x: 80, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: 80, opacity: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="pointer-events-auto absolute right-3 bottom-20 z-30
+                   flex flex-col gap-1 rounded-2xl border border-border bg-white p-2 shadow-xl"
+      >
+        {EMOTE_LIST.map((emoji) => (
+          <button
+            key={emoji}
+            type="button"
+            onClick={() => onSelect(emoji)}
+            className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl
+                       transition-all hover:bg-highlight active:scale-90"
+            aria-label={`Send ${emoji}`}
+          >
+            {emoji}
+          </button>
+        ))}
+      </motion.div>
+    </>
   );
 }
 
