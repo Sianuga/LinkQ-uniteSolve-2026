@@ -31,10 +31,9 @@ export function MatchCard({ candidate, onConnect }: MatchCardProps) {
         {/* Top row: avatar + info */}
         <div className="flex items-start gap-3">
           <Avatar
-            src={candidate.avatar_url}
-            alt={candidate.name}
-            size={56}
-            fallback={candidate.name}
+            name={candidate.name}
+            size="md"
+            avatarType={candidate.avatar}
           />
 
           <div className="flex min-w-0 flex-1 flex-col gap-1">

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserPlus } from 'lucide-react';
 import { Avatar, Tag, ProgressBar, Button } from '@/components/ui';
@@ -41,6 +42,7 @@ function applyFilter(
 /* ------------------------------------------------------------------ */
 
 export default function EventPeopleScreen() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterKey>('all');
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
 
@@ -56,6 +58,10 @@ export default function EventPeopleScreen() {
       }
       return next;
     });
+  }
+
+  function handleViewProfile(candidate: MatchCandidate) {
+    navigate(`/users/${candidate.user_id}`);
   }
 
   return (
@@ -100,18 +106,28 @@ export default function EventPeopleScreen() {
                   delay: index * 0.05,
                   ease: 'easeOut',
                 }}
-                className="flex items-center gap-3 rounded-xl bg-surface p-3 shadow-sm"
+                className="group flex items-center gap-3 rounded-xl bg-surface p-3 shadow-sm transition-colors hover:bg-highlight"
               >
                 {/* Avatar */}
-                <Avatar
-                  name={candidate.name}
-                  avatarType={candidate.avatar}
-                  src={candidate.avatar_url}
-                  size="sm"
-                />
+                <button
+                  type="button"
+                  onClick={() => handleViewProfile(candidate)}
+                  className="cursor-pointer"
+                >
+                  <Avatar
+                    name={candidate.name}
+                    avatarType={candidate.avatar}
+                    src={candidate.avatar_url}
+                    size="sm"
+                    className="transition-transform group-hover:scale-105"
+                  />
+                </button>
 
-                {/* Info */}
-                <div className="flex min-w-0 flex-1 flex-col gap-1">
+                {/* Info - clickable */}
+                <div
+                  className="flex min-w-0 flex-1 flex-col gap-1 cursor-pointer"
+                  onClick={() => handleViewProfile(candidate)}
+                >
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="truncate text-sm font-semibold text-gray-900">
                       {candidate.name}
@@ -149,7 +165,10 @@ export default function EventPeopleScreen() {
                   variant={isConnected ? 'secondary' : 'primary'}
                   size="sm"
                   className="shrink-0"
-                  onClick={() => handleConnect(candidate)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleConnect(candidate);
+                  }}
                 >
                   {isConnected ? (
                     'Sent'

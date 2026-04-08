@@ -458,6 +458,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-10T11:30:00+02:00',
     category: 'lecture',
     attendee_count: 87,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
   {
     id: 'event_002',
@@ -469,6 +470,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-11T16:00:00+02:00',
     category: 'seminar',
     attendee_count: 34,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
   {
     id: 'event_003',
@@ -492,6 +494,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-09T18:00:00+02:00',
     category: 'social',
     attendee_count: 42,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
   {
     id: 'event_005',
@@ -503,6 +506,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-14T17:00:00+02:00',
     category: 'lecture',
     attendee_count: 63,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
   {
     id: 'event_006',
@@ -514,6 +518,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-12T13:00:00+02:00',
     category: 'seminar',
     attendee_count: 28,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
   {
     id: 'event_007',
@@ -537,6 +542,7 @@ export const mockEvents: AppEvent[] = [
     end_time: '2026-04-15T23:30:00+02:00',
     category: 'social',
     attendee_count: 37,
+    image_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=640&q=80',
   },
 ];
 
@@ -861,18 +867,27 @@ export const notifications = mockNotifications;
 export const connections = mockConnections;
 export const groups = mockGroups;
 export const messagesByConversation: Record<string, import('@/types').Message[]> = {
-  'conv-001': [
-    { id: 'm-001', sender_id: 'user_002', content: "Hey! Saw you're in ML Lab too!", timestamp: '2026-04-08T10:00:00Z' },
-    { id: 'm-002', sender_id: mockCurrentUser.id, content: "It's intense but cool! Working on the assignment?", timestamp: '2026-04-08T10:15:00Z' },
-    { id: 'm-003', sender_id: 'user_002', content: 'Struggling with backprop. Want to work together?', timestamp: '2026-04-08T10:20:00Z' },
-    { id: 'm-004', sender_id: mockCurrentUser.id, content: 'Definitely! Free tomorrow afternoon?', timestamp: '2026-04-08T10:25:00Z' },
-    { id: 'm-005', sender_id: 'user_002', content: 'Perfect, see you at the library!', timestamp: '2026-04-08T10:30:00Z' },
+  'conv_001': [
+    { id: 'm-001', sender_id: 'user_005', content: "Hey! Are you going to the Distributed Systems lecture on Friday?", timestamp: '2026-04-08T09:12:00+02:00' },
+    { id: 'm-002', sender_id: mockCurrentUser.id, content: "Yes! Looking forward to it. Want to grab coffee before?", timestamp: '2026-04-08T09:20:00+02:00' },
+    { id: 'm-003', sender_id: 'user_005', content: "Sure! How about 9am at the cafeteria?", timestamp: '2026-04-08T09:25:00+02:00' },
   ],
-  'conv-002': [
-    { id: 'm-010', sender_id: mockCurrentUser.id, content: "Hey! Both into Distributed Systems?", timestamp: '2026-04-07T16:00:00Z' },
-    { id: 'm-011', sender_id: 'user_003', content: 'Yeah! Going to the hackathon?', timestamp: '2026-04-07T16:30:00Z' },
-    { id: 'm-012', sender_id: mockCurrentUser.id, content: "Planning to! Need a teammate?", timestamp: '2026-04-07T17:00:00Z' },
-    { id: 'm-013', sender_id: 'user_003', content: "Let's team up!", timestamp: '2026-04-07T18:00:00Z' },
+  'conv_002': [
+    { id: 'm-010', sender_id: 'user_002', content: "The NLP seminar was amazing! Want to work on the next assignment together?", timestamp: '2026-04-07T18:45:00+02:00' },
+    { id: 'm-011', sender_id: mockCurrentUser.id, content: "Definitely! I found the RLHF part really interesting.", timestamp: '2026-04-07T19:00:00+02:00' },
+    { id: 'm-012', sender_id: 'user_002', content: "Same! Let's meet at the library tomorrow.", timestamp: '2026-04-07T19:15:00+02:00' },
+  ],
+  'conv_003': [
+    { id: 'm-020', sender_id: 'user_009', content: "Team name ideas for the hackathon: NullPointerExceptions? lol", timestamp: '2026-04-07T14:22:00+02:00' },
+    { id: 'm-021', sender_id: mockCurrentUser.id, content: "Haha I like it! Or 'It's not a bug, it's a feature'", timestamp: '2026-04-07T14:30:00+02:00' },
+  ],
+  'conv_004': [
+    { id: 'm-030', sender_id: 'user_004', content: "Just submitted the lab report. Let me know if you spot any issues!", timestamp: '2026-04-06T21:10:00+02:00' },
+    { id: 'm-031', sender_id: mockCurrentUser.id, content: "Will do! Thanks for sharing.", timestamp: '2026-04-06T21:30:00+02:00' },
+  ],
+  'conv_005': [
+    { id: 'm-040', sender_id: 'user_006', content: "See you at the coffee meetup tomorrow!", timestamp: '2026-04-05T16:33:00+02:00' },
+    { id: 'm-041', sender_id: mockCurrentUser.id, content: "Looking forward to it!", timestamp: '2026-04-05T16:45:00+02:00' },
   ],
 };
 export const mockMessages = messagesByConversation;
