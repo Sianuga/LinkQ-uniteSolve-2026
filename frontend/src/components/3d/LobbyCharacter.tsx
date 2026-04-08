@@ -384,30 +384,38 @@ const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
 const BANANA_GUY_MODEL = '/models/cute_cat_in_cute_banana.glb';
 const NORMAL_GUY_MODEL = '/models/man_in_suit.glb';
 
-function useClonedModel(path: string, scale = 0.015) {
+function useClonedModel(path: string, targetHeight = 1.8) {
   const { scene } = useGLTF(path);
   const cloned = useMemo(() => {
     const c = scene.clone(true);
-    // Reset any root-level transforms from Sketchfab export so the model
-    // sits at the parent group's position, not at the scene origin.
-    c.position.set(0, 0, 0);
-    c.rotation.set(0, 0, 0);
-    c.scale.setScalar(1);
+    // Compute bounding box to center and scale the model
+    const box = new THREE.Box3().setFromObject(c);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+
+    // Scale so the model is approximately targetHeight tall
+    const currentHeight = size.y;
+    const s = currentHeight > 0 ? targetHeight / currentHeight : 1;
+    c.scale.setScalar(s);
+
+    // Re-center: shift so the bottom sits at y=0 and x/z are centered
+    c.position.set(-center.x * s, -box.min.y * s, -center.z * s);
+
     return c;
-  }, [scene]);
-  return <primitive object={cloned} scale={scale} position={[0, 0, 0]} />;
+  }, [scene, targetHeight]);
+  return <primitive object={cloned} />;
 }
 
 function BuffArnoldGLB() {
-  return useClonedModel(BUFF_ARNOLD_MODEL, 0.015);
+  return useClonedModel(BUFF_ARNOLD_MODEL, 1.9);
 }
 
 function BananaGuyGLB() {
-  return useClonedModel(BANANA_GUY_MODEL, 0.015);
+  return useClonedModel(BANANA_GUY_MODEL, 1.6);
 }
 
 function NormalGuyGLB() {
-  return useClonedModel(NORMAL_GUY_MODEL, 0.015);
+  return useClonedModel(NORMAL_GUY_MODEL, 1.8);
 }
 
 useGLTF.preload(BUFF_ARNOLD_MODEL);

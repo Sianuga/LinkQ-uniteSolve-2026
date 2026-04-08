@@ -34,10 +34,10 @@ _collection = None
 try:
     from sentence_transformers import SentenceTransformer
     import chromadb
-except ImportError:
+except Exception:
     _HAS_ML = False
     logger.warning(
-        "sentence-transformers and/or chromadb not installed. "
+        "sentence-transformers and/or chromadb not available. "
         "Matching engine will return random demo scores."
     )
 

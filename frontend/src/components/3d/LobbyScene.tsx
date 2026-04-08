@@ -64,8 +64,8 @@ function useCircleLayout(count: number) {
 /*  Camera controller — orbits around circle to face focused char     */
 /* ------------------------------------------------------------------ */
 
-const CAMERA_DISTANCE = 5; // distance from center
-const CAMERA_HEIGHT = 2.2;
+const CAMERA_DISTANCE = 4.5; // distance from center
+const CAMERA_HEIGHT = 1.8;
 
 function CameraController({
   focusIndex,
@@ -82,26 +82,28 @@ function CameraController({
 
   useEffect(() => {
     if (characterCount === 0) return;
-    // Camera goes to the opposite side of the circle from the focused character
-    // so it faces toward them
     const charAngle = (focusIndex / characterCount) * Math.PI * 2;
     targetAngle.current = charAngle + overscrollOffset * 0.3;
   }, [focusIndex, characterCount, overscrollOffset]);
 
   useFrame(() => {
-    // Smoothly lerp angle
-    currentAngle.current = THREE.MathUtils.lerp(currentAngle.current, targetAngle.current, 0.06);
+    // Lerp angle — handle wrapping around 2PI to take shortest path
+    let diff = targetAngle.current - currentAngle.current;
+    // Normalize to [-PI, PI] so we always rotate the short way
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    currentAngle.current += diff * 0.06;
 
-    // Position camera on the opposite side of the circle, looking inward
-    const camAngle = currentAngle.current + Math.PI; // opposite side
+    // Camera sits behind the focused character (opposite side), looking inward
+    const camAngle = currentAngle.current + Math.PI;
     camera.position.x = Math.sin(camAngle) * CAMERA_DISTANCE;
     camera.position.z = Math.cos(camAngle) * CAMERA_DISTANCE;
     camera.position.y = CAMERA_HEIGHT;
 
-    // Look at the focused character's position on the circle
+    // Look at the focused character (slightly above ground for better framing)
     const lookX = Math.sin(currentAngle.current) * CIRCLE_RADIUS;
     const lookZ = Math.cos(currentAngle.current) * CIRCLE_RADIUS;
-    camera.lookAt(lookX, 0.8, lookZ);
+    camera.lookAt(lookX, 0.9, lookZ);
   });
 
   return null;
