@@ -1,6 +1,5 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { MeshReflectorMaterial } from "@react-three/drei";
 import * as THREE from "three";
 
 // ---------------------------------------------------------------------------
@@ -160,16 +159,10 @@ function ReflectiveFloor() {
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
       <circleGeometry args={[FLOOR_RADIUS, 128]} />
-      <MeshReflectorMaterial
-        mirror={0.5}
-        blur={[300, 300]}
-        resolution={512}
-        mixBlur={0.5}
-        mixStrength={0.8}
+      <meshStandardMaterial
         color={BG_COLOR}
-        metalness={0.6}
-        roughness={0.4}
-        depthScale={1.2}
+        metalness={0.8}
+        roughness={0.2}
       />
     </mesh>
   );

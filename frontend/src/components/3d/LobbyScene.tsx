@@ -6,11 +6,7 @@ import {
   AdaptiveDpr,
   Html,
 } from '@react-three/drei';
-import {
-  EffectComposer,
-  Bloom,
-  Vignette,
-} from '@react-three/postprocessing';
+// Post-processing removed for faster load — emissive materials provide glow
 import * as THREE from 'three';
 
 import LobbyLighting from '@/components/3d/LobbyLighting';
@@ -170,21 +166,7 @@ function InnerScene({ characters, selectedId, onSelectCharacter }: InnerScenePro
         touches={{ ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_ROTATE }}
       />
 
-      {/* ---- Post-processing ---- */}
-      {!dprDegraded && (
-        <EffectComposer multisampling={0}>
-          <Bloom
-            luminanceThreshold={0.8}
-            luminanceSmoothing={0.3}
-            intensity={0.6}
-          />
-          <Vignette
-            eskil={false}
-            offset={0.1}
-            darkness={0.5}
-          />
-        </EffectComposer>
-      )}
+      {/* Post-processing removed for performance — emissive materials handle glow */}
     </>
   );
 }
