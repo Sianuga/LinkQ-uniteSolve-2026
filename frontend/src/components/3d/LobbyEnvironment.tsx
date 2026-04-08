@@ -209,16 +209,18 @@ function ClassroomModel() {
     const box = new THREE.Box3().setFromObject(c);
     const size = box.getSize(new THREE.Vector3());
     const center = box.getCenter(new THREE.Vector3());
-    // Scale classroom to be ~12 units wide to contain the character lineup
-    const s = 12 / Math.max(size.x, size.z);
+    // Scale classroom to ~6 units wide — backdrop behind characters
+    const s = 6 / Math.max(size.x, size.z);
     const wrapper = new THREE.Group();
     wrapper.add(c);
     wrapper.scale.setScalar(s);
+    // Center and place floor at y=0
     c.position.set(-center.x, -box.min.y, -center.z);
     return wrapper;
   }, [scene]);
 
-  return <primitive object={cloned} position={[0, 0, -2]} />;
+  // Push far behind characters (z=-8) so camera sees chars in front, classroom behind
+  return <primitive object={cloned} position={[0, 0, -8]} />;
 }
 
 useGLTF.preload(CLASSROOM_MODEL);
