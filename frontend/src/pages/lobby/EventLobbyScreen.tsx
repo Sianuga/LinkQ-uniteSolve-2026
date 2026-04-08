@@ -168,16 +168,8 @@ export default function EventLobbyScreen() {
 
   return (
     <div className="h-dvh w-full relative overflow-hidden bg-[#0a0a1a]">
-      {/* 3D Scene — blurs when bottom sheet is open */}
-      <div
-        className="absolute inset-0 h-full w-full"
-        style={{
-          filter: selectedCharacterId
-            ? 'blur(2px) brightness(0.7)'
-            : 'none',
-          transition: 'filter 0.3s ease-in-out',
-        }}
-      >
+      {/* 3D Scene */}
+      <div className="absolute inset-0 h-full w-full">
         <ErrorBoundary FallbackComponent={WebGLFallback}>
           <Suspense fallback={<LobbyLoading />}>
             <LobbyScene
