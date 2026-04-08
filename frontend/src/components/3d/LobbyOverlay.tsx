@@ -108,7 +108,7 @@ const nameVariants = {
 /* ------------------------------------------------------------------ */
 
 /** Party fullness dots: filled = joined, empty = remaining */
-function PartyDots({
+function PartyBadge({
   count,
   capacity,
 }: {
@@ -116,22 +116,10 @@ function PartyDots({
   capacity: number;
 }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <div className="flex items-center gap-1">
-        {Array.from({ length: capacity }, (_, i) => (
-          <span
-            key={i}
-            className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ${
-              i < count ? 'bg-blue-400' : 'bg-white/20'
-            }`}
-          />
-        ))}
-      </div>
-      <span
-        className="ml-1 whitespace-nowrap text-xs font-medium text-white/60"
-        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
-      >
-        {count}/{capacity} joined
+    <div className="flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 shadow-sm">
+      <Users className="h-3.5 w-3.5 text-primary" />
+      <span className="whitespace-nowrap text-xs font-semibold text-text-primary">
+        {count}/{capacity}
       </span>
     </div>
   );
@@ -157,8 +145,8 @@ function CarouselDots({
           aria-label={`Go to character ${i + 1}`}
           className={`rounded-full transition-all duration-300 ${
             i === activeIndex
-              ? 'h-3 w-3 bg-white'
-              : 'h-2.5 w-2.5 bg-white/30'
+              ? 'h-3 w-3 bg-primary'
+              : 'h-2.5 w-2.5 bg-gray-300'
           }`}
         />
       ))}
@@ -176,8 +164,7 @@ function MiscIcons() {
           key={i}
           type="button"
           className="flex h-10 w-10 items-center justify-center rounded-full
-                     bg-white/10 text-white/70 backdrop-blur-sm"
-          style={{ WebkitBackdropFilter: 'blur(8px)' }}
+                     bg-gray-100 text-text-secondary hover:bg-gray-200 transition-colors"
           aria-hidden="true"
           tabIndex={-1}
         >
@@ -265,9 +252,13 @@ export default function LobbyOverlay({
       {/* ============================================================== */}
       {/* BOTTOM AREA                                                    */}
       {/* ============================================================== */}
-      <div className="flex flex-col gap-3 px-4 pb-[max(env(safe-area-inset-bottom,12px),12px)]">
-        {/* ---- Focused character name + match badge (centered) ---- */}
-        <div className="flex min-h-[40px] items-center justify-center">
+      {/* White frosted bottom panel */}
+      <div
+        className="flex flex-col gap-2 rounded-t-2xl border-t border-white/20 bg-white/95 px-4 pb-[max(env(safe-area-inset-bottom,12px),16px)] pt-3 backdrop-blur-xl"
+        style={{ WebkitBackdropFilter: 'blur(24px)' }}
+      >
+        {/* ---- Focused character name + match badge ---- */}
+        <div className="flex min-h-[36px] items-center justify-center">
           <AnimatePresence mode="wait">
             {focused && (
               <motion.div
@@ -278,13 +269,10 @@ export default function LobbyOverlay({
                 exit="exit"
                 className="flex items-center gap-2"
               >
-                <span
-                  className="text-xl font-bold text-white"
-                  style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
-                >
+                <span className="text-lg font-bold text-text-primary">
                   {focused.name}
                 </span>
-                <span className="rounded-full bg-blue-500/80 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
+                <span className="rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-white">
                   {Math.round(focused.matchScore * 100)}%
                 </span>
               </motion.div>
@@ -292,19 +280,18 @@ export default function LobbyOverlay({
           </AnimatePresence>
         </div>
 
-        {/* ---- Bottom row: party dots | carousel dots | misc icons ---- */}
-        <div className="pointer-events-auto flex items-center justify-between">
-          {/* Left: party fullness */}
-          <PartyDots count={partyCount} capacity={partyCapacity} />
-
-          {/* Center: carousel dots */}
+        {/* ---- Carousel dots (centered) ---- */}
+        <div className="pointer-events-auto flex justify-center">
           <CarouselDots
             count={characters.length}
             activeIndex={focusIndex}
             onDotClick={onFocusDot}
           />
+        </div>
 
-          {/* Right: decorative icons */}
+        {/* ---- Bottom row: party badge | misc icons ---- */}
+        <div className="pointer-events-auto flex items-center justify-between">
+          <PartyBadge count={partyCount} capacity={partyCapacity} />
           <MiscIcons />
         </div>
       </div>

@@ -36,16 +36,17 @@ export interface LobbySceneProps {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const CAMERA_POS: [number, number, number] = [0, 1.6, 4.5];
-const CAMERA_LOOKAT: [number, number, number] = [0, 0.8, 0];
-const ZOOM_POS: [number, number, number] = [0, 1.4, 3.0];
-const ZOOM_LOOKAT: [number, number, number] = [0, 0.9, 0];
+const CAMERA_POS: [number, number, number] = [0, 1.8, 6.5];
+const CAMERA_LOOKAT: [number, number, number] = [0, 0.6, 0];
+const ZOOM_POS: [number, number, number] = [0, 1.5, 4.0];
+const ZOOM_LOOKAT: [number, number, number] = [0, 0.8, 0];
 
-/** Carousel slot positions — only 3 characters visible at a time. */
+/** Carousel slot positions — only 3 characters visible at a time.
+ *  Side chars peek in from edges so user knows there's more to swipe. */
 const SLOTS = {
-  center: { pos: [0, 0, 0.3] as [number, number, number], scale: 1.0 },
-  left: { pos: [-2.0, 0, -0.5] as [number, number, number], scale: 0.7 },
-  right: { pos: [2.0, 0, -0.5] as [number, number, number], scale: 0.7 },
+  center: { pos: [0, 0, 0] as [number, number, number], scale: 1.0 },
+  left: { pos: [-1.5, 0, -0.3] as [number, number, number], scale: 0.65 },
+  right: { pos: [1.5, 0, -0.3] as [number, number, number], scale: 0.65 },
 };
 
 /* ------------------------------------------------------------------ */
@@ -181,10 +182,10 @@ function AnimatedSlot({
 
   useFrame(() => {
     if (!ref.current) return;
-    ref.current.position.x = lerp(ref.current.position.x, targetPos[0], 0.1);
-    ref.current.position.y = lerp(ref.current.position.y, targetPos[1], 0.1);
-    ref.current.position.z = lerp(ref.current.position.z, targetPos[2], 0.1);
-    const s = lerp(ref.current.scale.x, targetScale, 0.1);
+    ref.current.position.x = lerp(ref.current.position.x, targetPos[0], 0.07);
+    ref.current.position.y = lerp(ref.current.position.y, targetPos[1], 0.07);
+    ref.current.position.z = lerp(ref.current.position.z, targetPos[2], 0.07);
+    const s = lerp(ref.current.scale.x, targetScale, 0.07);
     ref.current.scale.setScalar(s);
   });
 
@@ -371,7 +372,7 @@ export default function LobbyScene({
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: CAMERA_POS, fov: 55 }}
+      camera={{ position: CAMERA_POS, fov: 60 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       style={{ background: '#0a0a1a', touchAction: 'none' }}
     >
