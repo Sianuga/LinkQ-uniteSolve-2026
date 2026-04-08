@@ -167,9 +167,10 @@ Base URL: `{{baseUrl}}` (configurable)
 ### Auth
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/auth/register` | - | Register user `{name, email, password}` |
+| POST | `/auth/register` | - | Register user `{name, email, password}` | 
 | POST | `/auth/login` | - | Login → returns `{token}` |
 | GET | `/me` | Bearer | Get current user profile |
+| POST | `/oauth` | OAuth | OAuth from moodule |
 
 ### Users
 | Method | Endpoint | Auth | Description |
@@ -182,16 +183,10 @@ Base URL: `{{baseUrl}}` (configurable)
 |--------|----------|------|-------------|
 | GET | `/events?university=` | - | List events (filter by university) |
 | POST | `/events` | Bearer | Create event |
-| GET | `/events/:id` | - | Get event details → `{id, title, description, location, start_time, end_time, parent_event_id}` |
+| GET | `/events/:id` | - | Get event details → `{id, title, description, location, start_time, end_time}` |
 | POST | `/events/:id/join` | Bearer | Join event |
 | GET | `/events/:id/participants` | - | Get event participants → `[{id, name, university, program, avatar_url}]` |
 | GET | `/events/:id/matches` | - | Get swipe candidates → `[{user_id, name, avatar, match_score, shared{events,interests}}]` |
-
-### Sub-events
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/events/:id/subevents` | - | List sub-events |
-| POST | `/events/:id/subevents` | Bearer | Create sub-event |
 
 ### Connections
 | Method | Endpoint | Auth | Description |
@@ -200,10 +195,20 @@ Base URL: `{{baseUrl}}` (configurable)
 | GET | `/connections` | Bearer | Get connections list → `[{id, requester_id, receiver_id, status}]` |
 | PATCH | `/connections/:id` | Bearer | Update connection status `{status: "ACCEPTED"|"REJECTED"}` |
 
-### Swipes
+
+### Groups
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| POST | `/swipes` | Bearer | Record swipe action `{target_user_id, event_id, action: "LIKE"|"PASS"}` |
+| GET | `/group/:id` | Bearer | Get group members → `{id, name, university, program, avatar_url}` |
+| POST | `/groups?event_id= | Bearer | Create group from some users who participated in event` |
+| POST | `/group/:group_id | Bearer | Join some group  `{status: "ACCEPTED"|"REJECTED"}`  |
+| GET | `/group/event/:event_id` | Bearer | Get all group for event_id → `{group_id, number_of_member}` |
+
+### Matching
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/match/:match_id?event_id=&type=?&?looking_for=?` | Bearer | Submit a matching request for the user or the group. type can be group, or the user. which indicate the match_id will be user_id or the group_id and want to find member for such event_id, looking_for (only apply for type group) indicate how many people they are looking for |
+
 
 ## Complete Screen Map
 
