@@ -301,10 +301,16 @@ function BlandNormalGuy({ mat }: { mat: THREE.MeshStandardMaterial }) {
 function MysterySilhouette({ mat }: { mat: THREE.MeshStandardMaterial }) {
   const glitchRef = useRef<THREE.Group>(null);
 
-  useFrame(() => {
+  useFrame(({ clock }) => {
     if (!glitchRef.current) return;
-    // Subtle random glitch on X
-    glitchRef.current.position.x = (Math.random() - 0.5) * 0.04;
+    // Occasional glitch — only triggers briefly every ~2 seconds
+    const t = clock.elapsedTime;
+    const glitchPhase = Math.sin(t * 3) * Math.sin(t * 7);
+    if (Math.abs(glitchPhase) > 0.95) {
+      glitchRef.current.position.x = (Math.random() - 0.5) * 0.06;
+    } else {
+      glitchRef.current.position.x *= 0.9; // ease back to center
+    }
   });
 
   return (

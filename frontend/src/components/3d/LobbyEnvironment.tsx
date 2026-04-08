@@ -1,5 +1,7 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
+import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import * as THREE from "three";
 
 // ---------------------------------------------------------------------------
@@ -193,33 +195,65 @@ function VolumetricBeam() {
 // Main Export
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Classroom model
+// ---------------------------------------------------------------------------
+
+const CLASSROOM_MODEL = '/models/arena/lowpoly_stylized_classroom.glb';
+
+function ClassroomModel() {
+  const { scene } = useGLTF(CLASSROOM_MODEL);
+  const cloned = useMemo(() => {
+    const c = skeletonClone(scene);
+    c.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(c);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    // Scale classroom to be ~12 units wide to contain the character lineup
+    const s = 12 / Math.max(size.x, size.z);
+    const wrapper = new THREE.Group();
+    wrapper.add(c);
+    wrapper.scale.setScalar(s);
+    c.position.set(-center.x, -box.min.y, -center.z);
+    return wrapper;
+  }, [scene]);
+
+  return <primitive object={cloned} position={[0, 0, -2]} />;
+}
+
+useGLTF.preload(CLASSROOM_MODEL);
+
+// ---------------------------------------------------------------------------
+// Main Export
+// ---------------------------------------------------------------------------
+
 export default function LobbyEnvironment() {
   return (
     <>
       {/* Scene-level properties (fog + background) — attaches to scene */}
       <color attach="background" args={[BG_COLOR]} />
-      <fogExp2 attach="fog" args={[BG_COLOR, 0.06]} />
+      <fogExp2 attach="fog" args={[BG_COLOR, 0.03]} />
 
-      {/* Lighting */}
-      <ambientLight intensity={0.15} color="#93C5FD" />
+      {/* Lighting — brighter to illuminate classroom */}
+      <ambientLight intensity={0.4} color="#ffffff" />
       <directionalLight
         position={[3, 6, 2]}
-        intensity={0.4}
-        color="#a5b4fc"
+        intensity={0.8}
+        color="#ffffff"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
       <pointLight position={[0, 3, 0]} intensity={0.6} color="#3B82F6" distance={10} decay={2} />
 
-      {/* Floor */}
+      {/* Classroom environment */}
+      <ClassroomModel />
+
+      {/* Floor (fallback if classroom doesn't cover it) */}
       <ReflectiveFloor />
-      <FloorGridLines />
 
       {/* Atmosphere */}
-      <GlowStrip />
       <FloatingParticles />
-      <VolumetricBeam />
     </>
   );
 }

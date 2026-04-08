@@ -37,20 +37,56 @@ export interface LobbySceneProps {
 /* ------------------------------------------------------------------ */
 
 const SPACING = 2.0;
-const CAMERA_POS: [number, number, number] = [0, 1.6, 5.5];
-const CAMERA_LOOKAT: [number, number, number] = [0, 0.9, 0];
-const CAMERA_FOV = 40;
+
+// Overview: camera far back to see all 5 characters
+const OVERVIEW_POS: [number, number, number] = [0, 2.2, 10];
+const OVERVIEW_LOOKAT: [number, number, number] = [0, 0.8, 0];
+
+// Zoomed: camera close to focused character
+const ZOOM_DISTANCE = 3.5;
+const ZOOM_HEIGHT = 1.5;
+const ZOOM_LOOKAT_Y = 0.9;
 
 /* ------------------------------------------------------------------ */
-/*  CameraSetup — fixed camera, calls lookAt every frame              */
+/*  CameraController — overview (all chars visible) or zoom on select */
 /* ------------------------------------------------------------------ */
 
-function CameraSetup() {
+function CameraController({
+  selectedId,
+  focusIndex,
+  characterCount,
+}: {
+  selectedId: string | null;
+  focusIndex: number;
+  characterCount: number;
+}) {
   const { camera } = useThree();
+  const targetPos = useRef(new THREE.Vector3(...OVERVIEW_POS));
+  const targetLookAt = useRef(new THREE.Vector3(...OVERVIEW_LOOKAT));
+  const currentPos = useRef(new THREE.Vector3(...OVERVIEW_POS));
+  const currentLookAt = useRef(new THREE.Vector3(...OVERVIEW_LOOKAT));
+
+  useEffect(() => {
+    if (selectedId) {
+      // Zoom in on the focused character
+      const totalWidth = (characterCount - 1) * SPACING;
+      const charX = -totalWidth / 2 + focusIndex * SPACING;
+      targetPos.current.set(charX, ZOOM_HEIGHT, ZOOM_DISTANCE);
+      targetLookAt.current.set(charX, ZOOM_LOOKAT_Y, 0);
+    } else {
+      // Overview — see all characters
+      targetPos.current.set(...OVERVIEW_POS);
+      targetLookAt.current.set(...OVERVIEW_LOOKAT);
+    }
+  }, [selectedId, focusIndex, characterCount]);
 
   useFrame(() => {
-    camera.position.set(CAMERA_POS[0], CAMERA_POS[1], CAMERA_POS[2]);
-    camera.lookAt(CAMERA_LOOKAT[0], CAMERA_LOOKAT[1], CAMERA_LOOKAT[2]);
+    const speed = 0.06;
+    currentPos.current.lerp(targetPos.current, speed);
+    currentLookAt.current.lerp(targetLookAt.current, speed);
+
+    camera.position.copy(currentPos.current);
+    camera.lookAt(currentLookAt.current);
   });
 
   return null;
@@ -154,50 +190,21 @@ function LineupGroup({
   characters,
   focusIndex,
   selectedId,
-  overscrollOffset,
   onSelect,
 }: {
   characters: CharacterData[];
   focusIndex: number;
   selectedId: string | null;
-  overscrollOffset: number;
   onSelect: (id: string) => void;
 }) {
-  const groupRef = useRef<THREE.Group>(null);
-
-  // Store per-character z targets for smooth lerp
-  const charGroupRefs = useRef<(THREE.Group | null)[]>([]);
-
-  useFrame(() => {
-    if (!groupRef.current) return;
-
-    // Slide group so the focused character is centered at x=0
-    const targetX = -focusIndex * SPACING + overscrollOffset * SPACING * 0.3;
-    groupRef.current.position.x = THREE.MathUtils.lerp(
-      groupRef.current.position.x,
-      targetX,
-      0.08,
-    );
-
-    // Smoothly lerp each character's z position based on focus
-    for (let i = 0; i < characters.length; i++) {
-      const ref = charGroupRefs.current[i];
-      if (!ref) continue;
-      const targetZ = i === focusIndex ? 0.5 : -0.3;
-      ref.position.z = THREE.MathUtils.lerp(ref.position.z, targetZ, 0.08);
-    }
-  });
+  // Characters in fixed positions — camera moves, not the group
+  const totalWidth = (characters.length - 1) * SPACING;
+  const startX = -totalWidth / 2;
 
   return (
-    <group ref={groupRef}>
+    <group>
       {characters.map((char, i) => (
-        <group
-          key={char.userId}
-          ref={(el) => {
-            charGroupRefs.current[i] = el;
-          }}
-          position={[i * SPACING, 0, i === focusIndex ? 0.5 : -0.3]}
-        >
+        <group key={char.userId} position={[startX + i * SPACING, 0, 0]}>
           <LobbyCharacter
             userId={char.userId}
             name={char.name}
@@ -262,7 +269,7 @@ function InnerScene({
       <PerformanceMonitor />
       <AdaptiveDpr pixelated />
 
-      <CameraSetup />
+      <CameraController selectedId={selectedId} focusIndex={focusIndex} characterCount={characters.length} />
 
       <LobbyLighting />
       <LobbyEnvironment />
@@ -278,7 +285,6 @@ function InnerScene({
         characters={characters}
         focusIndex={focusIndex}
         selectedId={selectedId}
-        overscrollOffset={overscrollOffset}
         onSelect={onSelectCharacter}
       />
     </>
@@ -324,7 +330,7 @@ export default function LobbyScene({
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: CAMERA_POS, fov: CAMERA_FOV }}
+      camera={{ position: OVERVIEW_POS, fov: 50 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       style={{ background: '#0a0a1a', touchAction: 'none' }}
     >
