@@ -10,7 +10,8 @@ const BG_COLOR = "#0a0a1a";
 const PARTICLE_COUNT = 50;
 const PARTICLE_RADIUS = 5;
 const PARTICLE_HEIGHT = 4;
-const FLOOR_RADIUS = 4;
+const FLOOR_WIDTH = 20;
+const FLOOR_DEPTH = 8;
 
 // ---------------------------------------------------------------------------
 // Floating Particles — pre-computed at module scope (pure)
@@ -97,21 +98,21 @@ function FloatingParticles() {
 }
 
 // ---------------------------------------------------------------------------
-// Grid Rings on the Floor
+// Horizontal Floor Lines
 // ---------------------------------------------------------------------------
 
-function FloorGridRings() {
-  const radii = [1.3, 2.6, 3.8];
+function FloorGridLines() {
+  const zOffsets = [-2.5, -0.8, 0.8, 2.5];
 
   return (
-    <group rotation-x={-Math.PI / 2} position-y={0.005}>
-      {radii.map((r) => (
-        <mesh key={r}>
-          <ringGeometry args={[r - 0.005, r + 0.005, 128]} />
+    <group position-y={0.005}>
+      {zOffsets.map((z) => (
+        <mesh key={z} position={[0, 0, z]} rotation-x={-Math.PI / 2}>
+          <planeGeometry args={[FLOOR_WIDTH, 0.01]} />
           <meshBasicMaterial
             color="#1E3A8A"
             transparent
-            opacity={0.15}
+            opacity={0.1}
             side={THREE.DoubleSide}
             depthWrite={false}
           />
@@ -122,10 +123,10 @@ function FloorGridRings() {
 }
 
 // ---------------------------------------------------------------------------
-// Ambient Glow Ring (pulsing torus)
+// Ambient Glow Strip (pulsing horizontal line at character feet)
 // ---------------------------------------------------------------------------
 
-function GlowRing() {
+function GlowStrip() {
   const meshRef = useRef<THREE.Mesh>(null);
 
   useFrame(({ clock }) => {
@@ -137,8 +138,8 @@ function GlowRing() {
   });
 
   return (
-    <mesh ref={meshRef} rotation-x={-Math.PI / 2} position-y={0.01}>
-      <torusGeometry args={[3.5, 0.02, 16, 128]} />
+    <mesh ref={meshRef} rotation-x={-Math.PI / 2} position-y={0.01} position-z={0}>
+      <planeGeometry args={[FLOOR_WIDTH * 0.9, 0.04]} />
       <meshStandardMaterial
         color="#000000"
         emissive="#3B82F6"
@@ -158,7 +159,7 @@ function GlowRing() {
 function ReflectiveFloor() {
   return (
     <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
-      <circleGeometry args={[FLOOR_RADIUS, 128]} />
+      <planeGeometry args={[FLOOR_WIDTH, FLOOR_DEPTH]} />
       <meshStandardMaterial
         color={BG_COLOR}
         metalness={0.8}
@@ -213,10 +214,10 @@ export default function LobbyEnvironment() {
 
       {/* Floor */}
       <ReflectiveFloor />
-      <FloorGridRings />
+      <FloorGridLines />
 
       {/* Atmosphere */}
-      <GlowRing />
+      <GlowStrip />
       <FloatingParticles />
       <VolumetricBeam />
     </>

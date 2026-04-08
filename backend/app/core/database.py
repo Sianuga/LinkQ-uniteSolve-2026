@@ -16,8 +16,9 @@ class Database:
 
     def load_seed_data(self) -> None:
         """Load seed data from data/seed/*.json if files exist."""
+        env_seed = os.environ.get("LINKQ_SEED_DIR", "")
         candidates = [
-            Path(os.environ.get("LINKQ_SEED_DIR", "")),   # explicit env var
+            *([] if not env_seed else [Path(env_seed)]),   # explicit env var (only if set)
             Path(os.getcwd()).parent / "data" / "seed",    # run from backend/
             Path(os.getcwd()) / "data" / "seed",           # run from project root
             Path("../data/seed"),                          # relative fallback
@@ -25,7 +26,7 @@ class Database:
         ]
         seed_dir = None
         for p in candidates:
-            if p.is_dir():
+            if p.is_dir() and (p / "users.json").exists():
                 seed_dir = p
                 break
         if seed_dir is None:

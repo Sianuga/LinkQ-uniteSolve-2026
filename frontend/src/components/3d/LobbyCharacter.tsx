@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Capsule, Sphere, Cylinder, Cone, useGLTF } from '@react-three/drei';
+import { Capsule, Sphere, Cylinder, Cone, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { AvatarType } from '../../types';
@@ -460,94 +460,6 @@ function CharacterBody({
   }
 }
 
-// ---------------------------------------------------------------------------
-// Head Y positions per avatar type (for label placement)
-// ---------------------------------------------------------------------------
-
-const HEAD_Y: Record<AvatarType, number> = {
-  buff_arnold: 2.15,
-  banana_guy: 2.2,
-  anime_girl: 2.05,
-  bland_normal_guy: 1.95,
-  mystery_silhouette: 1.95,
-};
-
-// ---------------------------------------------------------------------------
-// Match score colour helper
-// ---------------------------------------------------------------------------
-
-function scoreColor(score: number): string {
-  const pct = score <= 1 ? score * 100 : score;
-  if (pct >= 80) return '#22c55e';
-  if (pct >= 60) return '#eab308';
-  if (pct >= 40) return '#f97316';
-  return '#ef4444';
-}
-
-// ---------------------------------------------------------------------------
-// Floating label component (Drei Html)
-// ---------------------------------------------------------------------------
-
-function FloatingLabel({
-  name,
-  matchScore,
-  y,
-}: {
-  name: string;
-  matchScore: number;
-  y: number;
-}) {
-  return (
-    <Html
-      position={[0, y, 0]}
-      center
-      distanceFactor={6}
-      style={{ pointerEvents: 'none' }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 6,
-          background: 'rgba(255,255,255,0.15)',
-          backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)',
-          border: '1px solid rgba(255,255,255,0.2)',
-          borderRadius: 20,
-          padding: '4px 12px',
-          whiteSpace: 'nowrap',
-          userSelect: 'none',
-        }}
-      >
-        <span
-          style={{
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: 13,
-            fontFamily: 'Inter, system-ui, sans-serif',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          {name}
-        </span>
-        <span
-          style={{
-            background: scoreColor(matchScore),
-            color: '#fff',
-            fontWeight: 700,
-            fontSize: 11,
-            fontFamily: 'Inter, system-ui, sans-serif',
-            borderRadius: 10,
-            padding: '1px 7px',
-            lineHeight: '18px',
-          }}
-        >
-          {matchScore <= 1 ? Math.round(matchScore * 100) : matchScore}%
-        </span>
-      </div>
-    </Html>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -632,7 +544,7 @@ export default function LobbyCharacter({
   };
 
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
+    <group position={position}>
       <group
         ref={groupRef}
         onClick={(e) => {
@@ -656,6 +568,20 @@ export default function LobbyCharacter({
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} receiveShadow>
           <circleGeometry args={[0.35, 24]} />
           <meshStandardMaterial color="#000" transparent opacity={0.18} />
+        </mesh>
+
+        {/* Pedestal ring */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+          <ringGeometry args={[0.5, 0.58, 48]} />
+          <meshStandardMaterial
+            color={preset.emissive}
+            emissive={preset.emissive}
+            emissiveIntensity={isFocused ? 0.8 : 0.2}
+            transparent
+            opacity={isFocused ? 0.9 : 0.3}
+            side={THREE.DoubleSide}
+            toneMapped={false}
+          />
         </mesh>
 
         {/* Selected spotlight from above */}
@@ -688,12 +614,6 @@ export default function LobbyCharacter({
         )}
       </group>
 
-      {/* Floating name + match score label — always visible, outside groupRef so it is not scaled */}
-      <FloatingLabel
-        name={name}
-        matchScore={matchScore}
-        y={HEAD_Y[avatarType]}
-      />
     </group>
   );
 }

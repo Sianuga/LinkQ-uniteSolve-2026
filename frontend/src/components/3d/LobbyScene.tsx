@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useRef, useState, useEffect, useCallback } from 'react';
+import { Suspense, useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { PerformanceMonitor, AdaptiveDpr, Html } from '@react-three/drei';
 import { useDrag } from '@use-gesture/react';
@@ -24,7 +24,7 @@ export interface CharacterData {
   shared: { events: number; interests: number };
 }
 
-interface LobbySceneProps {
+export interface LobbySceneProps {
   characters: CharacterData[];
   selectedId: string | null;
   focusIndex: number;
@@ -33,84 +33,31 @@ interface LobbySceneProps {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Circle layout — characters arranged on circular platform          */
+/*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const CIRCLE_RADIUS = 2.2; // radius of character circle (inside platform edge of 4)
-
-function useCircleLayout(count: number) {
-  return useMemo(() => {
-    if (count === 0) return [];
-    if (count === 1) return [{ position: [0, 0, 0] as [number, number, number], rotationY: 0, angle: 0 }];
-
-    return Array.from({ length: count }, (_, i) => {
-      // Spread evenly around the circle
-      const angle = (i / count) * Math.PI * 2;
-      const x = Math.sin(angle) * CIRCLE_RADIUS;
-      const z = Math.cos(angle) * CIRCLE_RADIUS;
-      // Face toward center
-      const rotationY = angle + Math.PI;
-
-      return {
-        position: [x, 0, z] as [number, number, number],
-        rotationY,
-        angle,
-      };
-    });
-  }, [count]);
-}
+const SPACING = 2.0;
+const CAMERA_POS: [number, number, number] = [0, 1.6, 5.5];
+const CAMERA_LOOKAT: [number, number, number] = [0, 0.9, 0];
+const CAMERA_FOV = 40;
 
 /* ------------------------------------------------------------------ */
-/*  Camera controller — orbits around circle to face focused char     */
+/*  CameraSetup — fixed camera, calls lookAt every frame              */
 /* ------------------------------------------------------------------ */
 
-const CAMERA_DISTANCE = 4.5; // distance from center
-const CAMERA_HEIGHT = 1.8;
-
-function CameraController({
-  focusIndex,
-  characterCount,
-  overscrollOffset = 0,
-}: {
-  focusIndex: number;
-  characterCount: number;
-  overscrollOffset?: number;
-}) {
+function CameraSetup() {
   const { camera } = useThree();
-  const targetAngle = useRef(0);
-  const currentAngle = useRef(0);
-
-  useEffect(() => {
-    if (characterCount === 0) return;
-    const charAngle = (focusIndex / characterCount) * Math.PI * 2;
-    targetAngle.current = charAngle + overscrollOffset * 0.3;
-  }, [focusIndex, characterCount, overscrollOffset]);
 
   useFrame(() => {
-    // Lerp angle — handle wrapping around 2PI to take shortest path
-    let diff = targetAngle.current - currentAngle.current;
-    // Normalize to [-PI, PI] so we always rotate the short way
-    while (diff > Math.PI) diff -= Math.PI * 2;
-    while (diff < -Math.PI) diff += Math.PI * 2;
-    currentAngle.current += diff * 0.06;
-
-    // Camera sits behind the focused character (opposite side), looking inward
-    const camAngle = currentAngle.current + Math.PI;
-    camera.position.x = Math.sin(camAngle) * CAMERA_DISTANCE;
-    camera.position.z = Math.cos(camAngle) * CAMERA_DISTANCE;
-    camera.position.y = CAMERA_HEIGHT;
-
-    // Look at the focused character (slightly above ground for better framing)
-    const lookX = Math.sin(currentAngle.current) * CIRCLE_RADIUS;
-    const lookZ = Math.cos(currentAngle.current) * CIRCLE_RADIUS;
-    camera.lookAt(lookX, 0.9, lookZ);
+    camera.position.set(CAMERA_POS[0], CAMERA_POS[1], CAMERA_POS[2]);
+    camera.lookAt(CAMERA_LOOKAT[0], CAMERA_LOOKAT[1], CAMERA_LOOKAT[2]);
   });
 
   return null;
 }
 
 /* ------------------------------------------------------------------ */
-/*  Swipe handler — horizontal drag on the canvas to change focus     */
+/*  SwipeHandler — horizontal drag on the canvas to change focus       */
 /* ------------------------------------------------------------------ */
 
 function SwipeHandler({
@@ -126,7 +73,6 @@ function SwipeHandler({
 }) {
   const { gl } = useThree();
 
-  // When `target` is specified, useDrag auto-binds to the element — no manual bind() call needed
   useDrag(
     ({ movement: [mx], velocity: [vx], elapsed, last, tap }) => {
       if (tap) return;
@@ -166,6 +112,114 @@ function SwipeHandler({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Per-character spotlight                                             */
+/* ------------------------------------------------------------------ */
+
+function CharacterSpotlight({ isFocused }: { isFocused: boolean }) {
+  const lightRef = useRef<THREE.SpotLight>(null);
+  const targetRef = useRef<THREE.Object3D>(null);
+  const currentIntensity = useRef(0.4);
+
+  useFrame(() => {
+    if (!lightRef.current) return;
+    const target = isFocused ? 2.5 : 0.4;
+    currentIntensity.current = THREE.MathUtils.lerp(currentIntensity.current, target, 0.08);
+    lightRef.current.intensity = currentIntensity.current;
+  });
+
+  return (
+    <>
+      <spotLight
+        ref={lightRef}
+        position={[0, 4, 1]}
+        intensity={0.4}
+        angle={0.5}
+        penumbra={0.7}
+        distance={8}
+        color={isFocused ? '#ffffff' : '#a0b4d0'}
+        castShadow={false}
+        target={targetRef.current ?? undefined}
+      />
+      <object3D ref={targetRef} position={[0, 0, 0]} />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  LineupGroup — horizontal character lineup that slides to center    */
+/*  the focused character                                              */
+/* ------------------------------------------------------------------ */
+
+function LineupGroup({
+  characters,
+  focusIndex,
+  selectedId,
+  overscrollOffset,
+  onSelect,
+}: {
+  characters: CharacterData[];
+  focusIndex: number;
+  selectedId: string | null;
+  overscrollOffset: number;
+  onSelect: (id: string) => void;
+}) {
+  const groupRef = useRef<THREE.Group>(null);
+
+  // Store per-character z targets for smooth lerp
+  const charGroupRefs = useRef<(THREE.Group | null)[]>([]);
+
+  useFrame(() => {
+    if (!groupRef.current) return;
+
+    // Slide group so the focused character is centered at x=0
+    const targetX = -focusIndex * SPACING + overscrollOffset * SPACING * 0.3;
+    groupRef.current.position.x = THREE.MathUtils.lerp(
+      groupRef.current.position.x,
+      targetX,
+      0.08,
+    );
+
+    // Smoothly lerp each character's z position based on focus
+    for (let i = 0; i < characters.length; i++) {
+      const ref = charGroupRefs.current[i];
+      if (!ref) continue;
+      const targetZ = i === focusIndex ? 0.5 : -0.3;
+      ref.position.z = THREE.MathUtils.lerp(ref.position.z, targetZ, 0.08);
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {characters.map((char, i) => (
+        <group
+          key={char.userId}
+          ref={(el) => {
+            charGroupRefs.current[i] = el;
+          }}
+          position={[i * SPACING, 0, i === focusIndex ? 0.5 : -0.3]}
+        >
+          <LobbyCharacter
+            userId={char.userId}
+            name={char.name}
+            avatarType={char.avatarType}
+            matchScore={char.matchScore}
+            program={char.program}
+            tags={char.tags}
+            shared={char.shared}
+            position={[0, 0, 0]}
+            rotationY={0}
+            isSelected={char.userId === selectedId}
+            isFocused={i === focusIndex}
+            onClick={() => onSelect(char.userId)}
+          />
+          <CharacterSpotlight isFocused={i === focusIndex} />
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Loading spinner                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -179,58 +233,6 @@ function CanvasLoader() {
         </p>
       </div>
     </Html>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Focus spotlight — follows the focused character from above         */
-/* ------------------------------------------------------------------ */
-
-function FocusSpotlight({
-  focusIndex,
-  characterCount,
-}: {
-  focusIndex: number;
-  characterCount: number;
-}) {
-  const lightRef = useRef<THREE.SpotLight>(null);
-  const targetRef = useRef<THREE.Object3D>(null);
-  const targetPos = useRef({ x: 0, z: 0 });
-
-  useEffect(() => {
-    if (characterCount === 0) return;
-    const angle = (focusIndex / characterCount) * Math.PI * 2;
-    targetPos.current = {
-      x: Math.sin(angle) * CIRCLE_RADIUS,
-      z: Math.cos(angle) * CIRCLE_RADIUS,
-    };
-  }, [focusIndex, characterCount]);
-
-  useFrame(() => {
-    if (!lightRef.current) return;
-    lightRef.current.position.x = THREE.MathUtils.lerp(lightRef.current.position.x, targetPos.current.x, 0.08);
-    lightRef.current.position.z = THREE.MathUtils.lerp(lightRef.current.position.z, targetPos.current.z, 0.08);
-    if (targetRef.current) {
-      targetRef.current.position.x = lightRef.current.position.x;
-      targetRef.current.position.z = lightRef.current.position.z;
-    }
-  });
-
-  return (
-    <>
-      <spotLight
-        ref={lightRef}
-        position={[0, 4, 0]}
-        intensity={2}
-        angle={0.4}
-        penumbra={0.8}
-        distance={8}
-        color="#ffffff"
-        castShadow={false}
-        target={targetRef.current ?? undefined}
-      />
-      <object3D ref={targetRef} position={[0, 0, 0]} />
-    </>
   );
 }
 
@@ -255,43 +257,30 @@ function InnerScene({
   onSwipe: (dir: 'left' | 'right', skip: number) => void;
   onOverscroll: (offset: number) => void;
 }) {
-  const layout = useCircleLayout(characters.length);
-
   return (
     <>
       <PerformanceMonitor />
       <AdaptiveDpr pixelated />
 
+      <CameraSetup />
+
       <LobbyLighting />
       <LobbyEnvironment />
 
-      <CameraController focusIndex={focusIndex} characterCount={characters.length} overscrollOffset={overscrollOffset} />
-      <SwipeHandler characterCount={characters.length} focusIndex={focusIndex} onSwipe={onSwipe} onOverscroll={onOverscroll} />
+      <SwipeHandler
+        characterCount={characters.length}
+        focusIndex={focusIndex}
+        onSwipe={onSwipe}
+        onOverscroll={onOverscroll}
+      />
 
-      <FocusSpotlight focusIndex={focusIndex} characterCount={characters.length} />
-
-      {characters.map((char, i) => {
-        const placement = layout[i];
-        if (!placement) return null;
-
-        return (
-          <LobbyCharacter
-            key={char.userId}
-            userId={char.userId}
-            name={char.name}
-            avatarType={char.avatarType}
-            matchScore={char.matchScore}
-            program={char.program}
-            tags={char.tags}
-            shared={char.shared}
-            position={placement.position}
-            rotationY={placement.rotationY}
-            isSelected={char.userId === selectedId}
-            isFocused={i === focusIndex}
-            onClick={() => onSelectCharacter(char.userId)}
-          />
-        );
-      })}
+      <LineupGroup
+        characters={characters}
+        focusIndex={focusIndex}
+        selectedId={selectedId}
+        overscrollOffset={overscrollOffset}
+        onSelect={onSelectCharacter}
+      />
     </>
   );
 }
@@ -320,7 +309,6 @@ export default function LobbyScene({
         const delta = dir === 'right' ? skip : -skip;
         const next = prev + delta;
         const clamped = Math.max(0, Math.min(characters.length - 1, next));
-        // Swipe only moves focus, does NOT select (no bottom sheet)
         onFocusChange?.(clamped);
         return clamped;
       });
@@ -336,7 +324,7 @@ export default function LobbyScene({
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: [0, 2, 5], fov: 45 }}
+      camera={{ position: CAMERA_POS, fov: CAMERA_FOV }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       style={{ background: '#0a0a1a', touchAction: 'none' }}
     >

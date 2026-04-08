@@ -1,6 +1,14 @@
 import { useCallback } from 'react';
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion';
-import { ArrowLeft, Users, Sparkles } from 'lucide-react';
+import {
+  ArrowLeft,
+  LayoutList,
+  MessageCircle,
+  Smile,
+  Settings,
+  Users,
+  Sparkles,
+} from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -16,12 +24,25 @@ interface SelectedCharacter {
   shared: { events: number; interests: number };
 }
 
+interface CharacterSummary {
+  name: string;
+  matchScore: number;
+  avatarType: string;
+  userId: string;
+}
+
 export interface LobbyOverlayProps {
   eventTitle: string;
+  characters: CharacterSummary[];
+  focusIndex: number;
+  partyCount: number;
+  partyCapacity: number;
   selectedCharacter: SelectedCharacter | null;
   onBack: () => void;
   onViewProfile: (userId: string) => void;
   onDismiss: () => void;
+  onListView: () => void;
+  onFocusDot: (index: number) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -29,6 +50,11 @@ export interface LobbyOverlayProps {
 /* ------------------------------------------------------------------ */
 
 const AVATAR_EMOJI: Record<string, string> = {
+  buff_arnold: '\u{1F4AA}',
+  banana_guy: '\u{1F34C}',
+  anime_girl: '\u{1F338}',
+  bland_normal_guy: '\u{1F464}',
+  mystery_silhouette: '\u{2753}',
   robot: '\u{1F916}',
   alien: '\u{1F47E}',
   wizard: '\u{1F9D9}',
@@ -63,17 +89,124 @@ const scrimVariants = {
   exit: { opacity: 0, transition: { duration: 0.2 } },
 };
 
+const nameVariants = {
+  initial: { opacity: 0, y: 6 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: 'easeOut' },
+  },
+  exit: {
+    opacity: 0,
+    y: -6,
+    transition: { duration: 0.15, ease: 'easeIn' },
+  },
+};
+
 /* ------------------------------------------------------------------ */
-/*  Component                                                          */
+/*  Sub-components                                                     */
+/* ------------------------------------------------------------------ */
+
+/** Party fullness dots: filled = joined, empty = remaining */
+function PartyDots({
+  count,
+  capacity,
+}: {
+  count: number;
+  capacity: number;
+}) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
+        {Array.from({ length: capacity }, (_, i) => (
+          <span
+            key={i}
+            className={`inline-block h-2 w-2 rounded-full transition-colors duration-300 ${
+              i < count ? 'bg-blue-400' : 'bg-white/20'
+            }`}
+          />
+        ))}
+      </div>
+      <span
+        className="ml-1 whitespace-nowrap text-xs font-medium text-white/60"
+        style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+      >
+        {count}/{capacity} joined
+      </span>
+    </div>
+  );
+}
+
+/** Carousel navigation dots */
+function CarouselDots({
+  count,
+  activeIndex,
+  onDotClick,
+}: {
+  count: number;
+  activeIndex: number;
+  onDotClick: (i: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {Array.from({ length: count }, (_, i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onDotClick(i)}
+          aria-label={`Go to character ${i + 1}`}
+          className={`rounded-full transition-all duration-300 ${
+            i === activeIndex
+              ? 'h-3 w-3 bg-white'
+              : 'h-2.5 w-2.5 bg-white/30'
+          }`}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Decorative action buttons (bottom-right) */
+function MiscIcons() {
+  const icons = [MessageCircle, Smile, Settings] as const;
+  return (
+    <div className="flex items-center gap-2">
+      {icons.map((Icon, i) => (
+        <button
+          key={i}
+          type="button"
+          className="flex h-10 w-10 items-center justify-center rounded-full
+                     bg-white/10 text-white/70 backdrop-blur-sm"
+          style={{ WebkitBackdropFilter: 'blur(8px)' }}
+          aria-hidden="true"
+          tabIndex={-1}
+        >
+          <Icon className="h-[18px] w-[18px]" />
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
 /* ------------------------------------------------------------------ */
 
 export default function LobbyOverlay({
   eventTitle,
+  characters,
+  focusIndex,
+  partyCount,
+  partyCapacity,
   selectedCharacter,
   onBack,
   onViewProfile,
   onDismiss,
+  onListView,
+  onFocusDot,
 }: LobbyOverlayProps) {
+  const focused = characters[focusIndex] ?? null;
+
   /* ---- Drag-to-dismiss handler ---- */
   const handleDragEnd = useCallback(
     (_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
@@ -86,60 +219,103 @@ export default function LobbyOverlay({
 
   return (
     <div className="pointer-events-none absolute inset-0 z-10 flex flex-col">
-      {/* -------------------------------------------------------------- */}
-      {/* 1. Top bar                                                     */}
-      {/* -------------------------------------------------------------- */}
-      <div className="pointer-events-auto relative flex items-center px-3 pt-[env(safe-area-inset-top,12px)]">
-        {/* Back button */}
+      {/* ============================================================== */}
+      {/* TOP BAR                                                        */}
+      {/* ============================================================== */}
+      <div className="pointer-events-auto flex items-center justify-between px-4 pt-[env(safe-area-inset-top,12px)]">
+        {/* Back */}
         <button
           type="button"
           onClick={onBack}
-          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-full
-                     text-white transition-colors duration-150 hover:bg-white/10 active:bg-white/20"
+          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center
+                     rounded-full text-white transition-colors duration-150
+                     hover:bg-white/10 active:bg-white/20"
           style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
           aria-label="Go back"
         >
           <ArrowLeft className="h-6 w-6 drop-shadow-md" />
         </button>
 
-        {/* Event title — centered */}
+        {/* Title */}
         <h1
-          className="pointer-events-none absolute inset-x-0 top-[env(safe-area-inset-top,12px)] flex h-11
-                     items-center justify-center text-base font-semibold text-white"
+          className="flex-1 truncate px-2 text-center text-lg font-bold text-white"
           style={{ textShadow: '0 1px 6px rgba(0,0,0,0.5)' }}
         >
           {eventTitle}
         </h1>
+
+        {/* List toggle */}
+        <button
+          type="button"
+          onClick={onListView}
+          className="flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center
+                     rounded-full text-white transition-colors duration-150
+                     hover:bg-white/10 active:bg-white/20"
+          aria-label="Toggle list view"
+        >
+          <LayoutList className="h-6 w-6 drop-shadow-md" />
+        </button>
       </div>
 
-      {/* Spacer pushes hint & sheet to bottom */}
+      {/* ============================================================== */}
+      {/* SPACER — 3D scene shows through                                */}
+      {/* ============================================================== */}
       <div className="flex-1" />
 
-      {/* -------------------------------------------------------------- */}
-      {/* 2. Hint text (auto-fades, only when nothing selected)          */}
-      {/* -------------------------------------------------------------- */}
-      <AnimatePresence>
-        {!selectedCharacter && (
-          <motion.p
-            key="hint"
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 0 }}
-            transition={{ delay: 3, duration: 1.2, ease: 'easeOut' }}
-            className="pointer-events-none pb-10 text-center text-sm font-medium text-white/80"
-            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}
-          >
-            Tap a character to learn more
-          </motion.p>
-        )}
-      </AnimatePresence>
+      {/* ============================================================== */}
+      {/* BOTTOM AREA                                                    */}
+      {/* ============================================================== */}
+      <div className="flex flex-col gap-3 px-4 pb-[max(env(safe-area-inset-bottom,12px),12px)]">
+        {/* ---- Focused character name + match badge (centered) ---- */}
+        <div className="flex min-h-[40px] items-center justify-center">
+          <AnimatePresence mode="wait">
+            {focused && (
+              <motion.div
+                key={focused.userId}
+                variants={nameVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="flex items-center gap-2"
+              >
+                <span
+                  className="text-xl font-bold text-white"
+                  style={{ textShadow: '0 2px 8px rgba(0,0,0,0.6)' }}
+                >
+                  {focused.name}
+                </span>
+                <span className="rounded-full bg-blue-500/80 px-2.5 py-0.5 text-xs font-semibold text-white backdrop-blur-sm">
+                  {Math.round(focused.matchScore * 100)}%
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-      {/* -------------------------------------------------------------- */}
-      {/* 3. Character detail bottom sheet                               */}
-      {/* -------------------------------------------------------------- */}
+        {/* ---- Bottom row: party dots | carousel dots | misc icons ---- */}
+        <div className="pointer-events-auto flex items-center justify-between">
+          {/* Left: party fullness */}
+          <PartyDots count={partyCount} capacity={partyCapacity} />
+
+          {/* Center: carousel dots */}
+          <CarouselDots
+            count={characters.length}
+            activeIndex={focusIndex}
+            onDotClick={onFocusDot}
+          />
+
+          {/* Right: decorative icons */}
+          <MiscIcons />
+        </div>
+      </div>
+
+      {/* ============================================================== */}
+      {/* CHARACTER DETAIL BOTTOM SHEET (glass morphism)                  */}
+      {/* ============================================================== */}
       <AnimatePresence>
         {selectedCharacter && (
           <>
-            {/* Scrim — tapping dismisses */}
+            {/* Scrim */}
             <motion.div
               key="scrim"
               variants={scrimVariants}
@@ -162,8 +338,9 @@ export default function LobbyOverlay({
               dragConstraints={{ top: 0 }}
               dragElastic={0.15}
               onDragEnd={handleDragEnd}
-              className="pointer-events-auto relative z-20 flex max-h-[45dvh] min-h-[40dvh] flex-col
-                         rounded-t-2xl border border-white/20 bg-white/10 backdrop-blur-xl"
+              className="pointer-events-auto absolute bottom-0 left-0 right-0 z-20
+                         flex max-h-[45dvh] min-h-[40dvh] flex-col rounded-t-2xl
+                         border border-white/20 bg-white/10 backdrop-blur-xl"
               style={{ WebkitBackdropFilter: 'blur(24px)' }}
               role="dialog"
               aria-label={`${selectedCharacter.name} details`}
@@ -173,9 +350,9 @@ export default function LobbyOverlay({
                 <div className="h-1 w-10 rounded-full bg-white/40" />
               </div>
 
-              {/* Content — scrollable when overflow */}
+              {/* Content */}
               <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-5 pb-6">
-                {/* ---- Name + avatar type ---- */}
+                {/* Name + avatar type */}
                 <div className="flex items-center gap-3">
                   <span className="text-3xl leading-none" aria-hidden="true">
                     {avatarEmoji(selectedCharacter.avatarType)}
@@ -190,7 +367,7 @@ export default function LobbyOverlay({
                   </div>
                 </div>
 
-                {/* ---- Match score bar ---- */}
+                {/* Match score bar */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="flex items-center gap-1 text-white/80">
@@ -209,12 +386,16 @@ export default function LobbyOverlay({
                       animate={{
                         width: `${Math.round(selectedCharacter.matchScore * 100)}%`,
                       }}
-                      transition={{ delay: 0.15, duration: 0.5, ease: 'easeOut' }}
+                      transition={{
+                        delay: 0.15,
+                        duration: 0.5,
+                        ease: 'easeOut',
+                      }}
                     />
                   </div>
                 </div>
 
-                {/* ---- Shared stats ---- */}
+                {/* Shared stats */}
                 <p className="flex items-center gap-1.5 text-xs text-white/60">
                   <Users className="h-3.5 w-3.5" />
                   {selectedCharacter.shared.events}{' '}
@@ -226,7 +407,7 @@ export default function LobbyOverlay({
                     : 'interests'}
                 </p>
 
-                {/* ---- Tags ---- */}
+                {/* Tags */}
                 {selectedCharacter.tags.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {selectedCharacter.tags.slice(0, 4).map((tag) => (
@@ -241,7 +422,7 @@ export default function LobbyOverlay({
                   </div>
                 )}
 
-                {/* ---- View profile button ---- */}
+                {/* View profile button */}
                 <button
                   type="button"
                   onClick={() => onViewProfile(selectedCharacter.userId)}
