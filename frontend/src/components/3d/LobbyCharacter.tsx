@@ -390,6 +390,7 @@ function AuraOrb({ index }: { index: number }) {
 const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
 const BANANA_GUY_MODEL = '/models/cute_cat_in_cute_banana.glb';
 const NORMAL_GUY_MODEL = '/models/man_in_suit.glb';
+const ANIME_GIRL_MODEL = '/models/official_hatsune_miku_model_rigless.glb';
 
 function useClonedModel(path: string, targetHeight = 1.8) {
   const { scene } = useGLTF(path);
@@ -435,9 +436,14 @@ function NormalGuyGLB() {
   return useClonedModel(NORMAL_GUY_MODEL, 1.8);
 }
 
+function AnimeGirlGLB() {
+  return useClonedModel(ANIME_GIRL_MODEL, 1.7);
+}
+
 useGLTF.preload(BUFF_ARNOLD_MODEL);
 useGLTF.preload(BANANA_GUY_MODEL);
 useGLTF.preload(NORMAL_GUY_MODEL);
+useGLTF.preload(ANIME_GIRL_MODEL);
 
 // ---------------------------------------------------------------------------
 // Body router
@@ -456,7 +462,7 @@ function CharacterBody({
     case 'banana_guy':
       return <BananaGuyGLB />;
     case 'anime_girl':
-      return <AnimeGirl mat={mat} />;
+      return <AnimeGirlGLB />;
     case 'bland_normal_guy':
       return <NormalGuyGLB />;
     case 'mystery_silhouette':
