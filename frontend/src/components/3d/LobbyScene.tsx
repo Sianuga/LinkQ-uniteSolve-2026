@@ -1,6 +1,7 @@
-import { Suspense, useMemo, useRef, useState, useEffect } from 'react';
+import { Suspense, useMemo, useRef, useState, useEffect, useCallback } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import { PerformanceMonitor, AdaptiveDpr, Html } from '@react-three/drei';
+import { useDrag } from '@use-gesture/react';
 import * as THREE from 'three';
 
 import LobbyLighting from '@/components/3d/LobbyLighting';
@@ -53,18 +54,26 @@ function useLineLayout(count: number) {
 /*  Camera controller — smoothly follows focusIndex on X axis         */
 /* ------------------------------------------------------------------ */
 
-function CameraController({ focusIndex, characterCount }: { focusIndex: number; characterCount: number }) {
+function CameraController({
+  focusIndex,
+  characterCount,
+  overscrollOffset = 0,
+}: {
+  focusIndex: number;
+  characterCount: number;
+  overscrollOffset?: number;
+}) {
   const { camera } = useThree();
   const targetX = useRef(0);
 
   useEffect(() => {
     const totalWidth = (characterCount - 1) * CHARACTER_SPACING;
     const startX = -totalWidth / 2;
-    targetX.current = startX + focusIndex * CHARACTER_SPACING;
-  }, [focusIndex, characterCount]);
+    targetX.current = startX + focusIndex * CHARACTER_SPACING + overscrollOffset;
+  }, [focusIndex, characterCount, overscrollOffset]);
 
   useFrame(() => {
-    // Smooth lerp camera X toward the focused character
+    // Smooth lerp camera X toward the focused character (+ any rubber-band offset)
     camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX.current, 0.08);
     camera.lookAt(targetX.current, 0.8, 0);
   });
@@ -78,41 +87,52 @@ function CameraController({ focusIndex, characterCount }: { focusIndex: number; 
 
 function SwipeHandler({
   characterCount,
+  focusIndex,
   onSwipe,
+  onOverscroll,
 }: {
   characterCount: number;
-  onSwipe: (direction: 'left' | 'right') => void;
+  focusIndex: number;
+  onSwipe: (direction: 'left' | 'right', skip: number) => void;
+  onOverscroll: (offset: number) => void;
 }) {
-  const startX = useRef(0);
-  const dragging = useRef(false);
-
   const { gl } = useThree();
 
-  useEffect(() => {
-    const canvas = gl.domElement;
+  // When `target` is specified, useDrag auto-binds to the element — no manual bind() call needed
+  useDrag(
+    ({ movement: [mx], velocity: [vx], elapsed, last, tap }) => {
+      if (tap) return;
+      if (last && Math.abs(mx) < 10 && elapsed < 300) return;
 
-    const onPointerDown = (e: PointerEvent) => {
-      startX.current = e.clientX;
-      dragging.current = true;
-    };
-
-    const onPointerUp = (e: PointerEvent) => {
-      if (!dragging.current) return;
-      dragging.current = false;
-      const dx = e.clientX - startX.current;
-      if (Math.abs(dx) > 40) {
-        onSwipe(dx < 0 ? 'right' : 'left');
+      if (!last) {
+        const atStart = focusIndex === 0 && mx > 0;
+        const atEnd = focusIndex === characterCount - 1 && mx < 0;
+        if (atStart || atEnd) {
+          const rubberBand = Math.sign(mx) * Math.min(Math.abs(mx) / 200, 0.5);
+          onOverscroll(rubberBand);
+        }
+        return;
       }
-    };
 
-    canvas.addEventListener('pointerdown', onPointerDown);
-    canvas.addEventListener('pointerup', onPointerUp);
+      onOverscroll(0);
 
-    return () => {
-      canvas.removeEventListener('pointerdown', onPointerDown);
-      canvas.removeEventListener('pointerup', onPointerUp);
-    };
-  }, [gl, onSwipe, characterCount]);
+      const absMx = Math.abs(mx);
+      const absVx = Math.abs(vx);
+
+      if (absMx > 25 || absVx > 0.3) {
+        const direction: 'left' | 'right' = mx < 0 ? 'right' : 'left';
+        const skip = absVx > 1.0 ? 2 : 1;
+        onSwipe(direction, skip);
+        navigator.vibrate?.(10);
+      }
+    },
+    {
+      target: gl.domElement,
+      pointer: { touch: true },
+      threshold: 10,
+      filterTaps: true,
+    },
+  );
 
   return null;
 }
@@ -135,6 +155,59 @@ function CanvasLoader() {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Focus spotlight — follows the focused character from above         */
+/* ------------------------------------------------------------------ */
+
+function FocusSpotlight({
+  focusIndex,
+  characterCount,
+}: {
+  focusIndex: number;
+  characterCount: number;
+}) {
+  const lightRef = useRef<THREE.SpotLight>(null);
+  const targetRef = useRef<THREE.Object3D>(null);
+  const targetX = useRef(0);
+
+  useEffect(() => {
+    const totalWidth = (characterCount - 1) * CHARACTER_SPACING;
+    const startX = -totalWidth / 2;
+    targetX.current = startX + focusIndex * CHARACTER_SPACING;
+  }, [focusIndex, characterCount]);
+
+  useFrame(() => {
+    if (!lightRef.current) return;
+    // Smoothly lerp the spotlight X position toward the focused character
+    lightRef.current.position.x = THREE.MathUtils.lerp(
+      lightRef.current.position.x,
+      targetX.current,
+      0.08,
+    );
+    // Update the target so the spotlight always aims down at the character
+    if (targetRef.current) {
+      targetRef.current.position.x = lightRef.current.position.x;
+    }
+  });
+
+  return (
+    <>
+      <spotLight
+        ref={lightRef}
+        position={[0, 4, 0]}
+        intensity={2}
+        angle={0.4}
+        penumbra={0.8}
+        distance={8}
+        color="#ffffff"
+        castShadow={false}
+        target={targetRef.current ?? undefined}
+      />
+      <object3D ref={targetRef} position={[0, 0, 0]} />
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Inner scene                                                        */
 /* ------------------------------------------------------------------ */
 
@@ -142,14 +215,18 @@ function InnerScene({
   characters,
   selectedId,
   focusIndex,
+  overscrollOffset,
   onSelectCharacter,
   onSwipe,
+  onOverscroll,
 }: {
   characters: CharacterData[];
   selectedId: string | null;
   focusIndex: number;
+  overscrollOffset: number;
   onSelectCharacter: (id: string) => void;
-  onSwipe: (dir: 'left' | 'right') => void;
+  onSwipe: (dir: 'left' | 'right', skip: number) => void;
+  onOverscroll: (offset: number) => void;
 }) {
   const layout = useLineLayout(characters.length);
 
@@ -161,8 +238,10 @@ function InnerScene({
       <LobbyLighting />
       <LobbyEnvironment />
 
-      <CameraController focusIndex={focusIndex} characterCount={characters.length} />
-      <SwipeHandler characterCount={characters.length} onSwipe={onSwipe} />
+      <CameraController focusIndex={focusIndex} characterCount={characters.length} overscrollOffset={overscrollOffset} />
+      <SwipeHandler characterCount={characters.length} focusIndex={focusIndex} onSwipe={onSwipe} onOverscroll={onOverscroll} />
+
+      <FocusSpotlight focusIndex={focusIndex} characterCount={characters.length} />
 
       {characters.map((char, i) => {
         const placement = layout[i];
@@ -181,6 +260,7 @@ function InnerScene({
             position={placement.position}
             rotationY={placement.rotationY}
             isSelected={char.userId === selectedId}
+            isFocused={i === focusIndex}
             onClick={() => onSelectCharacter(char.userId)}
           />
         );
@@ -201,15 +281,17 @@ export default function LobbyScene({
   onFocusChange,
 }: LobbySceneProps) {
   const [internalFocus, setInternalFocus] = useState(focusIndex);
+  const [overscrollOffset, setOverscrollOffset] = useState(0);
 
   useEffect(() => {
     setInternalFocus(focusIndex);
   }, [focusIndex]);
 
-  const handleSwipe = useMemo(
-    () => (dir: 'left' | 'right') => {
+  const handleSwipe = useCallback(
+    (dir: 'left' | 'right', skip: number) => {
       setInternalFocus((prev) => {
-        const next = dir === 'right' ? prev + 1 : prev - 1;
+        const delta = dir === 'right' ? skip : -skip;
+        const next = prev + delta;
         const clamped = Math.max(0, Math.min(characters.length - 1, next));
         // Swipe only moves focus, does NOT select (no bottom sheet)
         onFocusChange?.(clamped);
@@ -218,6 +300,10 @@ export default function LobbyScene({
     },
     [characters.length, onFocusChange],
   );
+
+  const handleOverscroll = useCallback((offset: number) => {
+    setOverscrollOffset(offset);
+  }, []);
 
   return (
     <Canvas
@@ -232,8 +318,10 @@ export default function LobbyScene({
           characters={characters}
           selectedId={selectedId}
           focusIndex={internalFocus}
+          overscrollOffset={overscrollOffset}
           onSelectCharacter={onSelectCharacter}
           onSwipe={handleSwipe}
+          onOverscroll={handleOverscroll}
         />
       </Suspense>
     </Canvas>

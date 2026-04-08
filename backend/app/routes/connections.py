@@ -13,7 +13,8 @@ router = APIRouter(prefix="/connections", tags=["connections"])
 
 
 @router.post("", response_model=ConnectionResponse, status_code=status.HTTP_200_OK)
-def send_connection_request(body: ConnectionRequest, user_id: str = Depends(get_current_user)):
+def send_connection_request(body: ConnectionRequest, current_user: dict = Depends(get_current_user)):
+    user_id = current_user["id"]
     # Check target exists
     if body.target_user_id not in db.users:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Target user not found")
@@ -57,7 +58,7 @@ def send_connection_request(body: ConnectionRequest, user_id: str = Depends(get_
 
 @router.get("", response_model=list[ConnectionResponse])
 def list_connections(
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     status_filter: Optional[str] = Query(
         default=None,
         alias="status",
@@ -66,6 +67,7 @@ def list_connections(
     limit: int = Query(default=50, ge=1, le=200),
     offset: int = Query(default=0, ge=0),
 ):
+    user_id = current_user["id"]
     results = [
         c for c in db.connections
         if c["requester_id"] == user_id or c["receiver_id"] == user_id
@@ -80,8 +82,9 @@ def list_connections(
 def update_connection(
     connection_id: str,
     body: ConnectionUpdate,
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
+    user_id = current_user["id"]
     for conn in db.connections:
         if conn["id"] == connection_id:
             # Only the receiver can accept/reject

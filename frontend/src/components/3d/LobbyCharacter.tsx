@@ -1,6 +1,6 @@
 import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Html, Capsule, Sphere, Cylinder, Cone } from '@react-three/drei';
+import { Html, Capsule, Sphere, Cylinder, Cone, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import type { AvatarType } from '../../types';
 
@@ -15,6 +15,7 @@ interface LobbyCharacterProps {
   position: [number, number, number];
   onClick: () => void;
   isSelected: boolean;
+  isFocused: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -371,6 +372,28 @@ function AuraOrb({ index }: { index: number }) {
 }
 
 // ---------------------------------------------------------------------------
+// GLB model for buff_arnold
+// ---------------------------------------------------------------------------
+
+const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
+
+function BuffArnoldGLB() {
+  const { scene } = useGLTF(BUFF_ARNOLD_MODEL);
+  const cloned = useMemo(() => scene.clone(true), [scene]);
+
+  return (
+    <primitive
+      object={cloned}
+      scale={0.015}
+      position={[0, 0, 0]}
+      rotation={[0, 0, 0]}
+    />
+  );
+}
+
+useGLTF.preload(BUFF_ARNOLD_MODEL);
+
+// ---------------------------------------------------------------------------
 // Body router
 // ---------------------------------------------------------------------------
 
@@ -383,7 +406,7 @@ function CharacterBody({
 }) {
   switch (avatarType) {
     case 'buff_arnold':
-      return <BuffArnold mat={mat} />;
+      return <BuffArnoldGLB />;
     case 'banana_guy':
       return <BananaGuy mat={mat} />;
     case 'anime_girl':
@@ -496,6 +519,7 @@ export default function LobbyCharacter({
   position,
   onClick,
   isSelected,
+  isFocused,
 }: LobbyCharacterProps) {
   const groupRef = useRef<THREE.Group>(null);
   const headRef = useRef<THREE.Group>(null);
@@ -503,6 +527,9 @@ export default function LobbyCharacter({
 
   const preset = PRESETS[avatarType];
   const mat = useMat(preset, isSelected);
+
+  // Track animated focus values for smooth lerp
+  const focusState = useRef({ scale: 1.0, opacity: 1.0, emissive: preset.emissiveIntensity });
 
   // Stable random seed per character (from name) for desynchronised animation
   const seed = useMemo(() => {
@@ -513,16 +540,34 @@ export default function LobbyCharacter({
     return (h & 0xffff) / 0xffff;
   }, [name]);
 
-  // ------ idle animation ------
+  // ------ idle animation + focus dimming ------
   useFrame(({ clock }) => {
     if (!groupRef.current) return;
     const t = clock.elapsedTime + seed * 100;
 
-    // Breathing — gentle scale Y oscillation
+    // Focus-based target values
+    const targetScale = isFocused ? (isSelected ? 1.1 : 1.0) : 0.75;
+    const targetOpacity = isFocused ? (preset.opacity ?? 1) : 0.4;
+    const targetEmissive = isFocused
+      ? preset.emissiveIntensity + (isSelected ? 0.25 : 0)
+      : preset.emissiveIntensity * 0.2; // desaturated when not focused
+
+    // Smooth lerp
+    const lerpSpeed = 0.07;
+    focusState.current.scale = THREE.MathUtils.lerp(focusState.current.scale, targetScale, lerpSpeed);
+    focusState.current.opacity = THREE.MathUtils.lerp(focusState.current.opacity, targetOpacity, lerpSpeed);
+    focusState.current.emissive = THREE.MathUtils.lerp(focusState.current.emissive, targetEmissive, lerpSpeed);
+
+    // Apply scale with breathing
     const breathe = 1.0 + Math.sin(t * 1.8) * 0.01;
-    const targetScale = isSelected ? 1.1 : 1.0;
-    groupRef.current.scale.setScalar(targetScale);
-    groupRef.current.scale.y = targetScale * breathe;
+    const s = focusState.current.scale;
+    groupRef.current.scale.setScalar(s);
+    groupRef.current.scale.y = s * breathe;
+
+    // Update material opacity and emissive for dimming
+    mat.opacity = focusState.current.opacity;
+    mat.transparent = focusState.current.opacity < 0.99;
+    mat.emissiveIntensity = focusState.current.emissive;
 
     // Weight shift — subtle Z rotation
     groupRef.current.rotation.z = Math.sin(t * 0.7) * 0.02;

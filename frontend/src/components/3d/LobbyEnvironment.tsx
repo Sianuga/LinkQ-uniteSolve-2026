@@ -169,6 +169,26 @@ function ReflectiveFloor() {
 }
 
 // ---------------------------------------------------------------------------
+// Volumetric Light Beam — fake god-ray using an open-ended cone
+// ---------------------------------------------------------------------------
+
+function VolumetricBeam() {
+  return (
+    <mesh position={[0, 3, 0]} rotation={[Math.PI, 0, 0]}>
+      <coneGeometry args={[1.2, 5, 32, 1, true]} />
+      <meshBasicMaterial
+        color="#3B82F6"
+        transparent
+        opacity={0.08}
+        blending={THREE.AdditiveBlending}
+        side={THREE.DoubleSide}
+        depthWrite={false}
+      />
+    </mesh>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main Export
 // ---------------------------------------------------------------------------
 
@@ -198,6 +218,7 @@ export default function LobbyEnvironment() {
       {/* Atmosphere */}
       <GlowRing />
       <FloatingParticles />
+      <VolumetricBeam />
     </>
   );
 }
