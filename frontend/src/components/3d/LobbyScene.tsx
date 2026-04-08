@@ -33,26 +33,39 @@ interface LobbySceneProps {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Line layout — characters spaced in a row along X axis             */
+/*  Circle layout — characters arranged on circular platform          */
 /* ------------------------------------------------------------------ */
 
-const CHARACTER_SPACING = 2.5; // distance between characters
+const CIRCLE_RADIUS = 2.2; // radius of character circle (inside platform edge of 4)
 
-function useLineLayout(count: number) {
+function useCircleLayout(count: number) {
   return useMemo(() => {
-    const totalWidth = (count - 1) * CHARACTER_SPACING;
-    const startX = -totalWidth / 2;
+    if (count === 0) return [];
+    if (count === 1) return [{ position: [0, 0, 0] as [number, number, number], rotationY: 0, angle: 0 }];
 
-    return Array.from({ length: count }, (_, i) => ({
-      position: [startX + i * CHARACTER_SPACING, 0, 0] as [number, number, number],
-      rotationY: 0, // all face camera
-    }));
+    return Array.from({ length: count }, (_, i) => {
+      // Spread evenly around the circle
+      const angle = (i / count) * Math.PI * 2;
+      const x = Math.sin(angle) * CIRCLE_RADIUS;
+      const z = Math.cos(angle) * CIRCLE_RADIUS;
+      // Face toward center
+      const rotationY = angle + Math.PI;
+
+      return {
+        position: [x, 0, z] as [number, number, number],
+        rotationY,
+        angle,
+      };
+    });
   }, [count]);
 }
 
 /* ------------------------------------------------------------------ */
-/*  Camera controller — smoothly follows focusIndex on X axis         */
+/*  Camera controller — orbits around circle to face focused char     */
 /* ------------------------------------------------------------------ */
+
+const CAMERA_DISTANCE = 5; // distance from center
+const CAMERA_HEIGHT = 2.2;
 
 function CameraController({
   focusIndex,
@@ -64,18 +77,31 @@ function CameraController({
   overscrollOffset?: number;
 }) {
   const { camera } = useThree();
-  const targetX = useRef(0);
+  const targetAngle = useRef(0);
+  const currentAngle = useRef(0);
 
   useEffect(() => {
-    const totalWidth = (characterCount - 1) * CHARACTER_SPACING;
-    const startX = -totalWidth / 2;
-    targetX.current = startX + focusIndex * CHARACTER_SPACING + overscrollOffset;
+    if (characterCount === 0) return;
+    // Camera goes to the opposite side of the circle from the focused character
+    // so it faces toward them
+    const charAngle = (focusIndex / characterCount) * Math.PI * 2;
+    targetAngle.current = charAngle + overscrollOffset * 0.3;
   }, [focusIndex, characterCount, overscrollOffset]);
 
   useFrame(() => {
-    // Smooth lerp camera X toward the focused character (+ any rubber-band offset)
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX.current, 0.08);
-    camera.lookAt(targetX.current, 0.8, 0);
+    // Smoothly lerp angle
+    currentAngle.current = THREE.MathUtils.lerp(currentAngle.current, targetAngle.current, 0.06);
+
+    // Position camera on the opposite side of the circle, looking inward
+    const camAngle = currentAngle.current + Math.PI; // opposite side
+    camera.position.x = Math.sin(camAngle) * CAMERA_DISTANCE;
+    camera.position.z = Math.cos(camAngle) * CAMERA_DISTANCE;
+    camera.position.y = CAMERA_HEIGHT;
+
+    // Look at the focused character's position on the circle
+    const lookX = Math.sin(currentAngle.current) * CIRCLE_RADIUS;
+    const lookZ = Math.cos(currentAngle.current) * CIRCLE_RADIUS;
+    camera.lookAt(lookX, 0.8, lookZ);
   });
 
   return null;
@@ -167,25 +193,24 @@ function FocusSpotlight({
 }) {
   const lightRef = useRef<THREE.SpotLight>(null);
   const targetRef = useRef<THREE.Object3D>(null);
-  const targetX = useRef(0);
+  const targetPos = useRef({ x: 0, z: 0 });
 
   useEffect(() => {
-    const totalWidth = (characterCount - 1) * CHARACTER_SPACING;
-    const startX = -totalWidth / 2;
-    targetX.current = startX + focusIndex * CHARACTER_SPACING;
+    if (characterCount === 0) return;
+    const angle = (focusIndex / characterCount) * Math.PI * 2;
+    targetPos.current = {
+      x: Math.sin(angle) * CIRCLE_RADIUS,
+      z: Math.cos(angle) * CIRCLE_RADIUS,
+    };
   }, [focusIndex, characterCount]);
 
   useFrame(() => {
     if (!lightRef.current) return;
-    // Smoothly lerp the spotlight X position toward the focused character
-    lightRef.current.position.x = THREE.MathUtils.lerp(
-      lightRef.current.position.x,
-      targetX.current,
-      0.08,
-    );
-    // Update the target so the spotlight always aims down at the character
+    lightRef.current.position.x = THREE.MathUtils.lerp(lightRef.current.position.x, targetPos.current.x, 0.08);
+    lightRef.current.position.z = THREE.MathUtils.lerp(lightRef.current.position.z, targetPos.current.z, 0.08);
     if (targetRef.current) {
       targetRef.current.position.x = lightRef.current.position.x;
+      targetRef.current.position.z = lightRef.current.position.z;
     }
   });
 
@@ -228,7 +253,7 @@ function InnerScene({
   onSwipe: (dir: 'left' | 'right', skip: number) => void;
   onOverscroll: (offset: number) => void;
 }) {
-  const layout = useLineLayout(characters.length);
+  const layout = useCircleLayout(characters.length);
 
   return (
     <>
