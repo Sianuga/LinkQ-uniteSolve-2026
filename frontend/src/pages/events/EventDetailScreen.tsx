@@ -56,7 +56,7 @@ export default function EventDetailScreen() {
   if (!event) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4">
-        <p className="text-lg font-semibold text-gray-900">Event not found</p>
+        <p className="text-lg font-semibold text-text-primary">Event not found</p>
         <Button variant="secondary" onClick={() => navigate('/events')}>
           Back to Events
         </Button>
@@ -81,9 +81,9 @@ export default function EventDetailScreen() {
           className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-highlight"
           aria-label="Go back"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-700" />
+          <ArrowLeft className="h-5 w-5 text-text-secondary" />
         </button>
-        <h2 className="truncate text-lg font-semibold text-gray-900">
+        <h2 className="truncate text-lg font-semibold text-text-primary">
           {event.title}
         </h2>
       </div>
@@ -101,21 +101,21 @@ export default function EventDetailScreen() {
           </div>
         )}
 
-        <h1 className="text-2xl font-bold leading-8 text-gray-900 break-words">
+        <h1 className="text-2xl font-bold leading-8 text-text-primary break-words">
           {event.title}
         </h1>
 
         <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <MapPin className="h-4 w-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-2 text-sm text-text-secondary">
+            <MapPin className="h-4 w-4 shrink-0 text-text-secondary" />
             <span>{event.location}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Clock className="h-4 w-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-2 text-sm text-text-secondary">
+            <Clock className="h-4 w-4 shrink-0 text-text-secondary" />
             <span>{formatTime(event.start_time)}</span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <Users className="h-4 w-4 shrink-0 text-gray-400" />
+          <div className="flex items-center gap-2 text-sm text-text-secondary">
+            <Users className="h-4 w-4 shrink-0 text-text-secondary" />
             <span>{event.attendee_count ?? 120} attending</span>
           </div>
         </div>
@@ -148,7 +148,7 @@ export default function EventDetailScreen() {
               'relative flex-1 py-3 text-center text-sm font-medium transition-colors',
               activeTab === tab.key
                 ? 'text-primary'
-                : 'text-gray-500 hover:text-gray-700',
+                : 'text-text-secondary hover:text-text-secondary',
             ].join(' ')}
           >
             {tab.label}
@@ -175,7 +175,7 @@ export default function EventDetailScreen() {
         >
           {activeTab === 'overview' && (
             <div className="flex flex-col gap-4">
-              <p className="text-sm leading-6 text-gray-700 break-words">
+              <p className="text-sm leading-6 text-text-secondary break-words">
                 {event.description}
               </p>
               <div>

@@ -37,11 +37,11 @@ export function MatchCard({ candidate, onConnect }: MatchCardProps) {
           />
 
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h3 className="truncate text-base font-semibold leading-6 text-gray-900">
+            <h3 className="truncate text-base font-semibold leading-6 text-text-primary">
               {candidate.name}
             </h3>
             {candidate.program && (
-              <p className="truncate text-xs text-gray-500">{candidate.program}</p>
+              <p className="truncate text-xs text-text-secondary">{candidate.program}</p>
             )}
 
             {/* Match score */}
@@ -51,7 +51,7 @@ export function MatchCard({ candidate, onConnect }: MatchCardProps) {
                 className="flex-1"
                 animated
               />
-              <span className="shrink-0 text-xs font-semibold text-blue-900">
+              <span className="shrink-0 text-xs font-semibold text-primary">
                 {scorePercent}%
               </span>
             </div>
@@ -59,14 +59,14 @@ export function MatchCard({ candidate, onConnect }: MatchCardProps) {
         </div>
 
         {/* Shared info */}
-        <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-gray-500">
+        <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-text-secondary">
           {candidate.shared.events > 0 && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
+            <span className="rounded-full bg-highlight px-2 py-0.5 font-medium text-secondary">
               {candidate.shared.events} shared {candidate.shared.events === 1 ? 'event' : 'events'}
             </span>
           )}
           {candidate.shared.interests > 0 && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 font-medium text-blue-700">
+            <span className="rounded-full bg-highlight px-2 py-0.5 font-medium text-secondary">
               {candidate.shared.interests} shared {candidate.shared.interests === 1 ? 'interest' : 'interests'}
             </span>
           )}

@@ -73,8 +73,8 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.1, ease: 'easeOut' }}
       onClick={() => onClick?.(notification)}
-      className={`flex w-full items-start gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-gray-50 ${
-        notification.read ? '' : 'bg-blue-50/40'
+      className={`flex w-full items-start gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-background ${
+        notification.read ? '' : 'bg-highlight/40'
       }`}
     >
       {/* Icon or avatar */}
@@ -109,24 +109,24 @@ export function NotificationItem({ notification, onClick }: NotificationItemProp
         <div className="flex items-start justify-between gap-2">
           <h4
             className={`text-sm leading-5 ${
-              notification.read ? 'font-medium text-gray-700' : 'font-semibold text-gray-900'
+              notification.read ? 'font-medium text-text-secondary' : 'font-semibold text-text-primary'
             }`}
           >
             {notification.title}
           </h4>
-          <span className="shrink-0 text-[10px] text-gray-400">
+          <span className="shrink-0 text-[10px] text-text-secondary">
             {relativeTime(notification.timestamp)}
           </span>
         </div>
 
-        <p className="line-clamp-2 text-xs leading-4 text-gray-500">
+        <p className="line-clamp-2 text-xs leading-4 text-text-secondary">
           {notification.body}
         </p>
       </div>
 
       {/* Unread indicator */}
       {!notification.read && (
-        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-blue-600" />
+        <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-secondary" />
       )}
     </motion.button>
   );

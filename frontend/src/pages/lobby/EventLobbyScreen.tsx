@@ -79,7 +79,7 @@ function LobbyLoading() {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center bg-background">
       <div className="h-8 w-8 animate-spin rounded-full border-3 border-blue-400 border-t-transparent mb-3" />
-      <p className="animate-pulse text-sm font-medium text-white/70">
+      <p className="animate-pulse text-sm font-medium text-text-secondary">
         Entering lobby...
       </p>
     </div>
@@ -102,10 +102,10 @@ function WebGLFallback({ error }: FallbackProps) {
   const navigate = useNavigate();
 
   return (
-    <div className="flex h-dvh w-full flex-col bg-background text-white">
+    <div className="flex h-dvh w-full flex-col bg-background text-text-primary">
       <div className="shrink-0 px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
-        <p className="mb-2 text-xs text-red-400">3D unavailable: {error.message}</p>
-        <h1 className="text-lg font-bold">Event Lobby</h1>
+        <p className="mb-2 text-xs text-error">3D unavailable: {error.message}</p>
+        <h1 className="text-lg font-bold text-text-primary">Event Lobby</h1>
       </div>
       <div className="flex-1 overflow-y-auto px-4 pb-6">
         <div className="grid grid-cols-2 gap-3">
@@ -116,7 +116,7 @@ function WebGLFallback({ error }: FallbackProps) {
               <button
                 key={match.user_id}
                 onClick={() => navigate(`/users/${match.user_id}`)}
-                className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10"
+                className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-highlight p-4 hover:bg-background"
               >
                 <div
                   className="flex h-12 w-12 items-center justify-center rounded-full"
@@ -124,8 +124,8 @@ function WebGLFallback({ error }: FallbackProps) {
                 >
                   <UserIcon className="h-6 w-6" style={{ color }} />
                 </div>
-                <p className="w-full truncate text-center text-sm font-semibold">{match.name}</p>
-                <p className="text-xs text-blue-400">{pct}% match</p>
+                <p className="w-full truncate text-center text-sm font-semibold text-text-primary">{match.name}</p>
+                <p className="text-xs text-secondary">{pct}% match</p>
               </button>
             );
           })}
@@ -196,6 +196,8 @@ export default function EventLobbyScreen() {
         onDismiss={() => setSelectedCharacterId(null)}
         onListView={() => setShowListView(true)}
         onFocusDot={(i) => setFocusIndex(i)}
+        onChat={() => navigate('/messages')}
+        onSettings={() => navigate('/settings')}
       />
 
       {/* List view modal */}
@@ -203,10 +205,10 @@ export default function EventLobbyScreen() {
         <div className="absolute inset-0 z-50 flex flex-col bg-background/95 backdrop-blur-md">
           {/* Header */}
           <div className="flex items-center justify-between px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3">
-            <h2 className="text-lg font-bold text-white">All Participants</h2>
+            <h2 className="text-lg font-bold text-text-primary">All Participants</h2>
             <button
               onClick={() => setShowListView(false)}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-white hover:bg-white/10"
+              className="flex h-11 w-11 items-center justify-center rounded-full text-text-primary hover:bg-highlight"
               aria-label="Close list view"
             >
               <X size={24} />
@@ -226,7 +228,7 @@ export default function EventLobbyScreen() {
                       setShowListView(false);
                       navigate(`/users/${char.userId}`);
                     }}
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-white/10 bg-white/5 p-4 hover:bg-white/10 transition-colors"
+                    className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-highlight p-4 hover:bg-background transition-colors"
                   >
                     <div
                       className="flex h-12 w-12 items-center justify-center rounded-full"
@@ -234,8 +236,8 @@ export default function EventLobbyScreen() {
                     >
                       <UserIcon className="h-6 w-6" style={{ color }} />
                     </div>
-                    <p className="w-full truncate text-center text-sm font-semibold text-white">{char.name}</p>
-                    <p className="text-xs text-blue-400">{pct}% match</p>
+                    <p className="w-full truncate text-center text-sm font-semibold text-text-primary">{char.name}</p>
+                    <p className="text-xs text-secondary">{pct}% match</p>
                   </button>
                 );
               })}

@@ -891,10 +891,4 @@ export const messagesByConversation: Record<string, import('@/types').Message[]>
   ],
 };
 export const mockMessages = messagesByConversation;
-export const mockComparisons: Record<string, { match_score: number; shared: { events: string[]; interests: string[]; courses: string[] }; differences: { only_me: string[]; only_them: string[] } }> = {
-  'user_002': { match_score: 82, shared: { events: ['ML Lab'], interests: ['Cooking'], courses: ['Machine Learning'] }, differences: { only_me: ['Photography'], only_them: ['Dancing'] } },
-  'user_003': { match_score: 91, shared: { events: ['Distributed Systems'], interests: ['Gaming'], courses: ['Intro to AI'] }, differences: { only_me: ['Photography'], only_them: ['Cloud Computing'] } },
-  'user_004': { match_score: 74, shared: { events: ['Web Tech'], interests: ['Photography'], courses: [] }, differences: { only_me: ['Hiking'], only_them: ['Yoga'] } },
-  'user_005': { match_score: 58, shared: { events: [], interests: ['Hiking'], courses: [] }, differences: { only_me: ['Photography'], only_them: ['Weightlifting'] } },
-};
 

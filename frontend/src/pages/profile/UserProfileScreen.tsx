@@ -3,7 +3,6 @@ import { motion } from 'framer-motion';
 import {
   UserPlus,
   MessageCircle,
-  GitCompareArrows,
   GraduationCap,
   Calendar,
   Code,
@@ -298,15 +297,6 @@ export default function UserProfileScreen() {
           >
             <MessageCircle className="h-4 w-4" />
             Message
-          </Button>
-          <Button
-            variant="secondary"
-            size="md"
-            className="border-primary/30 text-primary"
-            onClick={() => navigate(`/users/${user.id}/compare`)}
-          >
-            <GitCompareArrows className="h-4 w-4" />
-            Compare
           </Button>
         </div>
       </motion.div>

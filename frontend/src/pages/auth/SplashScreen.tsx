@@ -30,8 +30,8 @@ export function SplashScreen() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-dvh overflow-hidden bg-[#050B1A] pb-safe">
-      {/* Background: deep gradient + subtle grid + glow */}
+    <div className="relative min-h-dvh overflow-hidden bg-gradient-to-br from-primary via-secondary to-primary pb-safe">
+      {/* Background: blue gradient + subtle grid + glow */}
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div
           className="absolute inset-0"
@@ -93,15 +93,15 @@ export function SplashScreen() {
             className="mt-5 space-y-2 text-left text-sm text-white/70"
           >
             <li className="flex gap-3">
-              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#93C5FD]" />
+              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-accent" />
               <span>Browse events and participants, instantly.</span>
             </li>
             <li className="flex gap-3">
-              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#93C5FD]" />
+              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-accent" />
               <span>Match by academic context, not random bios.</span>
             </li>
             <li className="flex gap-3">
-              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-[#93C5FD]" />
+              <span className="mt-1 inline-block h-1.5 w-1.5 rounded-full bg-accent" />
               <span>Join or create study groups for your next event.</span>
             </li>
           </motion.ul>
@@ -110,7 +110,7 @@ export function SplashScreen() {
           <motion.div variants={childVariants} className="mt-6 flex flex-col gap-3">
             <Button
               size="lg"
-              className="w-full bg-white text-[#0B1226] font-semibold hover:bg-white/90 active:bg-white/80"
+              className="w-full bg-white text-primary font-semibold hover:bg-white/90 active:bg-white/80"
               onClick={() => navigate('/register')}
             >
               Create account

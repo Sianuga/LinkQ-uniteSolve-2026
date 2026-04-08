@@ -64,12 +64,11 @@ const CreateGroup = lazy(() => import('@/pages/events/CreateGroupScreen'));
 
 // E — Profile & Connections
 const UserProfile = lazy(() => import('@/pages/profile/UserProfileScreen'));
-const ProfileComparisonPage = lazy(() => import('@/pages/profile/ProfileComparisonScreen'));
 const EditProfile = lazy(() => import('@/pages/profile/EditProfileScreen'));
 const ConnectionRequests = lazy(() => import('@/pages/profile/ConnectionsScreen'));
 
 // F — Messaging
-const Chat = lazy(() => import('@/pages/messaging/ChatScreen').then(m => ({ default: m.ChatScreen })));
+const Chat = lazy(() => import('@/pages/messaging/ChatScreen'));
 
 // G — 3D Lobby
 const EventLobby = lazy(() => import('@/pages/lobby/EventLobbyScreen'));
@@ -114,7 +113,6 @@ export default function App() {
           <Route path="/events/:id/lobby" element={<EventLobby />} />
 
           <Route path="/users/:id" element={<UserProfile />} />
-          <Route path="/users/:id/compare" element={<ProfileComparisonPage />} />
           <Route path="/profile/edit" element={<EditProfile />} />
           <Route path="/connections" element={<ConnectionRequests />} />
 

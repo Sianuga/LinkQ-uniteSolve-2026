@@ -254,7 +254,7 @@ export default function Step4_About() {
       </div>
 
       {/* Tab bar */}
-      <div className="mb-5 -mx-4 px-4">
+      <div className="mb-5 -mx-6 px-6">
         {/* Mobile: dropdown selector */}
         <div className="sm:hidden">
           <label className="text-xs font-semibold text-text-secondary tracking-wide uppercase">

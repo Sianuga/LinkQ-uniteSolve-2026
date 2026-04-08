@@ -46,8 +46,8 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.1, ease: 'easeOut' }}
       onClick={() => onClick?.(conversation)}
-      className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 min-h-[64px] text-left transition-colors hover:bg-gray-50 ${
-        unread ? 'bg-blue-50/40' : ''
+      className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 min-h-[64px] text-left transition-colors hover:bg-background ${
+        unread ? 'bg-highlight/40' : ''
       }`}
     >
       {/* Avatar */}
@@ -59,7 +59,7 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
         />
         {/* Unread dot on avatar */}
         {unread && (
-          <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-blue-600" />
+          <span className="absolute -top-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-white bg-secondary" />
         )}
       </div>
 
@@ -68,14 +68,14 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
         <div className="flex items-center justify-between gap-2">
           <h3
             className={`truncate text-sm leading-5 ${
-              unread ? 'font-bold text-gray-900' : 'font-semibold text-gray-900'
+              unread ? 'font-bold text-text-primary' : 'font-semibold text-text-primary'
             }`}
           >
             {participant.name}
           </h3>
           <span
             className={`shrink-0 text-[10px] ${
-              unread ? 'font-semibold text-blue-600' : 'text-gray-400'
+              unread ? 'font-semibold text-secondary' : 'text-text-secondary'
             }`}
           >
             {relativeTime(last_message_time)}
@@ -84,7 +84,7 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
 
         <p
           className={`truncate text-xs leading-4 ${
-            unread ? 'font-medium text-gray-700' : 'text-gray-500'
+            unread ? 'font-medium text-text-primary' : 'text-text-secondary'
           }`}
         >
           {last_message}

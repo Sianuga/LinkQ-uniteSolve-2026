@@ -43,6 +43,8 @@ export interface LobbyOverlayProps {
   onDismiss: () => void;
   onListView: () => void;
   onFocusDot: (index: number) => void;
+  onChat?: () => void;
+  onSettings?: () => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -146,7 +148,7 @@ function CarouselDots({
           className={`rounded-full transition-all duration-300 ${
             i === activeIndex
               ? 'h-3 w-3 bg-primary'
-              : 'h-2.5 w-2.5 bg-gray-300'
+              : 'h-2.5 w-2.5 bg-border'
           }`}
         />
       ))}
@@ -154,19 +156,32 @@ function CarouselDots({
   );
 }
 
-/** Decorative action buttons (bottom-right) */
-function MiscIcons() {
-  const icons = [MessageCircle, Smile, Settings] as const;
+/** Action buttons (bottom-right): chat, emote (decorative), settings */
+function MiscIcons({
+  onChat,
+  onSettings,
+}: {
+  onChat?: () => void;
+  onSettings?: () => void;
+}) {
+  const items = [
+    { Icon: MessageCircle, label: 'Open messages', onClick: onChat },
+    { Icon: Smile, label: 'Emote', onClick: undefined },
+    { Icon: Settings, label: 'Open settings', onClick: onSettings },
+  ] as const;
+
   return (
     <div className="flex items-center gap-2">
-      {icons.map((Icon, i) => (
+      {items.map(({ Icon, label, onClick }) => (
         <button
-          key={i}
+          key={label}
           type="button"
+          onClick={onClick}
           className="flex h-10 w-10 items-center justify-center rounded-full
-                     bg-gray-100 text-text-secondary hover:bg-gray-200 transition-colors"
-          aria-hidden="true"
-          tabIndex={-1}
+                     bg-highlight text-text-secondary hover:bg-border transition-colors"
+          aria-label={label}
+          aria-hidden={!onClick}
+          tabIndex={onClick ? 0 : -1}
         >
           <Icon className="h-[18px] w-[18px]" />
         </button>
@@ -191,6 +206,8 @@ export default function LobbyOverlay({
   onDismiss,
   onListView,
   onFocusDot,
+  onChat,
+  onSettings,
 }: LobbyOverlayProps) {
   const focused = characters[focusIndex] ?? null;
 
@@ -288,7 +305,7 @@ export default function LobbyOverlay({
         {/* ---- Bottom row: party badge | misc icons ---- */}
         <div className="pointer-events-auto flex items-center justify-between">
           <PartyBadge count={partyCount} capacity={partyCapacity} />
-          <MiscIcons />
+          <MiscIcons onChat={onChat} onSettings={onSettings} />
         </div>
       </div>
 
@@ -323,14 +340,14 @@ export default function LobbyOverlay({
               onDragEnd={handleDragEnd}
               className="pointer-events-auto absolute bottom-0 left-0 right-0 z-20
                          flex max-h-[45dvh] min-h-[40dvh] flex-col rounded-t-2xl
-                         border border-white/20 bg-white/10 backdrop-blur-xl"
+                         border border-border bg-surface/90 backdrop-blur-xl shadow-lg"
               style={{ WebkitBackdropFilter: 'blur(24px)' }}
               role="dialog"
               aria-label={`${selectedCharacter.name} details`}
             >
               {/* Drag handle */}
               <div className="flex justify-center pb-2 pt-3">
-                <div className="h-1 w-10 rounded-full bg-white/40" />
+                <div className="h-1 w-10 rounded-full bg-border" />
               </div>
 
               {/* Content */}
@@ -341,10 +358,10 @@ export default function LobbyOverlay({
                     {avatarEmoji(selectedCharacter.avatarType)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h2 className="truncate text-xl font-bold text-white">
+                    <h2 className="truncate text-xl font-bold text-text-primary">
                       {selectedCharacter.name}
                     </h2>
-                    <p className="truncate text-sm text-white/70">
+                    <p className="truncate text-sm text-text-secondary">
                       {selectedCharacter.program}
                     </p>
                   </div>
@@ -353,18 +370,18 @@ export default function LobbyOverlay({
                 {/* Match score bar */}
                 <div className="flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-xs font-semibold">
-                    <span className="flex items-center gap-1 text-white/80">
+                    <span className="flex items-center gap-1 text-text-secondary">
                       <Sparkles className="h-3.5 w-3.5" />
                       Match
                     </span>
-                    <span className="text-white">
+                    <span className="text-text-primary">
                       {Math.round(selectedCharacter.matchScore * 100)}%
                     </span>
                   </div>
 
-                  <div className="h-2 overflow-hidden rounded-full bg-white/10">
+                  <div className="h-2 overflow-hidden rounded-full bg-highlight">
                     <motion.div
-                      className="h-full rounded-full bg-blue-400"
+                      className="h-full rounded-full bg-secondary"
                       initial={{ width: 0 }}
                       animate={{
                         width: `${Math.round(selectedCharacter.matchScore * 100)}%`,
@@ -379,7 +396,7 @@ export default function LobbyOverlay({
                 </div>
 
                 {/* Shared stats */}
-                <p className="flex items-center gap-1.5 text-xs text-white/60">
+                <p className="flex items-center gap-1.5 text-xs text-text-secondary">
                   <Users className="h-3.5 w-3.5" />
                   {selectedCharacter.shared.events}{' '}
                   {selectedCharacter.shared.events === 1 ? 'event' : 'events'}
@@ -396,8 +413,8 @@ export default function LobbyOverlay({
                     {selectedCharacter.tags.slice(0, 4).map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/20 bg-white/10 px-3 py-1
-                                   text-xs font-medium text-white"
+                        className="rounded-full border border-border bg-highlight px-3 py-1
+                                   text-xs font-medium text-primary"
                       >
                         {tag}
                       </span>
@@ -410,7 +427,7 @@ export default function LobbyOverlay({
                   type="button"
                   onClick={() => onViewProfile(selectedCharacter.userId)}
                   className="mt-auto flex h-11 w-full cursor-pointer items-center justify-center
-                             rounded-xl bg-white text-sm font-semibold text-gray-900
+                             rounded-xl bg-primary text-sm font-semibold text-white
                              transition-transform duration-100 active:scale-[0.97]"
                 >
                   View Profile

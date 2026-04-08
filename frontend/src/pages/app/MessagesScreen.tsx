@@ -301,7 +301,7 @@ export default function MessagesScreen() {
                             className={[
                               'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors',
                               isSelected
-                                ? 'border-primary bg-blue-50'
+                                ? 'border-primary bg-highlight'
                                 : 'border-border bg-surface hover:bg-highlight',
                             ].join(' ')}
                           >
@@ -350,7 +350,7 @@ export default function MessagesScreen() {
                                     className={[
                                       'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors',
                                       isSelected
-                                        ? 'border-primary bg-blue-50'
+                                        ? 'border-primary bg-highlight'
                                         : 'border-border bg-surface hover:bg-highlight',
                                     ].join(' ')}
                                   >
@@ -396,7 +396,7 @@ export default function MessagesScreen() {
                                   className={[
                                     'flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors',
                                     isSelected
-                                      ? 'border-primary bg-blue-50'
+                                      ? 'border-primary bg-highlight'
                                       : 'border-border bg-surface hover:bg-highlight',
                                   ].join(' ')}
                                 >

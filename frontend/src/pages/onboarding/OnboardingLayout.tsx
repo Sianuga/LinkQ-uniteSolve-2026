@@ -35,7 +35,7 @@ export default function OnboardingLayout() {
     <div className="min-h-dvh bg-background flex flex-col overflow-x-hidden">
       {/* Top bar */}
       <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="max-w-lg mx-auto px-4 pt-3 pb-2">
+        <div className="max-w-lg mx-auto px-6 pt-3 pb-2">
           {/* Step indicator + back */}
           <div className="flex items-center gap-3 mb-2">
             {!isFirstStep ? (
@@ -66,7 +66,7 @@ export default function OnboardingLayout() {
       </div>
 
       {/* Step content */}
-      <div className="flex-1 min-h-0 max-w-lg mx-auto w-full px-4 py-5 pb-safe overflow-y-auto">
+      <div className="flex-1 min-h-0 max-w-lg mx-auto w-full px-6 py-5 pb-safe overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

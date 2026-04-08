@@ -42,14 +42,14 @@ export function ConnectionRequest({
 
       {/* Info */}
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <h3 className="truncate text-sm font-semibold leading-5 text-gray-900">
+        <h3 className="truncate text-sm font-semibold leading-5 text-text-primary">
           {requester.name}
         </h3>
-        <p className="truncate text-xs text-gray-500">
+        <p className="truncate text-xs text-text-secondary">
           {requester.program}
         </p>
         {requester.university && (
-          <p className="truncate text-[10px] text-gray-400">
+          <p className="truncate text-[10px] text-text-secondary">
             {requester.university}
           </p>
         )}

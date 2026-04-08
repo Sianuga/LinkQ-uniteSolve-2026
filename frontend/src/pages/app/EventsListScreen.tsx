@@ -89,12 +89,12 @@ function EventRow({ event, joined = false, onClick }: EventRowProps) {
             </div>
 
             {/* Title */}
-            <h3 className="text-sm font-semibold leading-5 text-gray-900 line-clamp-1">
+            <h3 className="text-sm font-semibold leading-5 text-text-primary line-clamp-1">
               {event.title}
             </h3>
 
             {/* Meta */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-text-secondary">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5 shrink-0" />
                 <span className="truncate max-w-[140px]">{event.location}</span>
@@ -149,7 +149,7 @@ export default function EventsListScreen() {
       <div className="sticky top-0 z-30 bg-surface px-4 pt-4 pb-3">
         <h1 className="mb-3 text-xl font-bold text-text-primary">Events</h1>
 
-        <div className="flex items-center gap-1 rounded-full bg-gray-100 p-1">
+        <div className="flex items-center gap-1 rounded-full bg-highlight p-1">
           {([
             { key: 'my' as const, label: 'My Events', icon: CalendarCheck },
             { key: 'all' as const, label: 'All Events', icon: Calendar },
@@ -160,7 +160,7 @@ export default function EventsListScreen() {
               onClick={() => setActiveTab(key)}
               className={[
                 'relative flex-1 rounded-full py-2.5 text-center text-sm font-semibold transition-colors duration-150 cursor-pointer select-none min-h-[44px]',
-                activeTab === key ? 'text-white' : 'text-gray-500 hover:text-gray-700',
+                activeTab === key ? 'text-white' : 'text-text-secondary hover:text-text-primary',
               ].join(' ')}
             >
               {activeTab === key && (

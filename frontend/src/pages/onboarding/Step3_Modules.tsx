@@ -38,7 +38,7 @@ export default function Step3_Modules() {
   const goNext = () => navigate('/onboarding/about');
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col min-h-full">
       {/* Header */}
       <div className="text-center space-y-2 mb-6">
         <motion.div

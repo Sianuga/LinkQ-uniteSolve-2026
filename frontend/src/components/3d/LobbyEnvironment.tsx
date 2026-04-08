@@ -43,35 +43,35 @@ export default function LobbyEnvironment() {
         color="#D4E0F7"
       />
 
-      {/* Ground plane — large, subtle, receives shadows */}
+      {/* Ground plane — academic blue stage, receives shadows */}
       <mesh rotation-x={-Math.PI / 2} position-y={-0.01} receiveShadow>
         <planeGeometry args={[30, 30]} />
         <meshStandardMaterial
-          color="#E8ECF4"
-          metalness={0.0}
-          roughness={0.9}
+          color="#1E3A8A"
+          metalness={0.3}
+          roughness={0.4}
         />
       </mesh>
 
-      {/* Subtle circular highlight under character area */}
+      {/* Circular highlight under character area — lighter blue */}
       <mesh rotation-x={-Math.PI / 2} position-y={0.001}>
         <circleGeometry args={[3, 64]} />
         <meshStandardMaterial
-          color="#FFFFFF"
-          metalness={0.0}
-          roughness={0.7}
+          color="#3B82F6"
+          metalness={0.3}
+          roughness={0.4}
           transparent
-          opacity={0.6}
+          opacity={0.15}
         />
       </mesh>
 
-      {/* Thin accent line on the ground */}
+      {/* Accent ring on the ground */}
       <mesh rotation-x={-Math.PI / 2} position-y={0.002}>
         <ringGeometry args={[2.8, 2.85, 64]} />
         <meshStandardMaterial
-          color="#3B82F6"
+          color="#93C5FD"
           transparent
-          opacity={0.15}
+          opacity={0.3}
           side={THREE.DoubleSide}
         />
       </mesh>

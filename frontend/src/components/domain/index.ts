@@ -19,5 +19,3 @@ export type { GroupCardProps } from './GroupCard';
 export { NotificationItem } from './NotificationItem';
 export type { NotificationItemProps } from './NotificationItem';
 
-export { MatchRing } from './MatchRing';
-export type { MatchRingProps } from './MatchRing';

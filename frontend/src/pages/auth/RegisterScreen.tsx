@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
+import { authApi } from '@/services/endpoints';
 import type { User } from '@/types';
 
 // ---------------------------------------------------------------------------
@@ -59,32 +60,49 @@ export function RegisterScreen() {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
+    try {
+      // Try backend registration first
+      const registerRes = await authApi.register({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      const token: string = registerRes.data.token;
+      setToken(token);
 
-    // Set demo token
-    setToken('demo-token');
+      // Fetch the newly created user profile
+      const meRes = await authApi.getMe();
+      const user: User = meRes.data;
+      setUser(user);
 
-    // Create mock user with onboarding_complete: false
-    const mockUser: User = {
-      id: 'user_new_' + Date.now(),
-      name: data.name,
-      email: data.email,
-      university: '',
-      program: '',
-      semester: 1,
-      avatar: 'mystery_silhouette',
-      onboarding_complete: false,
-      academic: { courses: [], degree: '' },
-      interests: { hobbies: [], topics: [] },
-      skills: { programming: [], languages: [], tools: [] },
-      goals: { learning: [], career: '', short_term: '' },
-      availability: { preferred_times: [], study_style: 'solo', timezone: 'CET' },
-      events: { attended: [], interested: [], categories: [] },
-    };
-    setUser(mockUser);
+      navigate('/onboarding/verify');
+    } catch {
+      // Backend unavailable — fall back to mock registration
+      console.warn('[RegisterScreen] Backend register failed, falling back to mock data');
+      await new Promise((r) => setTimeout(r, 400));
 
-    navigate('/onboarding/verify');
+      setToken('demo-token');
+
+      const mockUser: User = {
+        id: 'user_new_' + Date.now(),
+        name: data.name,
+        email: data.email,
+        university: '',
+        program: '',
+        semester: 1,
+        avatar: 'mystery_silhouette',
+        onboarding_complete: false,
+        academic: { courses: [], degree: '' },
+        interests: { hobbies: [], topics: [] },
+        skills: { programming: [], languages: [], tools: [] },
+        goals: { learning: [], career: '', short_term: '' },
+        availability: { preferred_times: [], study_style: 'solo', timezone: 'CET' },
+        events: { attended: [], interested: [], categories: [] },
+      };
+      setUser(mockUser);
+
+      navigate('/onboarding/verify');
+    }
   };
 
   return (

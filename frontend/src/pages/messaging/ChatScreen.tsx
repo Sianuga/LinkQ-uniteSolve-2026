@@ -215,7 +215,7 @@ export default function ChatScreen() {
                       'max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed',
                       isOwn
                         ? 'rounded-br-md bg-secondary text-white'
-                        : 'rounded-bl-md bg-gray-100 text-text-primary',
+                        : 'rounded-bl-md bg-highlight text-text-primary',
                     ].join(' ')}
                   >
                     {msg.content}
@@ -242,7 +242,7 @@ export default function ChatScreen() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-base text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors focus:bg-gray-50 focus:ring-2 focus:ring-secondary/30"
+            className="flex-1 rounded-full bg-highlight px-4 py-2.5 text-base text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors focus:bg-background focus:ring-2 focus:ring-secondary/30"
           />
           <button
             type="button"

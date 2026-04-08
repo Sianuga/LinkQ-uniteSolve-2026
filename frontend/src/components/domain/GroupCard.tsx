@@ -32,11 +32,11 @@ export function GroupCard({ group, onJoin }: GroupCardProps) {
         {/* Header row */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <h3 className="truncate text-base font-semibold leading-6 text-gray-900">
+            <h3 className="truncate text-base font-semibold leading-6 text-text-primary">
               {group.name || 'Study Group'}
             </h3>
             {group.description && (
-              <p className="line-clamp-2 text-xs leading-4 text-gray-500">
+              <p className="line-clamp-2 text-xs leading-4 text-text-secondary">
                 {group.description}
               </p>
             )}
@@ -46,7 +46,7 @@ export function GroupCard({ group, onJoin }: GroupCardProps) {
         {/* Stats row */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Member count */}
-          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+          <div className="flex items-center gap-1.5 text-xs text-text-secondary">
             <Users className="h-3.5 w-3.5" />
             <span>
               {group.number_of_member}{' '}
@@ -68,7 +68,7 @@ export function GroupCard({ group, onJoin }: GroupCardProps) {
             {group.members.slice(0, 5).map((member) => (
               <div
                 key={member.id}
-                className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-blue-100"
+                className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-highlight"
                 title={member.name}
               >
                 {member.avatar_url ? (
@@ -78,14 +78,14 @@ export function GroupCard({ group, onJoin }: GroupCardProps) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <span className="text-[10px] font-semibold text-blue-700">
+                  <span className="text-[10px] font-semibold text-secondary">
                     {member.name.charAt(0).toUpperCase()}
                   </span>
                 )}
               </div>
             ))}
             {group.members.length > 5 && (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-gray-100 text-[10px] font-semibold text-gray-500">
+              <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-highlight text-[10px] font-semibold text-text-secondary">
                 +{group.members.length - 5}
               </div>
             )}

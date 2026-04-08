@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { useAuthStore } from '@/store/authStore';
+import { authApi } from '@/services/endpoints';
 import type { User } from '@/types';
 
 // ---------------------------------------------------------------------------
@@ -117,20 +118,38 @@ export function LoginScreen() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 800));
+    try {
+      // Try backend login first
+      const loginRes = await authApi.login({ email: data.email, password: data.password });
+      const token: string = loginRes.data.token;
+      setToken(token);
 
-    setToken('demo-token');
+      // Fetch full user profile from backend
+      const meRes = await authApi.getMe();
+      const user: User = meRes.data;
+      setUser(user);
 
-    const isDemo = data.email.toLowerCase() === DEMO_EMAIL;
-    const user = isDemo ? demoUser : createFreshUser(data.email);
-    setUser(user);
+      if (user.onboarding_complete) {
+        navigate('/home', { replace: true });
+      } else {
+        navigate('/onboarding/verify', { replace: true });
+      }
+    } catch {
+      // Backend unavailable or credentials invalid — fall back to mock login
+      console.warn('[LoginScreen] Backend login failed, falling back to mock data');
+      await new Promise((r) => setTimeout(r, 400));
 
-    // Route based on onboarding status
-    if (user.onboarding_complete) {
-      navigate('/home', { replace: true });
-    } else {
-      navigate('/onboarding/verify', { replace: true });
+      setToken('demo-token');
+
+      const isDemo = data.email.toLowerCase() === DEMO_EMAIL;
+      const user = isDemo ? demoUser : createFreshUser(data.email);
+      setUser(user);
+
+      if (user.onboarding_complete) {
+        navigate('/home', { replace: true });
+      } else {
+        navigate('/onboarding/verify', { replace: true });
+      }
     }
   };
 

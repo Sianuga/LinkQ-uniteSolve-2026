@@ -51,12 +51,12 @@ export function ProfileHeader({ user, showEdit = false, onEdit }: ProfileHeaderP
 
       {/* Name + Program */}
       <div className="flex flex-col items-center gap-1 text-center">
-        <h2 className="text-xl font-bold leading-7 text-gray-900">
+        <h2 className="text-xl font-bold leading-7 text-text-primary">
           {user.name}
         </h2>
-        <p className="text-sm text-gray-500">{user.program}</p>
+        <p className="text-sm text-text-secondary">{user.program}</p>
         {user.university && (
-          <p className="text-xs text-gray-400">{user.university}</p>
+          <p className="text-xs text-text-secondary">{user.university}</p>
         )}
       </div>
 
@@ -67,7 +67,7 @@ export function ProfileHeader({ user, showEdit = false, onEdit }: ProfileHeaderP
             <Tag key={tag}>{tag}</Tag>
           ))}
           {tags.length > 8 && (
-            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-medium text-gray-500">
+            <span className="inline-flex items-center rounded-full bg-highlight px-2.5 py-0.5 text-[10px] font-medium text-text-secondary">
               +{tags.length - 8} more
             </span>
           )}

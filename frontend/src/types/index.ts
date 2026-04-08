@@ -101,19 +101,6 @@ export interface MatchCandidate {
   tags?: string[];
 }
 
-export interface ProfileComparison {
-  match_score: number;
-  shared: {
-    events: string[];
-    interests: string[];
-    courses?: string[];
-  };
-  differences: {
-    only_me: string[];
-    only_them: string[];
-  };
-}
-
 // ==================== Message ====================
 export interface Conversation {
   id: string;

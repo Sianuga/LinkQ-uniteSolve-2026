@@ -43,9 +43,9 @@ export default function CreateGroupScreen() {
           className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-highlight"
           aria-label="Go back"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-700" />
+          <ArrowLeft className="h-5 w-5 text-text-secondary" />
         </button>
-        <h2 className="text-lg font-semibold text-gray-900">Create Group</h2>
+        <h2 className="text-lg font-semibold text-text-primary">Create Group</h2>
       </div>
 
       {/* ---- Form ---- */}

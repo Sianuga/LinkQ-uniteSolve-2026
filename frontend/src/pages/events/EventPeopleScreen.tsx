@@ -77,7 +77,7 @@ export default function EventPeopleScreen() {
               'shrink-0 rounded-full px-4 py-1.5 text-xs font-medium transition-colors',
               activeFilter === chip.key
                 ? 'bg-primary text-white'
-                : 'bg-highlight text-gray-600 hover:bg-gray-200',
+                : 'bg-highlight text-text-secondary hover:bg-border',
             ].join(' ')}
           >
             {chip.label}
@@ -87,7 +87,7 @@ export default function EventPeopleScreen() {
 
       {/* ---- Attendee list ---- */}
       {filtered.length === 0 ? (
-        <p className="py-8 text-center text-sm text-gray-400">
+        <p className="py-8 text-center text-sm text-text-secondary">
           No attendees match this filter.
         </p>
       ) : (
@@ -129,7 +129,7 @@ export default function EventPeopleScreen() {
                   onClick={() => handleViewProfile(candidate)}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="truncate text-sm font-semibold text-gray-900">
+                    <h4 className="truncate text-sm font-semibold text-text-primary">
                       {candidate.name}
                     </h4>
                     <span className="shrink-0 text-xs font-semibold text-primary">
@@ -138,7 +138,7 @@ export default function EventPeopleScreen() {
                   </div>
 
                   {candidate.program && (
-                    <p className="truncate text-xs text-gray-500">
+                    <p className="truncate text-xs text-text-secondary">
                       {candidate.program}
                     </p>
                   )}

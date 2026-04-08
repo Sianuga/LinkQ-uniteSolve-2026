@@ -74,27 +74,27 @@ export function EventCard({ event, variant = 'vertical', onClick }: EventCardPro
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-semibold leading-6 text-gray-900 line-clamp-2">
+          <h3 className="text-base font-semibold leading-6 text-text-primary line-clamp-2">
             {event.title}
           </h3>
 
           {/* Meta row */}
           <div className="flex flex-col gap-1.5">
             {/* Location */}
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <div className="flex items-center gap-1.5 text-xs text-text-secondary">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
               <span className="truncate">{event.location}</span>
             </div>
 
             {/* Time */}
-            <div className="flex items-center gap-1.5 text-xs text-gray-500">
+            <div className="flex items-center gap-1.5 text-xs text-text-secondary">
               <Clock className="h-3.5 w-3.5 shrink-0" />
               <span>{formatTime(event.start_time)}</span>
             </div>
 
             {/* Attendees */}
             {event.attendee_count !== undefined && (
-              <div className="flex items-center gap-1.5 text-xs text-gray-500">
+              <div className="flex items-center gap-1.5 text-xs text-text-secondary">
                 <Users className="h-3.5 w-3.5 shrink-0" />
                 <span>
                   {event.attendee_count} {event.attendee_count === 1 ? 'attendee' : 'attendees'}

@@ -85,7 +85,7 @@ export default function ExploreScreen() {
       {/*  Search Bar                                                       */}
       {/* ---------------------------------------------------------------- */}
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-gray-400" />
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-text-secondary" />
         <input
           type="text"
           value={searchQuery}
@@ -95,14 +95,14 @@ export default function ExploreScreen() {
               ? 'Search events...'
               : 'Search people, skills, interests...'
           }
-          className="w-full rounded-full bg-gray-100 py-3 pl-10 pr-4 text-sm text-gray-900 placeholder:text-gray-400 outline-none transition-colors duration-150 focus:bg-gray-200 focus:ring-2 focus:ring-primary/20"
+          className="w-full rounded-full bg-highlight py-3 pl-10 pr-4 text-sm text-text-primary placeholder:text-text-secondary outline-none transition-colors duration-150 focus:bg-background focus:ring-2 focus:ring-primary/20"
         />
       </div>
 
       {/* ---------------------------------------------------------------- */}
       {/*  Segmented Toggle                                                 */}
       {/* ---------------------------------------------------------------- */}
-      <div className="flex items-center gap-1 rounded-full bg-gray-100 p-1">
+      <div className="flex items-center gap-1 rounded-full bg-highlight p-1">
         {(['events', 'people'] as const).map((tab) => (
           <button
             key={tab}
@@ -111,7 +111,7 @@ export default function ExploreScreen() {
               'relative flex-1 rounded-full py-2 min-h-[44px] text-center text-sm font-semibold capitalize transition-colors duration-150 cursor-pointer select-none',
               activeView === tab
                 ? 'text-white'
-                : 'text-gray-500 hover:text-gray-700',
+                : 'text-text-secondary hover:text-text-primary',
             ].join(' ')}
           >
             {/* Animated pill background */}
@@ -157,7 +157,7 @@ export default function ExploreScreen() {
                     'shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-150 cursor-pointer select-none min-h-[44px] flex items-center',
                     selectedCategory === cat.value
                       ? 'bg-primary text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                      : 'bg-highlight text-text-secondary hover:bg-border',
                   ].join(' ')}
                 >
                   {cat.label}

@@ -135,8 +135,8 @@ function NotificationItem({
       className={[
         'flex w-full items-start gap-3 px-4 py-3 text-left transition-colors',
         notification.read
-          ? 'bg-gray-50'
-          : 'bg-white border-l-[3px] border-l-blue-500',
+          ? 'bg-background'
+          : 'bg-surface border-l-[3px] border-l-secondary',
       ].join(' ')}
     >
       {/* Icon circle */}
@@ -171,7 +171,7 @@ function NotificationItem({
 
       {/* Unread dot */}
       {!notification.read && (
-        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-secondary" />
       )}
     </motion.button>
   );
