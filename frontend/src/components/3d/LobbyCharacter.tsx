@@ -2,6 +2,7 @@ import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { Html, Capsule, Sphere, Cylinder, Cone, useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
+import { clone as skeletonClone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { AvatarType } from '../../types';
 
 // ---------------------------------------------------------------------------
@@ -387,7 +388,7 @@ const NORMAL_GUY_MODEL = '/models/man_in_suit.glb';
 function useClonedModel(path: string, targetHeight = 1.8) {
   const { scene } = useGLTF(path);
   const cloned = useMemo(() => {
-    const c = scene.clone(true);
+    const c = skeletonClone(scene);
 
     // Force-update world matrices so Box3 computes correctly
     c.updateMatrixWorld(true);

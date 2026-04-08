@@ -16,15 +16,20 @@ class Database:
 
     def load_seed_data(self) -> None:
         """Load seed data from data/seed/*.json if files exist."""
-        seed_dir = Path(os.getcwd()).parent / "data" / "seed"
-        if not seed_dir.exists():
-            # Also try relative to project root
-            seed_dir = Path(os.getcwd()).parent / "data" / "seed"
-            if not seed_dir.exists():
-                # Try from backend dir directly
-                seed_dir = Path("../data/seed")
-                if not seed_dir.exists():
-                    return
+        candidates = [
+            Path(os.environ.get("LINKQ_SEED_DIR", "")),   # explicit env var
+            Path(os.getcwd()).parent / "data" / "seed",    # run from backend/
+            Path(os.getcwd()) / "data" / "seed",           # run from project root
+            Path("../data/seed"),                          # relative fallback
+            Path("/data/seed"),                            # Docker mount
+        ]
+        seed_dir = None
+        for p in candidates:
+            if p.is_dir():
+                seed_dir = p
+                break
+        if seed_dir is None:
+            return
 
         mapping = {
             "users.json": "users",
@@ -43,6 +48,15 @@ class Database:
                     if isinstance(data, list) and attr == "connections":
                         self.connections = data
                     elif isinstance(data, dict):
+                        # Notifications: remap field names from seed format to schema format
+                        if attr == "notifications":
+                            for uid, nlist in data.items():
+                                for n in nlist:
+                                    n.setdefault("user_id", uid)
+                                    if "text" in n and "message" not in n:
+                                        n["message"] = n.pop("text")
+                                    if "link" in n and "reference_id" not in n:
+                                        n["reference_id"] = n.pop("link")
                         setattr(self, attr, data)
                     elif isinstance(data, list):
                         # Convert list of dicts with "id" key into dict keyed by id
