@@ -1,4 +1,4 @@
-"""Notification routes for LinkQ API.
+"""Notification routes for Nexus API.
 
 Endpoints:
   GET    /notifications        -- list notifications for current user
@@ -19,12 +19,12 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 # ---------------------------------------------------------------------------
 @router.get("", response_model=list[NotificationResponse])
 def list_notifications(
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
     """Return notifications for the authenticated user, newest first."""
-
+    user_id = current_user["id"]
     user_notifs: list[dict] = db.notifications.get(user_id, [])
 
     # Sort newest first (by timestamp descending)
@@ -44,13 +44,13 @@ def list_notifications(
 @router.patch("/{notification_id}", response_model=NotificationResponse)
 def mark_notification_read(
     notification_id: str,
-    user_id: str = Depends(get_current_user),
+    current_user: dict = Depends(get_current_user),
 ):
     """Mark a single notification as read.
 
     Only the owner of the notification can mark it as read.
     """
-
+    user_id = current_user["id"]
     user_notifs: list[dict] = db.notifications.get(user_id, [])
 
     for notif in user_notifs:

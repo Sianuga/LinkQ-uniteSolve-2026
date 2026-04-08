@@ -1,12 +1,62 @@
-# NEXUS - Network for EXploration, Unity and Study
+# Nexus — Student Event Connection Platform
 
-_Start anywhere. Belong everywhere._ 
+Turn your calendar into your network. An event-centric platform connecting international students through shared academic events, courses, and interests.
 
-A student platform that connects peers through shared academic contexts and events, enabling them to discover who’s attending, connect in advance, and form meaningful study groups. It is designed to support integration, especially for international and new students, by turning everyday campus activities into **opportunities for connection.** Made
+**Competition:** uniteSolve 2026
 
 ## Quick Start
 
-### Frontend (React + Three.js)
+### Docker (Easiest)
+
+```bash
+docker compose up --build
+```
+
+That's it. Backend at `http://localhost:8000`, frontend at `http://localhost:5173`.
+
+### Run Everything (Without Docker)
+
+**Windows (PowerShell):**
+```powershell
+# Terminal 1 — Backend
+cd backend && python -m venv venv && venv\Scripts\activate && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 — Frontend
+cd frontend && npm install && npm run dev
+```
+
+**Mac / Linux (Bash):**
+```bash
+# Terminal 1 — Backend
+cd backend && python3 -m venv venv && source venv/bin/activate && pip install -r requirements.txt && uvicorn app.main:app --reload --port 8000
+
+# Terminal 2 — Frontend
+cd frontend && npm install && npm run dev
+```
+
+Backend runs at `http://localhost:8000` (Swagger docs at `/docs`).
+Frontend runs at `http://localhost:5173`.
+
+### Demo Account
+
+- **Email:** `demo@tu-darmstadt.de`
+- **Password:** `demo123`
+- Pre-filled profile, 6 events, 10+ connections, messages, notifications.
+- All other seed users use password `password123`.
+
+### Backend Only
+
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload --port 8000
+```
+
+Loads 100 users, 25 events, and full seed data automatically on startup. API docs at `http://localhost:8000/docs`.
+
+### Frontend Only
 
 ```bash
 cd frontend
@@ -14,15 +64,7 @@ npm install
 npm run dev
 ```
 
-Opens at `http://localhost:5173`. Use `demo@tu-darmstadt.de` with any password to skip onboarding and see the full app with mock data.
-
-### Backend (FastAPI + ChromaDB)
-
-```bash
-cd backend
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
+Opens at `http://localhost:5173`. Works with mock data if the backend isn't running.
 
 ## Tech Stack
 
@@ -34,26 +76,49 @@ uvicorn main:app --reload
 | State | Zustand + TanStack Query |
 | Backend | FastAPI (Python) |
 | Matching | ChromaDB + sentence-transformers (cosine similarity) |
-| API Spec | `likQ.postman_collection.json` |
+| API Spec | `nexus.postman_collection.json` |
 
 ## Project Structure
 
 ```
-frontend/           React app (28 screens, 73 source files)
+frontend/               React app (28 screens)
   src/
-    components/     UI (11) + Domain (8) + Layout (4)
-    pages/          Auth (4) + Onboarding (7) + App (5) + Events (5)
-                    + Profile (4) + Messaging (1) + Lobby (1) + Utility (2)
-    data/           Mock data (users, events, matches, messages)
-    store/          Zustand auth store
-    services/       Axios API client
-    types/          TypeScript interfaces
-    styles/         Tailwind theme + design tokens
-backend/            FastAPI server (TODO)
-scripts/            Seed data generation (TODO)
-data/seed/          Generated mock data JSON (TODO)
-Refs/               User flow wireframes (Onboarding, Matchmaking, Connecting)
-CLAUDE.md           Full project specification
+    components/         UI (11) + Domain (8) + Layout (4) + 3D
+    pages/              Auth (4) + Onboarding (7) + App (5) + Events (5)
+                        + Profile (4) + Messaging (1) + Lobby (1) + Utility (2)
+    data/               Mock data (users, events, matches, messages)
+    store/              Zustand auth store
+    services/           Axios API client
+    types/              TypeScript interfaces
+    styles/             Tailwind theme + design tokens
+backend/                FastAPI server (29 endpoints)
+  app/
+    main.py             Entry point — routers, CORS, lifespan
+    core/
+      config.py         Settings (env vars, JWT, ChromaDB paths)
+      database.py       In-memory DB with seed data loading
+      schema.sql        SQLite schema (ready for migration)
+      security.py       JWT auth + bcrypt password hashing
+    models/
+      schemas.py        30+ Pydantic models
+    routes/
+      auth.py           Register, login, /me, /oauth, /onboarding
+      events.py         CRUD, join, participants, matches
+      connections.py    Send, list, accept/reject
+      groups.py         Create, join, list by event
+      messages.py       Conversations, message history, send
+      matching.py       ChromaDB matching + profile comparison
+      notifications.py  List, mark read
+      users.py          Get user profile
+    services/
+      matching.py       Matching engine (753 lines) — cosine + Jaccard + context-aware weights
+      embedding.py      Bridge to ChromaDB embedding pipeline
+scripts/
+  generate_seed_data.py Generates all seed data (100 users, 25 events, etc.)
+data/seed/              Generated JSON seed files (6 files)
+Docs/                   Implementation plans
+Refs/                   User flow wireframes
+CLAUDE.md               Full project specification
 ```
 
 ## All Screens & Routes (28 total)

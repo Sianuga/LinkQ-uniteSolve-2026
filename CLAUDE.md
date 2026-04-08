@@ -1,8 +1,8 @@
-# LinkQ — Student Event Connection Platform
+# Nexus — Student Event Connection Platform
 
 ## What Is This
 
-LinkQ is an **event-centric student networking platform** that connects international students through shared academic events, courses, and interests. Unlike profile-first platforms (LinkedIn, Facebook), LinkQ is **event-first → then connection** — events are the nodes in the social graph, and shared attendance is the basis for meaningful peer discovery.
+Nexus is an **event-centric student networking platform** that connects international students through shared academic events, courses, and interests. Unlike profile-first platforms (LinkedIn, Facebook), Nexus is **event-first → then connection** — events are the nodes in the social graph, and shared attendance is the basis for meaningful peer discovery.
 
 **One-liner:** "LinkedIn + Event Graph + Campus Matching Engine" for university students.
 
@@ -44,7 +44,7 @@ The key insight: _"We both attend Advanced Distributed Systems seminar next week
 - **Similarity:** Cosine similarity on semantic segments + Jaccard on categorical data
 - **Embedding Model:** `sentence-transformers/all-MiniLM-L6-v2` (384 dims, free, local, fast — ideal for MVP)
 - **User Data:** JSON documents per user (gathered during onboarding)
-- **API spec:** `likQ.postman_collection.json` in repo root
+- **API spec:** `nexus.postman_collection.json` in repo root
 
 ### Frontend Libraries
 | Concern | Library | Why |
@@ -251,7 +251,7 @@ Start → Search for an event → Browse people on the event → Click Connect (
 
 ## API Endpoints
 
-Base URL: `{{baseUrl}}` (configurable). Full spec in `likQ.postman_collection.json`.
+Base URL: `{{baseUrl}}` (configurable). Full spec in `nexus.postman_collection.json`.
 
 ### Auth
 | Method | Endpoint | Auth | Description |

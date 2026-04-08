@@ -58,7 +58,7 @@ export const mockUsers: User[] = [
   },
   {
     id: 'user_002',
-    name: 'Priya Sharma',
+    name: 'BananaCat',
     email: 'priya.sharma@stud.tu-darmstadt.de',
     university: 'TU Darmstadt',
     program: 'M.Sc. Information Systems',
@@ -269,7 +269,7 @@ export const mockUsers: User[] = [
   },
   {
     id: 'user_007',
-    name: 'Emmanuel Okafor',
+    name: 'THE ORANGE',
     email: 'emmanuel.okafor@stud.tu-darmstadt.de',
     university: 'TU Darmstadt',
     program: 'M.Sc. IT Security',
@@ -562,7 +562,7 @@ export const mockConversations: Conversation[] = [
     id: 'conv_002',
     participant: {
       id: 'user_002',
-      name: 'Priya Sharma',
+      name: 'BananaCat',
       university: 'TU Darmstadt',
       program: 'M.Sc. Information Systems',
       avatar: 'banana_guy',
@@ -639,7 +639,7 @@ export const mockNotifications: Notification[] = [
     id: 'notif_003',
     type: 'new_match',
     title: 'New Match!',
-    body: 'You and Emmanuel Okafor share 3 interests. Say hi!',
+    body: 'You and THE ORANGE share 3 interests. Say hi!',
     read: false,
     timestamp: '2026-04-07T22:15:00+02:00',
     link: '/users/user_007',
@@ -657,7 +657,7 @@ export const mockNotifications: Notification[] = [
     id: 'notif_005',
     type: 'new_message',
     title: 'New Message',
-    body: 'Priya Sharma sent you a message',
+    body: 'BananaCat sent you a message',
     read: true,
     timestamp: '2026-04-07T11:30:00+02:00',
     link: '/messages/conv_002',
@@ -739,7 +739,7 @@ export const mockGroups: Group[] = [
     members: [
       { id: 'user_001', name: 'Akira Tanaka', university: 'TU Darmstadt', program: 'M.Sc. Computer Science', avatar: 'anime_girl' },
       { id: 'user_009', name: 'Yusuf Demir', university: 'TU Darmstadt', program: 'B.Sc. Computer Science', avatar: 'bland_normal_guy' },
-      { id: 'user_007', name: 'Emmanuel Okafor', university: 'TU Darmstadt', program: 'M.Sc. IT Security', avatar: 'buff_arnold' },
+      { id: 'user_007', name: 'THE ORANGE', university: 'TU Darmstadt', program: 'M.Sc. IT Security', avatar: 'buff_arnold' },
     ],
   },
   {
@@ -751,7 +751,7 @@ export const mockGroups: Group[] = [
     looking_for: 3,
     members: [
       { id: 'user_006', name: 'Anna Kowalska', university: 'TU Darmstadt', program: 'M.Sc. Data Science', avatar: 'anime_girl' },
-      { id: 'user_002', name: 'Priya Sharma', university: 'TU Darmstadt', program: 'M.Sc. Information Systems', avatar: 'banana_guy' },
+      { id: 'user_002', name: 'BananaCat', university: 'TU Darmstadt', program: 'M.Sc. Information Systems', avatar: 'banana_guy' },
       { id: 'user_001', name: 'Akira Tanaka', university: 'TU Darmstadt', program: 'M.Sc. Computer Science', avatar: 'anime_girl' },
     ],
   },
@@ -766,7 +766,7 @@ export const mockGroups: Group[] = [
       { id: 'user_003', name: 'Lukas Weber', university: 'TU Darmstadt', program: 'B.Sc. Electrical Engineering', avatar: 'buff_arnold' },
       { id: 'user_008', name: 'Marie Dupont', university: 'TU Darmstadt', program: 'M.Sc. Computational Engineering', avatar: 'banana_guy' },
       { id: 'user_010', name: 'Lisa Nguyen', university: 'TU Darmstadt', program: 'M.Sc. Computer Science', avatar: 'mystery_silhouette' },
-      { id: 'user_002', name: 'Priya Sharma', university: 'TU Darmstadt', program: 'M.Sc. Information Systems', avatar: 'banana_guy' },
+      { id: 'user_002', name: 'BananaCat', university: 'TU Darmstadt', program: 'M.Sc. Information Systems', avatar: 'banana_guy' },
       { id: 'user_004', name: 'Sofia Martinez', university: 'TU Darmstadt', program: 'M.Sc. Autonomous Systems', avatar: 'anime_girl' },
     ],
   },
@@ -815,7 +815,7 @@ export const mockMatches: MatchCandidate[] = [
   },
   {
     user_id: 'user_007',
-    name: 'Emmanuel Okafor',
+    name: 'THE ORANGE',
     avatar: 'buff_arnold',
     match_score: 0.78,
     shared: { events: 2, interests: 2 },
@@ -824,7 +824,7 @@ export const mockMatches: MatchCandidate[] = [
   },
   {
     user_id: 'user_002',
-    name: 'Priya Sharma',
+    name: 'BananaCat',
     avatar: 'banana_guy',
     match_score: 0.74,
     shared: { events: 2, interests: 2 },
