@@ -201,21 +201,80 @@ const emoteNotifVariants = {
   },
 };
 
-/** Big floating emoji that drifts up from center of the screen */
-function EmoteNotification({ emoji }: { emoji: string | null }) {
+/** Burst of emojis flying in random directions */
+const BURST_COUNT = 7;
+
+function EmoteNotification({ emoji, senderName = 'You' }: { emoji: string | null; senderName?: string }) {
+  const particles = useMemo(() => {
+    if (!emoji) return [];
+    return Array.from({ length: BURST_COUNT }, (_, i) => ({
+      id: i,
+      // Random horizontal spread: -150 to +150px
+      x: (Math.random() - 0.5) * 300,
+      // Random upward drift: -120 to -350px
+      y: -(120 + Math.random() * 230),
+      // Random rotation: -45 to +45 degrees
+      rotate: (Math.random() - 0.5) * 90,
+      // Random scale: 0.7 to 1.5
+      scale: 0.7 + Math.random() * 0.8,
+      // Random duration: 1.5 to 2.5s
+      duration: 1.5 + Math.random(),
+      // Random delay: 0 to 0.3s for stagger feel
+      delay: Math.random() * 0.3,
+      // Random starting position offset
+      startX: (Math.random() - 0.5) * 60,
+      startY: (Math.random() - 0.5) * 40,
+    }));
+  }, [emoji]);
+
   return (
     <AnimatePresence>
       {emoji && (
-        <motion.div
-          key={emoji + Date.now()}
-          initial={{ opacity: 1, y: 0, scale: 1 }}
-          animate={{ opacity: 0, y: -200, scale: 1.8 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 2, ease: 'easeOut' }}
-          className="pointer-events-none absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
-        >
-          <span className="text-6xl drop-shadow-lg">{emoji}</span>
-        </motion.div>
+        <>
+          {/* Flying emojis */}
+          {particles.map((p) => (
+            <motion.div
+              key={`${emoji}-${p.id}-${Date.now()}`}
+              initial={{
+                opacity: 1,
+                x: p.startX,
+                y: p.startY,
+                scale: p.scale,
+                rotate: 0,
+              }}
+              animate={{
+                opacity: 0,
+                x: p.x,
+                y: p.y,
+                scale: p.scale * 1.3,
+                rotate: p.rotate,
+              }}
+              exit={{ opacity: 0 }}
+              transition={{
+                duration: p.duration,
+                delay: p.delay,
+                ease: 'easeOut',
+              }}
+              className="pointer-events-none absolute left-1/2 top-1/2 z-30"
+              style={{ marginLeft: -24, marginTop: -24 }}
+            >
+              <span className="text-5xl drop-shadow-lg">{emoji}</span>
+            </motion.div>
+          ))}
+          {/* Sender label at bottom center */}
+          <motion.div
+            key={`label-${emoji}-${Date.now()}`}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="pointer-events-none absolute bottom-32 left-1/2 z-30 -translate-x-1/2"
+          >
+            <span className="rounded-full bg-text-primary/80 px-3 py-1 text-xs font-medium text-white shadow-md">
+              {senderName} sent {emoji}
+            </span>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
@@ -392,7 +451,7 @@ export default function LobbyOverlay({
       {/* ============================================================== */}
       {/* EMOTE NOTIFICATION (floating pill at top)                      */}
       {/* ============================================================== */}
-      <EmoteNotification emoji={emoteNotif} />
+      <EmoteNotification emoji={emoteNotif} senderName="You" />
 
       {/* ============================================================== */}
       {/* TOP BAR                                                        */}
