@@ -109,8 +109,9 @@ export function SplashScreen() {
           {/* CTAs */}
           <motion.div variants={childVariants} className="mt-6 flex flex-col gap-3">
             <Button
+              variant="secondary"
               size="lg"
-              className="w-full bg-white text-primary font-semibold hover:bg-white/90 active:bg-white/80"
+              className="w-full !bg-white !text-primary font-semibold hover:!bg-white/90 active:!bg-white/80 !border-white/20"
               onClick={() => navigate('/register')}
             >
               Create account
