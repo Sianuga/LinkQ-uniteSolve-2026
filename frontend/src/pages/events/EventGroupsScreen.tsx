@@ -45,13 +45,10 @@ export default function EventGroupsScreen({
 
   return (
     <div className="flex flex-col gap-4">
-      {/* ---- Create Group button ---- */}
-      <Link to={`/events/${resolvedEventId}/groups/create`}>
-        <Button variant="secondary" className="w-full gap-2">
-          <Plus className="h-4 w-4" />
-          Create Group
-        </Button>
-      </Link>
+      {/* Groups are formed through matchmaking — no manual create/join */}
+      <p className="text-xs text-text-secondary text-center px-4">
+        Groups are formed through the Match Me feature. Browse existing teams below.
+      </p>
 
       {/* ---- Group list ---- */}
       {groups.length === 0 ? (
@@ -138,22 +135,7 @@ export default function EventGroupsScreen({
                     </div>
                   )}
 
-                  {/* Join button */}
-                  <Button
-                    variant={isJoined ? 'secondary' : 'primary'}
-                    size="sm"
-                    className="mt-auto w-full"
-                    onClick={() => handleJoin(group)}
-                  >
-                    {isJoined ? (
-                      'Joined \u2713'
-                    ) : (
-                      <>
-                        <UserPlus className="mr-1.5 h-4 w-4" />
-                        Join Group
-                      </>
-                    )}
-                  </Button>
+                  {/* View-only — join through matchmaking */}
                 </Card>
               </motion.div>
             );

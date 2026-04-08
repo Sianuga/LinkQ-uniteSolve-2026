@@ -143,7 +143,7 @@ export default function EventDetailScreen() {
               Match Me
             </Button>
           </Link>
-          <Link to={`/events/${event.id}/groups`} className="flex-1">
+          <Link to={`/events/${event.id}/groups/create`} className="flex-1">
             <Button
               variant="secondary"
               size="lg"
