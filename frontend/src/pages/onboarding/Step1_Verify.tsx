@@ -77,7 +77,7 @@ export default function Step1_Verify() {
 
         <button
           onClick={goNext}
-          className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-secondary hover:text-primary transition-colors cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 py-2.5 min-h-[44px] text-sm font-medium text-secondary hover:text-primary transition-colors cursor-pointer"
         >
           <Upload className="w-4 h-4" />
           Upload a photo instead
@@ -96,7 +96,7 @@ export default function Step1_Verify() {
       >
         <button
           onClick={goNext}
-          className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer group"
+          className="flex items-center gap-1.5 min-h-[44px] text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer group"
         >
           Skip for demo
           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />

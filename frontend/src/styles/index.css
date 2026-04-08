@@ -42,6 +42,33 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Hide scrollbar utility */
+.scrollbar-none::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none,
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Prevent iOS Safari zoom on input focus (inputs < 16px trigger zoom) */
+@supports (-webkit-touch-callout: none) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe-area utility classes */
+.safe-area-bottom,
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.pt-safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

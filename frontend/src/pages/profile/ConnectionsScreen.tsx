@@ -55,7 +55,7 @@ function TabBar({
   ];
 
   return (
-    <div className="flex border-b border-border bg-surface px-4">
+    <div className="sticky top-0 z-10 flex border-b border-border bg-surface px-4 overflow-x-auto">
       {tabs.map((tab) => (
         <button
           key={tab.key}
@@ -214,7 +214,7 @@ export default function ConnectionsScreen() {
                             size="sm"
                             onClick={() => handleAccept(conn)}
                             aria-label={`Accept ${user.name}`}
-                            className="!min-h-[36px] !px-3 !bg-emerald-500 hover:!bg-emerald-600"
+                            className="!min-h-[44px] !px-3 !bg-emerald-500 hover:!bg-emerald-600"
                           >
                             <Check className="h-4 w-4 mr-1" />
                             Accept
@@ -224,7 +224,7 @@ export default function ConnectionsScreen() {
                             size="sm"
                             onClick={() => handleReject(conn)}
                             aria-label={`Reject ${user.name}`}
-                            className="!min-h-[36px] !px-3"
+                            className="!min-h-[44px] !px-3"
                           >
                             <X className="h-4 w-4 mr-1" />
                             Reject

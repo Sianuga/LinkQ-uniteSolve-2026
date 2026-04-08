@@ -84,7 +84,7 @@ export default function EventGroupsScreen({
                         {group.name || `Study Group #${index + 1}`}
                       </h3>
                       {group.description && (
-                        <p className="line-clamp-2 text-xs leading-4 text-gray-500">
+                        <p className="line-clamp-2 text-xs leading-4 text-gray-500 break-words">
                           {group.description}
                         </p>
                       )}

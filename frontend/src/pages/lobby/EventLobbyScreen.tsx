@@ -352,7 +352,7 @@ function CharacterOverlay({ match, onClose, onViewProfile }: CharacterOverlayPro
   const matchPct = Math.round(match.match_score * 100);
 
   return (
-    <div className="absolute inset-0 z-30 flex items-end justify-center pb-12 pointer-events-none">
+    <div className="absolute inset-0 z-30 flex items-end justify-center pb-[max(3rem,env(safe-area-inset-bottom))] pointer-events-none">
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/40 pointer-events-auto"
@@ -528,7 +528,7 @@ export default function EventLobbyScreen() {
 
       {/* Bottom hint */}
       {!selectedMatch && (
-        <div className="absolute inset-x-0 bottom-8 z-20 flex justify-center pointer-events-none">
+        <div className="absolute inset-x-0 bottom-[max(2rem,env(safe-area-inset-bottom))] z-20 flex justify-center pointer-events-none">
           <div className="rounded-full bg-white/10 backdrop-blur-md px-4 py-2 text-xs font-medium text-white/70">
             Tap a character to view their profile
           </div>

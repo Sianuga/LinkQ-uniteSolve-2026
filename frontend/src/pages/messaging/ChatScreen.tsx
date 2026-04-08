@@ -234,7 +234,7 @@ export function ChatScreen() {
       </div>
 
       {/* ---- Input Bar ---- */}
-      <div className="shrink-0 border-t border-border bg-surface px-4 py-3">
+      <div className="shrink-0 border-t border-border bg-surface px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-3">
           <input
             type="text"
@@ -242,13 +242,13 @@ export function ChatScreen() {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-sm text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors focus:bg-gray-50 focus:ring-2 focus:ring-secondary/30"
+            className="flex-1 rounded-full bg-gray-100 px-4 py-2.5 text-base text-text-primary placeholder:text-text-secondary/60 outline-none transition-colors focus:bg-gray-50 focus:ring-2 focus:ring-secondary/30"
           />
           <button
             type="button"
             onClick={handleSend}
             disabled={!inputValue.trim()}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-white transition-all hover:bg-secondary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-secondary text-white transition-all hover:bg-secondary/90 disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Send message"
           >
             <Send className="h-[18px] w-[18px]" />

@@ -78,7 +78,7 @@ export default function ExploreScreen() {
   };
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-6 pt-2">
+    <div className="flex flex-col gap-4 px-4 pb-24 pt-2">
       {/* ---------------------------------------------------------------- */}
       {/*  Search Bar                                                       */}
       {/* ---------------------------------------------------------------- */}
@@ -106,7 +106,7 @@ export default function ExploreScreen() {
             key={tab}
             onClick={() => setActiveView(tab)}
             className={[
-              'relative flex-1 rounded-full py-2 text-center text-sm font-semibold capitalize transition-colors duration-150 cursor-pointer select-none',
+              'relative flex-1 rounded-full py-2 min-h-[44px] text-center text-sm font-semibold capitalize transition-colors duration-150 cursor-pointer select-none',
               activeView === tab
                 ? 'text-white'
                 : 'text-gray-500 hover:text-gray-700',
@@ -146,13 +146,13 @@ export default function ExploreScreen() {
             className="flex flex-col gap-4"
           >
             {/* ---- Category chips (horizontal scroll) ---- */}
-            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide">
+            <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.value}
                   onClick={() => setSelectedCategory(cat.value)}
                   className={[
-                    'shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-150 cursor-pointer select-none',
+                    'shrink-0 rounded-full px-4 py-2 text-xs font-semibold transition-colors duration-150 cursor-pointer select-none min-h-[44px] flex items-center',
                     selectedCategory === cat.value
                       ? 'bg-primary text-white shadow-sm'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
@@ -169,7 +169,7 @@ export default function ExploreScreen() {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="grid grid-cols-2 gap-3"
+                className="grid grid-cols-1 min-[400px]:grid-cols-2 gap-3"
               >
                 <AnimatePresence>
                   {filteredEvents.map((event) => (

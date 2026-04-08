@@ -60,7 +60,7 @@ export default function MessagesScreen() {
   }
 
   return (
-    <div className="flex flex-col pb-4">
+    <div className="flex flex-col pb-24">
       {/* ---- Header area ---- */}
       <div className="sticky top-0 z-30 bg-surface px-4 pt-4 pb-2">
         <div className="mb-3 flex items-center justify-between">

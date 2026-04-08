@@ -75,7 +75,7 @@ export default function CreateGroupScreen() {
             className={[
               'w-full resize-none bg-surface text-text-primary placeholder:text-text-secondary',
               'border rounded-[var(--radius-sm)] px-3 py-3',
-              'text-sm leading-5 outline-none',
+              'text-base leading-5 outline-none',
               'transition-colors duration-150',
               'border-border focus:border-secondary focus:ring-2 focus:ring-secondary/20',
             ].join(' ')}
@@ -100,7 +100,7 @@ export default function CreateGroupScreen() {
             className={[
               'w-full bg-surface text-text-primary placeholder:text-text-secondary',
               'border rounded-[var(--radius-sm)] px-3 py-3',
-              'text-sm leading-5 outline-none',
+              'text-base leading-5 outline-none',
               'transition-colors duration-150',
               'border-border focus:border-secondary focus:ring-2 focus:ring-secondary/20',
             ].join(' ')}

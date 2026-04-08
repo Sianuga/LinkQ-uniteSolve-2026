@@ -235,11 +235,11 @@ export default function ProfileComparisonScreen() {
           {/* Avatars side-by-side */}
           <motion.div
             variants={fadeUp}
-            className="flex items-center gap-6 sm:gap-10"
+            className="flex items-center justify-center gap-4 sm:gap-10 w-full max-w-sm mx-auto"
           >
             {/* Me */}
-            <div className="flex flex-col items-center gap-2">
-              <div className="relative">
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+              <div className="relative shrink-0">
                 <Avatar
                   name={me.name}
                   avatarType={me.avatar}
@@ -251,9 +251,9 @@ export default function ProfileComparisonScreen() {
                   You
                 </span>
               </div>
-              <div className="text-center mt-1">
-                <p className="text-sm font-semibold text-text-primary">{me.name}</p>
-                <p className="text-xs text-text-secondary">{me.program}</p>
+              <div className="text-center mt-1 min-w-0 max-w-full">
+                <p className="text-sm font-semibold text-text-primary truncate">{me.name}</p>
+                <p className="text-xs text-text-secondary truncate">{me.program}</p>
               </div>
             </div>
 
@@ -268,24 +268,26 @@ export default function ProfileComparisonScreen() {
             </motion.div>
 
             {/* Them */}
-            <div className="flex flex-col items-center gap-2">
-              <Avatar
-                name={targetUser.name}
-                avatarType={targetUser.avatar}
-                src={targetUser.avatar_url}
-                size="lg"
-                className="ring-4 ring-secondary/20"
-              />
-              <div className="text-center mt-1">
-                <p className="text-sm font-semibold text-text-primary">{targetUser.name}</p>
-                <p className="text-xs text-text-secondary">{targetUser.program}</p>
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
+              <div className="shrink-0">
+                <Avatar
+                  name={targetUser.name}
+                  avatarType={targetUser.avatar}
+                  src={targetUser.avatar_url}
+                  size="lg"
+                  className="ring-4 ring-secondary/20"
+                />
+              </div>
+              <div className="text-center mt-1 min-w-0 max-w-full">
+                <p className="text-sm font-semibold text-text-primary truncate">{targetUser.name}</p>
+                <p className="text-xs text-text-secondary truncate">{targetUser.program}</p>
               </div>
             </div>
           </motion.div>
 
           {/* Match ring */}
           {comparison && (
-            <motion.div variants={fadeUp}>
+            <motion.div variants={fadeUp} className="flex items-center justify-center w-full max-w-[200px] mx-auto">
               <MatchRing score={comparison.match_score} />
             </motion.div>
           )}

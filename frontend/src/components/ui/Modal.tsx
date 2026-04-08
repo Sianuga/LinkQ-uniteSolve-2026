@@ -81,6 +81,7 @@ export function Modal({
             variants={panelVariants}
             className={[
               'relative w-full max-w-[400px]',
+              'max-h-[calc(100dvh-2rem)] overflow-y-auto',
               'bg-surface rounded-[var(--radius-lg)] shadow-lg',
               'p-6',
               className,
@@ -102,7 +103,7 @@ export function Modal({
                   onClick={onClose}
                   className={[
                     'inline-flex items-center justify-center',
-                    'w-8 h-8 rounded-full',
+                    'w-11 h-11 rounded-full',
                     'text-text-secondary hover:text-text-primary',
                     'hover:bg-highlight transition-colors duration-100',
                     'cursor-pointer',

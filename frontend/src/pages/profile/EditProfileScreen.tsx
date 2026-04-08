@@ -121,7 +121,7 @@ function TextareaField({
         className={[
           'w-full bg-surface text-text-primary placeholder:text-text-secondary',
           'border border-border rounded-[var(--radius-sm)] px-3 py-3',
-          'text-sm leading-5 outline-none resize-none',
+          'text-base leading-5 outline-none resize-none',
           'transition-colors duration-150',
           'focus:border-secondary focus:ring-2 focus:ring-secondary/20',
         ].join(' ')}

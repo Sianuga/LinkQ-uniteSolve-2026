@@ -115,7 +115,7 @@ export default function Step3_Modules() {
                             setDropdownOpen(false);
                           }}
                           className={[
-                            'w-full text-left px-3 py-2.5 text-sm cursor-pointer',
+                            'w-full text-left px-3 py-2.5 min-h-[44px] text-sm cursor-pointer',
                             'hover:bg-highlight transition-colors',
                             university === uni && 'bg-highlight font-medium text-primary',
                           ].filter(Boolean).join(' ')}
@@ -141,7 +141,7 @@ export default function Step3_Modules() {
 
             <button
               onClick={goNext}
-              className="w-full text-center text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer py-2"
+              className="w-full text-center text-sm text-text-secondary hover:text-text-primary transition-colors cursor-pointer py-2 min-h-[44px]"
             >
               <span className="flex items-center justify-center gap-1.5">
                 <Plus className="w-3.5 h-3.5" />

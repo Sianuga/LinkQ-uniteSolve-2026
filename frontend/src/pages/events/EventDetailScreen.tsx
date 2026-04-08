@@ -101,7 +101,7 @@ export default function EventDetailScreen() {
           </div>
         )}
 
-        <h1 className="text-2xl font-bold leading-8 text-gray-900">
+        <h1 className="text-2xl font-bold leading-8 text-gray-900 break-words">
           {event.title}
         </h1>
 
@@ -138,7 +138,7 @@ export default function EventDetailScreen() {
       </div>
 
       {/* ---- Tab bar ---- */}
-      <div className="relative flex border-b border-border px-4">
+      <div className="sticky top-[48px] z-10 relative flex border-b border-border bg-background px-4 overflow-hidden">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -175,7 +175,7 @@ export default function EventDetailScreen() {
         >
           {activeTab === 'overview' && (
             <div className="flex flex-col gap-4">
-              <p className="text-sm leading-6 text-gray-700">
+              <p className="text-sm leading-6 text-gray-700 break-words">
                 {event.description}
               </p>
               <div>

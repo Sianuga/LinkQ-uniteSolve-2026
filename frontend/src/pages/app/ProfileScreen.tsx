@@ -91,14 +91,14 @@ export default function ProfileScreen() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="relative flex flex-col gap-6 px-4 pb-8 pt-4"
+      className="relative flex flex-col gap-6 px-4 pb-24 pt-4"
     >
       {/* ---- Top-right action buttons ---- */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <button
           type="button"
           onClick={() => navigate('/profile/edit')}
-          className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-surface shadow-sm border border-border text-text-secondary hover:text-primary transition-colors cursor-pointer"
+          className="inline-flex items-center justify-center h-11 w-11 rounded-full bg-surface shadow-sm border border-border text-text-secondary hover:text-primary transition-colors cursor-pointer"
           aria-label="Edit profile"
         >
           <Edit className="h-4 w-4" />
@@ -106,7 +106,7 @@ export default function ProfileScreen() {
         <button
           type="button"
           onClick={() => navigate('/settings')}
-          className="inline-flex items-center justify-center h-9 w-9 rounded-full bg-surface shadow-sm border border-border text-text-secondary hover:text-primary transition-colors cursor-pointer"
+          className="inline-flex items-center justify-center h-11 w-11 rounded-full bg-surface shadow-sm border border-border text-text-secondary hover:text-primary transition-colors cursor-pointer"
           aria-label="Settings"
         >
           <Settings className="h-4 w-4" />
@@ -123,10 +123,10 @@ export default function ProfileScreen() {
         />
 
         <div className="flex flex-col items-center gap-0.5 text-center">
-          <h1 className="text-xl font-bold leading-7 text-text-primary">
+          <h1 className="text-xl font-bold leading-7 text-text-primary truncate max-w-[260px]">
             {user.name}
           </h1>
-          <p className="text-sm text-text-secondary">{user.program}</p>
+          <p className="text-sm text-text-secondary truncate max-w-[260px]">{user.program}</p>
           <p className="text-xs text-text-secondary">
             Semester {user.semester}
           </p>

@@ -30,6 +30,7 @@ export function Card({ children, className = '', onClick, ...rest }: CardProps) 
       className={[
         'bg-surface rounded-[var(--radius-lg)] p-4',
         'shadow-md',
+        'max-w-full overflow-hidden',
         isClickable && 'cursor-pointer select-none',
         'transition-shadow duration-150',
         isClickable && 'hover:shadow-lg',

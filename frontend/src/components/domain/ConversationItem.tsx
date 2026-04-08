@@ -46,7 +46,7 @@ export function ConversationItem({ conversation, onClick }: ConversationItemProp
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.1, ease: 'easeOut' }}
       onClick={() => onClick?.(conversation)}
-      className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-gray-50 ${
+      className={`flex w-full items-center gap-3 rounded-2xl px-4 py-3 min-h-[64px] text-left transition-colors hover:bg-gray-50 ${
         unread ? 'bg-blue-50/40' : ''
       }`}
     >

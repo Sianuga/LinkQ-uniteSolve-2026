@@ -68,7 +68,7 @@ export function ForgotPasswordScreen() {
 
   return (
     <motion.div
-      className="flex min-h-dvh flex-col bg-background"
+      className="flex min-h-dvh flex-col bg-background overflow-x-hidden"
       variants={pageVariants}
       initial="hidden"
       animate="visible"
@@ -86,7 +86,7 @@ export function ForgotPasswordScreen() {
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col justify-center px-6 pb-8">
+      <div className="flex flex-1 flex-col justify-center px-6 pb-8 pb-safe">
         <div className="mx-auto w-full max-w-md">
           <AnimatePresence mode="wait">
             {!sent ? (
@@ -214,7 +214,7 @@ export function ForgotPasswordScreen() {
 // ---------------------------------------------------------------------------
 function inputClass(hasError: boolean) {
   return [
-    'block w-full rounded-[var(--radius-md)] border bg-surface px-4 py-3 text-sm text-text-primary',
+    'block w-full rounded-[var(--radius-md)] border bg-surface px-4 py-3 text-base text-text-primary',
     'placeholder:text-text-secondary/60',
     'outline-none transition-colors duration-150',
     'focus:border-secondary focus:ring-2 focus:ring-secondary/30',

@@ -152,7 +152,7 @@ export default function HomeScreen() {
         <div className="flex items-center gap-3">
           <Link
             to="/notifications"
-            className="relative flex items-center justify-center w-10 h-10 rounded-full bg-surface shadow-sm hover:shadow-md transition-shadow"
+            className="relative flex items-center justify-center w-11 h-11 rounded-full bg-surface shadow-sm hover:shadow-md transition-shadow"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 text-text-secondary" />
@@ -163,7 +163,7 @@ export default function HomeScreen() {
             )}
           </Link>
 
-          <Link to="/profile" aria-label="My profile">
+          <Link to="/profile" aria-label="My profile" className="flex items-center justify-center min-w-[44px] min-h-[44px]">
             <Avatar
               name={currentUser.name}
               avatarType={currentUser.avatar}
@@ -196,7 +196,7 @@ export default function HomeScreen() {
           </div>
 
           {/* Horizontal scroll row */}
-          <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-none">
+          <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
             {upcomingEvents.map((event) => (
               <motion.div
                 key={event.id}

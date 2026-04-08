@@ -313,14 +313,14 @@ export default function Step6_Events() {
                     </AnimatePresence>
                   </div>
 
-                  <div className="flex items-center gap-3 mt-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
                     <span className="flex items-center gap-1 text-xs text-text-secondary">
-                      <Calendar className="w-3 h-3" />
+                      <Calendar className="w-3 h-3 shrink-0" />
                       {event.date}, {event.time}
                     </span>
                     <span className="flex items-center gap-1 text-xs text-text-secondary">
-                      <MapPin className="w-3 h-3" />
-                      {event.location}
+                      <MapPin className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{event.location}</span>
                     </span>
                   </div>
 

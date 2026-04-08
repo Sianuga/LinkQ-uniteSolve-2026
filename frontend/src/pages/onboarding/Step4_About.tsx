@@ -140,7 +140,7 @@ function TagPicker({
           onChange={(e) => setCustomInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={placeholder ?? 'Type and press Enter to add...'}
-          className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
+          className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
         />
       )}
     </div>
@@ -284,7 +284,7 @@ export default function Step4_About() {
                   onChange={(e) => setProgram(e.target.value)}
                   className={[
                     'w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-3',
-                    'text-sm outline-none cursor-pointer',
+                    'text-base outline-none cursor-pointer',
                     'focus:border-secondary focus:ring-2 focus:ring-secondary/20',
                     'transition-colors duration-150',
                     !program && 'text-text-secondary',
@@ -350,7 +350,7 @@ export default function Step4_About() {
                   onChange={(e) => setAboutMe(e.target.value)}
                   placeholder="Tell people something fun or interesting about you..."
                   rows={3}
-                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-sm text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
+                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
                 />
               </div>
             </motion.div>
@@ -426,7 +426,7 @@ export default function Step4_About() {
                   onChange={(e) => setHereTo(e.target.value)}
                   placeholder="e.g. meet people in my courses and find study partners..."
                   rows={3}
-                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-sm text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
+                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
                 />
               </div>
             </motion.div>

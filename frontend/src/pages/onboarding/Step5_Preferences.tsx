@@ -82,7 +82,7 @@ export default function Step5_Preferences() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-y-auto">
       {/* Header */}
       <div className="text-center space-y-2 mb-6">
         <motion.div
@@ -112,7 +112,7 @@ export default function Step5_Preferences() {
           Available Times
         </h2>
 
-        <div className="overflow-x-auto -mx-1">
+        <div className="overflow-x-auto -mx-1 scrollbar-hide">
           <div className="min-w-fit">
             {/* Header row */}
             <div className="grid gap-1.5 mb-1.5" style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}>

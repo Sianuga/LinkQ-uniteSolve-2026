@@ -30,7 +30,7 @@ export function SplashScreen() {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-dvh overflow-hidden">
+    <div className="relative min-h-dvh overflow-hidden pb-safe">
       {/* Animated gradient background */}
       <div
         className="absolute inset-0 -z-10"

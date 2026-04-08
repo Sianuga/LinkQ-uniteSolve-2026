@@ -137,7 +137,7 @@ export default function UserProfileScreen() {
           {user.bio && (
             <motion.p
               variants={fadeUp}
-              className="text-sm text-text-secondary text-center max-w-sm leading-relaxed"
+              className="text-sm text-text-secondary text-center max-w-sm leading-relaxed break-words"
             >
               {user.bio}
             </motion.p>

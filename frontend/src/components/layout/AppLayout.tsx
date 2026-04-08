@@ -10,7 +10,7 @@ export function AppLayout() {
 
   return (
     <div className="flex min-h-dvh flex-col bg-background">
-      <div className={showNav ? 'flex-1 pb-16' : 'flex-1'}>
+      <div className={showNav ? 'flex-1 pb-20' : 'flex-1'}>
         <Outlet />
       </div>
       {showNav && <BottomNav />}

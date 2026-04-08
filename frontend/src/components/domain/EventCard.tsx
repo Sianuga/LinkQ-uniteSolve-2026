@@ -46,7 +46,7 @@ export function EventCard({ event, variant = 'vertical', onClick }: EventCardPro
       whileHover={{ y: -2 }}
       whileTap={{ scale: 0.98 }}
       transition={{ duration: 0.15, ease: 'easeOut' }}
-      className={isHorizontal ? 'w-64 shrink-0' : 'w-full'}
+      className={isHorizontal ? 'w-64 min-w-[256px] shrink-0 snap-start' : 'w-full'}
     >
       <Card
         className={`cursor-pointer overflow-hidden ${isHorizontal ? '' : ''}`}

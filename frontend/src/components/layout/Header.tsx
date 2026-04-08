@@ -24,7 +24,7 @@ export function Header({
       {showBack && (
         <button
           onClick={() => navigate(-1)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-primary transition-colors hover:bg-highlight"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-primary transition-colors hover:bg-highlight"
           aria-label="Go back"
         >
           <ArrowLeft size={20} />
@@ -40,7 +40,7 @@ export function Header({
 
       {/* Search field */}
       {showSearch && (
-        <div className="relative flex-1">
+        <div className="relative min-w-0 flex-1">
           <Search
             size={16}
             className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-text-secondary"
@@ -61,7 +61,7 @@ export function Header({
       {showNotificationBell && (
         <button
           onClick={() => navigate('/notifications')}
-          className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-primary transition-colors hover:bg-highlight"
+          className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-text-primary transition-colors hover:bg-highlight"
           aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
         >
           <Bell size={20} />

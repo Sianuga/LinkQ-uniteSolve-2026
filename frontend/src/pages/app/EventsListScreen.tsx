@@ -159,7 +159,7 @@ export default function EventsListScreen() {
               type="button"
               onClick={() => setActiveTab(key)}
               className={[
-                'relative flex-1 rounded-full py-2.5 text-center text-sm font-semibold transition-colors duration-150 cursor-pointer select-none',
+                'relative flex-1 rounded-full py-2.5 text-center text-sm font-semibold transition-colors duration-150 cursor-pointer select-none min-h-[44px]',
                 activeTab === key ? 'text-white' : 'text-gray-500 hover:text-gray-700',
               ].join(' ')}
             >

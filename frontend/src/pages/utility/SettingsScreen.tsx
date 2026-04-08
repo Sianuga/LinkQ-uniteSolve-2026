@@ -33,14 +33,15 @@ function Toggle({
       aria-checked={enabled}
       onClick={onToggle}
       className={[
-        'relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
+        'relative inline-flex h-[31px] w-[51px] shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200',
         enabled ? 'bg-secondary' : 'bg-disabled',
       ].join(' ')}
+      style={{ touchAction: 'manipulation' }}
     >
       <span
         className={[
-          'inline-block h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200',
-          enabled ? 'translate-x-6' : 'translate-x-1',
+          'inline-block h-[27px] w-[27px] rounded-full bg-white shadow-sm transition-transform duration-200',
+          enabled ? 'translate-x-[22px]' : 'translate-x-[2px]',
         ].join(' ')}
       />
     </button>
@@ -147,7 +148,7 @@ export function SettingsScreen() {
             ).map(([key, label], idx) => (
               <div key={key}>
                 {idx > 0 && <div className="border-t border-border" />}
-                <div className="flex items-center justify-between px-4 py-3">
+                <div className="flex items-center justify-between px-4 py-3 min-h-[44px]">
                   <span className="text-sm text-text-primary">{label}</span>
                   <Toggle
                     enabled={notifications[key]}

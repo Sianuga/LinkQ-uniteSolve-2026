@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             className={[
               'w-full bg-surface text-text-primary placeholder:text-text-secondary',
               'border rounded-[var(--radius-sm)] px-3 py-3',
-              'text-sm leading-5 outline-none',
+              'text-base leading-5 outline-none',
               'transition-colors duration-150',
               icon && 'pl-10',
               error

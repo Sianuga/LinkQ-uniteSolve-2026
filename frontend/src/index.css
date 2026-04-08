@@ -57,9 +57,16 @@
   text-align: center;
   border-inline: 1px solid var(--border);
   min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    border-inline: none;
+  }
 }
 
 body {
