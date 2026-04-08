@@ -155,6 +155,7 @@ export default function EventLobbyScreen() {
     return match ? toSelectedCharacter(match) : null;
   }, [selectedCharacterId]);
 
+  // Tap character → open bottom sheet + focus camera
   const handleSelectCharacter = useCallback(
     (userId: string) => {
       setSelectedCharacterId(userId);
@@ -164,31 +165,22 @@ export default function EventLobbyScreen() {
     [characters],
   );
 
+  // Dots → move camera only, no sheet
   const handleDotClick = useCallback(
     (i: number) => {
       setFocusIndex(i);
-      if (characters[i]) {
-        setSelectedCharacterId(characters[i].userId);
-      }
     },
-    [characters],
+    [],
   );
 
+  // Arrows → move camera only, no sheet
   const goPrev = useCallback(() => {
-    setFocusIndex((prev) => {
-      const next = Math.max(0, prev - 1);
-      if (characters[next]) setSelectedCharacterId(characters[next].userId);
-      return next;
-    });
-  }, [characters]);
+    setFocusIndex((prev) => Math.max(0, prev - 1));
+  }, []);
 
   const goNext = useCallback(() => {
-    setFocusIndex((prev) => {
-      const next = Math.min(characters.length - 1, prev + 1);
-      if (characters[next]) setSelectedCharacterId(characters[next].userId);
-      return next;
-    });
-  }, [characters]);
+    setFocusIndex((prev) => Math.min(characters.length - 1, prev + 1));
+  }, [characters.length]);
 
   return (
     <div className="h-dvh w-full relative overflow-hidden bg-[#0a0a1a]">
@@ -200,6 +192,7 @@ export default function EventLobbyScreen() {
             selectedId={selectedCharacterId}
             focusIndex={focusIndex}
             onSelectCharacter={handleSelectCharacter}
+            onFocusChange={setFocusIndex}
           />
         </Suspense>
       </ErrorBoundary>

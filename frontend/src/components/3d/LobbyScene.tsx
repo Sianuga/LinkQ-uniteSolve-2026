@@ -28,6 +28,7 @@ interface LobbySceneProps {
   selectedId: string | null;
   focusIndex: number;
   onSelectCharacter: (id: string) => void;
+  onFocusChange?: (index: number) => void;
 }
 
 /* ------------------------------------------------------------------ */
@@ -197,6 +198,7 @@ export default function LobbyScene({
   selectedId,
   focusIndex,
   onSelectCharacter,
+  onFocusChange,
 }: LobbySceneProps) {
   const [internalFocus, setInternalFocus] = useState(focusIndex);
 
@@ -209,14 +211,12 @@ export default function LobbyScene({
       setInternalFocus((prev) => {
         const next = dir === 'right' ? prev + 1 : prev - 1;
         const clamped = Math.max(0, Math.min(characters.length - 1, next));
-        // Also select the character we swipe to
-        if (characters[clamped]) {
-          onSelectCharacter(characters[clamped].userId);
-        }
+        // Swipe only moves focus, does NOT select (no bottom sheet)
+        onFocusChange?.(clamped);
         return clamped;
       });
     },
-    [characters, onSelectCharacter],
+    [characters.length, onFocusChange],
   );
 
   return (
