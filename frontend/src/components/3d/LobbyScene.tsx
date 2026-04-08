@@ -36,14 +36,14 @@ export interface LobbySceneProps {
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
 
-const SPACING = 2.0;
+const SPACING = 1.4;
 
-// Overview: camera far back to see all 5 characters
-const OVERVIEW_POS: [number, number, number] = [0, 2.2, 10];
+// Overview: camera far back to see all 5 characters on mobile portrait
+const OVERVIEW_POS: [number, number, number] = [0, 2.2, 12];
 const OVERVIEW_LOOKAT: [number, number, number] = [0, 0.8, 0];
 
 // Zoomed: camera close to focused character
-const ZOOM_DISTANCE = 3.5;
+const ZOOM_DISTANCE = 3.0;
 const ZOOM_HEIGHT = 1.5;
 const ZOOM_LOOKAT_Y = 0.9;
 
@@ -330,7 +330,7 @@ export default function LobbyScene({
     <Canvas
       shadows
       dpr={[1, 1.5]}
-      camera={{ position: OVERVIEW_POS, fov: 50 }}
+      camera={{ position: OVERVIEW_POS, fov: 55 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
       style={{ background: '#0a0a1a', touchAction: 'none' }}
     >

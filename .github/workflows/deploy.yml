@@ -11,9 +11,7 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  workflow_dispatch: # Manual trigger only — auto-deploy disabled for now
 
 concurrency:
   group: deploy

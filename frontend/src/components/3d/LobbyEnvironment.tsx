@@ -159,15 +159,74 @@ function GlowStrip() {
 // ---------------------------------------------------------------------------
 
 function ReflectiveFloor() {
+  const rimRef = useRef<THREE.Mesh>(null);
+
+  // Pulse the rim glow
+  useFrame(({ clock }) => {
+    const mat = rimRef.current?.material as THREE.MeshStandardMaterial | undefined;
+    if (!mat) return;
+    const t = clock.getElapsedTime();
+    mat.emissiveIntensity = 0.6 + 0.3 * Math.sin(t * 0.8);
+  });
+
+  const MAIN_RADIUS = 6;
+  const MAIN_HEIGHT = 0.8;
+  const BASE_RADIUS = 6.5;
+  const BASE_HEIGHT = 0.15;
+  const RIM_INNER = MAIN_RADIUS - 0.06;
+  const RIM_OUTER = MAIN_RADIUS + 0.06;
+  const RIM_HEIGHT = 0.04;
+  const SEGMENTS = 64;
+
   return (
-    <mesh rotation-x={-Math.PI / 2} position-y={0} receiveShadow>
-      <planeGeometry args={[FLOOR_WIDTH, FLOOR_DEPTH]} />
-      <meshStandardMaterial
-        color={BG_COLOR}
-        metalness={0.8}
-        roughness={0.2}
-      />
-    </mesh>
+    <group>
+      {/* Main platform cylinder — top surface at y=0 */}
+      <mesh position-y={-MAIN_HEIGHT / 2} receiveShadow castShadow>
+        <cylinderGeometry args={[MAIN_RADIUS, MAIN_RADIUS, MAIN_HEIGHT, SEGMENTS]} />
+        <meshStandardMaterial
+          color={BG_COLOR}
+          metalness={0.8}
+          roughness={0.2}
+        />
+      </mesh>
+
+      {/* Stepped base — slightly wider, sits below main cylinder */}
+      <mesh position-y={-MAIN_HEIGHT - BASE_HEIGHT / 2} receiveShadow>
+        <cylinderGeometry args={[BASE_RADIUS, BASE_RADIUS, BASE_HEIGHT, SEGMENTS]} />
+        <meshStandardMaterial
+          color="#06060f"
+          metalness={0.6}
+          roughness={0.35}
+        />
+      </mesh>
+
+      {/* Glowing rim ring on top edge */}
+      <mesh ref={rimRef} position-y={0.005} rotation-x={-Math.PI / 2}>
+        <ringGeometry args={[RIM_INNER, RIM_OUTER, SEGMENTS]} />
+        <meshStandardMaterial
+          color="#000000"
+          emissive="#3B82F6"
+          emissiveIntensity={0.6}
+          transparent
+          opacity={0.9}
+          toneMapped={false}
+          side={THREE.DoubleSide}
+          depthWrite={false}
+        />
+      </mesh>
+
+      {/* Subtle side glow — a slightly larger transparent cylinder hugging the edge */}
+      <mesh position-y={-MAIN_HEIGHT / 2}>
+        <cylinderGeometry args={[MAIN_RADIUS + 0.02, MAIN_RADIUS + 0.02, MAIN_HEIGHT, SEGMENTS, 1, true]} />
+        <meshStandardMaterial
+          color="#0d0d2b"
+          metalness={0.5}
+          roughness={0.3}
+          transparent
+          opacity={0.7}
+        />
+      </mesh>
+    </group>
   );
 }
 
