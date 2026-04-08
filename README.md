@@ -56,8 +56,83 @@ Refs/               User flow wireframes (Onboarding, Matchmaking, Connecting)
 CLAUDE.md           Full project specification
 ```
 
-## Screens
+## All Screens & Routes (28 total)
 
-28 screens across 8 flows: Auth, Onboarding (6-step wizard), Home/Explore/Events/Messages/Profile tabs, Event Detail (Overview/People/Groups), Profile Comparison with animated match ring, Chat, 3D Avatar Lobby, Notifications, Settings.
+Login with `demo@tu-darmstadt.de` (any password) to skip onboarding and access all screens.
 
-See `CLAUDE.md` for the complete screen map and design system.
+### Pre-Auth
+
+| # | Screen | Route |
+|---|--------|-------|
+| A1 | Splash | `/` |
+| A2 | Register | `/register` |
+| A3 | Login | `/login` |
+| A4 | Forgot Password | `/forgot-password` |
+
+### Onboarding (register first → auto-redirects)
+
+| # | Screen | Route |
+|---|--------|-------|
+| B1 | Student ID Scan | `/onboarding/verify` |
+| B2 | Avatar Picker | `/onboarding/avatar` |
+| B3 | Module Login | `/onboarding/modules` |
+| B4 | About You | `/onboarding/about` |
+| B5 | Study Preferences | `/onboarding/preferences` |
+| B6 | Event Browser + Done | `/onboarding/events` |
+
+### Main Tabs (bottom navigation)
+
+| # | Screen | Route |
+|---|--------|-------|
+| C1 | Home | `/home` |
+| C2 | Explore | `/explore` |
+| C3 | Events List | `/events` |
+| C4 | Messages | `/messages` |
+| C5 | My Profile | `/profile` |
+
+### Event Screens
+
+| # | Screen | Route | Example |
+|---|--------|-------|---------|
+| D1 | Event Detail | `/events/:id` | `/events/e-001` |
+| D2 | Event People | `/events/:id/people` | `/events/e-001/people` |
+| D3 | Event Groups | `/events/:id/groups` | `/events/e-001/groups` |
+| D4 | Create Event | `/events/create` | |
+| D5 | Create Group | `/events/:id/groups/create` | `/events/e-001/groups/create` |
+
+### 3D Lobby
+
+| # | Screen | Route | Example |
+|---|--------|-------|---------|
+| G1 | Event Lobby | `/events/:id/lobby` | `/events/e-001/lobby` |
+
+### Profile & Connections
+
+| # | Screen | Route | Example |
+|---|--------|-------|---------|
+| E1 | User Profile | `/users/:id` | `/users/u-002` |
+| E2 | Profile Comparison | `/users/:id/compare` | `/users/u-002/compare` |
+| E3 | Edit Profile | `/profile/edit` | |
+| E4 | Connections | `/connections` | |
+
+### Messaging
+
+| # | Screen | Route | Example |
+|---|--------|-------|---------|
+| F1 | Chat | `/messages/:conversationId` | `/messages/conv-001` |
+
+### Utility
+
+| # | Screen | Route |
+|---|--------|-------|
+| H1 | Notifications | `/notifications` |
+| H2 | Settings | `/settings` |
+
+### Available Mock Data IDs
+
+- **Events:** `e-001` through `e-008`
+- **Users:** `u-001` (you) through `u-006`
+- **Conversations:** `conv-001` through `conv-004`
+- **Groups:** `g-001` through `g-004`
+
+See `CLAUDE.md` for the complete design system and project specification.
