@@ -11,8 +11,38 @@ import type { MatchCandidate } from '@/types';
 /*  Map MatchCandidate -> character format for LobbyScene              */
 /* ------------------------------------------------------------------ */
 
+// Pick exactly 5 characters — one per avatar type for variety
+const DESIRED_AVATARS: import('@/types').AvatarType[] = [
+  'buff_arnold', 'banana_guy', 'anime_girl', 'bland_normal_guy', 'mystery_silhouette',
+];
+
 function toCharacters(matches: MatchCandidate[]) {
-  return matches.map((m) => ({
+  const picked: ReturnType<typeof mapMatch>[] = [];
+  const usedTypes = new Set<string>();
+
+  // First pass: pick one of each desired avatar type
+  for (const avatarType of DESIRED_AVATARS) {
+    const match = matches.find((m) => m.avatar === avatarType && !usedTypes.has(m.user_id));
+    if (match) {
+      picked.push(mapMatch(match));
+      usedTypes.add(match.user_id);
+    }
+  }
+
+  // If we don't have 5 yet, fill from remaining matches
+  for (const m of matches) {
+    if (picked.length >= 5) break;
+    if (!usedTypes.has(m.user_id)) {
+      picked.push(mapMatch(m));
+      usedTypes.add(m.user_id);
+    }
+  }
+
+  return picked;
+}
+
+function mapMatch(m: MatchCandidate) {
+  return {
     userId: m.user_id,
     name: m.name,
     avatarType: m.avatar,
@@ -23,7 +53,7 @@ function toCharacters(matches: MatchCandidate[]) {
       events: m.shared.events,
       interests: m.shared.interests,
     },
-  }));
+  };
 }
 
 function toSelectedCharacter(match: MatchCandidate) {

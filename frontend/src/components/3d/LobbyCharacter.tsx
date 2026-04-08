@@ -13,9 +13,14 @@ interface LobbyCharacterProps {
   name: string;
   matchScore: number;
   position: [number, number, number];
+  rotationY?: number;
   onClick: () => void;
   isSelected: boolean;
   isFocused: boolean;
+  userId?: string;
+  program?: string;
+  tags?: string[];
+  shared?: { events: number; interests: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -377,7 +382,7 @@ function AuraOrb({ index }: { index: number }) {
 
 const BUFF_ARNOLD_MODEL = '/models/character_01.glb';
 const BANANA_GUY_MODEL = '/models/cute_cat_in_cute_banana.glb';
-const NORMAL_GUY_MODEL = '/models/normal_guy.glb';
+const NORMAL_GUY_MODEL = '/models/man_in_suit.glb';
 
 function BuffArnoldGLB() {
   const { scene } = useGLTF(BUFF_ARNOLD_MODEL);
@@ -525,6 +530,7 @@ export default function LobbyCharacter({
   name,
   matchScore,
   position,
+  rotationY = 0,
   onClick,
   isSelected,
   isFocused,
@@ -598,7 +604,7 @@ export default function LobbyCharacter({
   };
 
   return (
-    <group position={position}>
+    <group position={position} rotation={[0, rotationY, 0]}>
       <group
         ref={groupRef}
         onClick={(e) => {
