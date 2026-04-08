@@ -18,8 +18,8 @@ interface AvatarOption {
 const AVATARS: AvatarOption[] = [
   {
     type: 'buff_arnold',
-    name: 'Buff Arnold',
-    subtitle: 'The Gym Legend',
+    name: 'Cyber Samurai',
+    subtitle: 'The Quiet Carry',
     emoji: '\u{1F4AA}',
     color: '#DC2626',
     bgGradient: 'from-red-500 to-orange-500',
@@ -27,8 +27,8 @@ const AVATARS: AvatarOption[] = [
   },
   {
     type: 'banana_guy',
-    name: 'Banana Guy',
-    subtitle: 'The Party Animal',
+    name: 'Banana Suit',
+    subtitle: 'The Icebreaker',
     emoji: '\u{1F34C}',
     color: '#F59E0B',
     bgGradient: 'from-yellow-400 to-amber-500',
@@ -36,8 +36,8 @@ const AVATARS: AvatarOption[] = [
   },
   {
     type: 'anime_girl',
-    name: 'Anime Girl',
-    subtitle: 'The Culture Icon',
+    name: 'Synth Idol',
+    subtitle: 'The Vibes',
     emoji: '\u{2728}',
     color: '#14B8A6',
     bgGradient: 'from-teal-400 to-cyan-500',
@@ -45,8 +45,8 @@ const AVATARS: AvatarOption[] = [
   },
   {
     type: 'bland_normal_guy',
-    name: 'Normal Guy',
-    subtitle: 'The Everyman',
+    name: 'Campus Classic',
+    subtitle: 'The Reliable One',
     emoji: '\u{1F64B}',
     color: '#6B7280',
     bgGradient: 'from-gray-400 to-slate-500',
@@ -69,7 +69,7 @@ export default function Step2_Avatar() {
 
   const goNext = () => {
     if (selected) {
-      navigate('/onboarding/modules');
+      navigate('/onboarding/about');
     }
   };
 
@@ -81,7 +81,7 @@ export default function Step2_Avatar() {
           Pick Your Avatar
         </h1>
         <p className="text-sm text-text-secondary">
-          Choose the character that represents you in the lobby. This is how others see you at events.
+          Choose how you’ll appear in event lobbies. You can change this later.
         </p>
       </div>
 
@@ -117,7 +117,7 @@ export default function Step2_Avatar() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center text-sm text-text-secondary mb-4"
         >
-          You picked{' '}
+          Selected:{' '}
           <span className="font-semibold text-text-primary">
             {AVATARS.find((a) => a.type === selected)?.name}
           </span>
@@ -163,12 +163,12 @@ function AvatarCard({
       whileTap={{ scale: 0.95 }}
       onClick={onSelect}
       className={[
-        'relative flex flex-col items-center gap-1 p-4 rounded-[var(--radius-lg)]',
+        'relative flex min-h-[132px] flex-col items-center justify-center gap-1 p-4 rounded-[var(--radius-lg)]',
         'cursor-pointer select-none overflow-hidden',
         'transition-all duration-200',
         isSelected
-          ? `ring-2 ring-offset-2 ring-offset-background ${avatar.borderGlow}`
-          : 'hover:shadow-lg',
+          ? `ring-2 ring-offset-2 ring-offset-background shadow-sm ${avatar.borderGlow}`
+          : 'hover:shadow-md',
       ].join(' ')}
       style={{
         borderColor: isSelected ? avatar.color : undefined,
@@ -177,7 +177,7 @@ function AvatarCard({
       }}
     >
       {/* Background gradient */}
-      <div className={`absolute inset-0 bg-gradient-to-br ${avatar.bgGradient} opacity-10`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${avatar.bgGradient} opacity-[0.08]`} />
 
       {/* Selected check */}
       {isSelected && (
@@ -202,16 +202,16 @@ function AvatarCard({
       </motion.div>
 
       {/* Info */}
-      <div className="relative z-10 text-center">
-        <p className="text-sm font-bold text-text-primary">{avatar.name}</p>
-        <p className="text-xs text-text-secondary">{avatar.subtitle}</p>
+      <div className="relative z-10 text-center px-1">
+        <p className="text-sm font-bold text-text-primary leading-tight">{avatar.name}</p>
+        <p className="text-xs text-text-secondary leading-tight">{avatar.subtitle}</p>
       </div>
 
       {/* Surface overlay for unselected */}
       <div
         className={[
           'absolute inset-0 border rounded-[var(--radius-lg)] transition-colors duration-200',
-          isSelected ? 'border-transparent' : 'border-border bg-surface/60',
+          isSelected ? 'border-transparent bg-highlight/20' : 'border-border bg-surface/60',
         ].join(' ')}
         style={{ pointerEvents: 'none' }}
       />

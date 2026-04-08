@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -27,6 +27,7 @@ interface FakeEvent {
   attendees: number;
   category: EventCategory;
   emoji: string;
+  image_url?: string;
 }
 
 const EVENTS: FakeEvent[] = [
@@ -39,6 +40,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 142,
     category: 'lecture',
     emoji: '\u{1F4BB}',
+    image_url: 'https://source.unsplash.com/featured/800x600?lecture-hall,university',
   },
   {
     id: 'evt_2',
@@ -49,6 +51,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 56,
     category: 'seminar',
     emoji: '\u{1F916}',
+    image_url: 'https://source.unsplash.com/featured/800x600?workshop,students,laptop',
   },
   {
     id: 'evt_3',
@@ -59,6 +62,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 230,
     category: 'hackathon',
     emoji: '\u{1F680}',
+    image_url: 'https://source.unsplash.com/featured/800x600?hackathon,programming,team',
   },
   {
     id: 'evt_4',
@@ -69,6 +73,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 85,
     category: 'social',
     emoji: '\u{1F389}',
+    image_url: 'https://source.unsplash.com/featured/800x600?friends,cafe,students',
   },
   {
     id: 'evt_5',
@@ -79,6 +84,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 38,
     category: 'seminar',
     emoji: '\u{1F9E0}',
+    image_url: 'https://source.unsplash.com/featured/800x600?seminar,university,classroom',
   },
   {
     id: 'evt_6',
@@ -89,6 +95,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 24,
     category: 'club',
     emoji: '\u{1F980}',
+    image_url: 'https://source.unsplash.com/featured/800x600?coding,meetup,developer',
   },
   {
     id: 'evt_7',
@@ -99,6 +106,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 310,
     category: 'social',
     emoji: '\u{1F4BC}',
+    image_url: 'https://source.unsplash.com/featured/800x600?career-fair,conference,people',
   },
   {
     id: 'evt_8',
@@ -109,6 +117,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 32,
     category: 'lecture',
     emoji: '\u{1F441}\u{FE0F}',
+    image_url: 'https://source.unsplash.com/featured/800x600?computer-vision,lab,university',
   },
   {
     id: 'evt_9',
@@ -119,6 +128,7 @@ const EVENTS: FakeEvent[] = [
     attendees: 18,
     category: 'club',
     emoji: '\u{1F310}',
+    image_url: 'https://source.unsplash.com/featured/800x600?open-source,workspace,laptop',
   },
   {
     id: 'evt_10',
@@ -129,15 +139,16 @@ const EVENTS: FakeEvent[] = [
     attendees: 12,
     category: 'seminar',
     emoji: '\u{1F4D0}',
+    image_url: 'https://source.unsplash.com/featured/800x600?study-group,library,students',
   },
 ];
 
 const CATEGORY_COLORS: Record<EventCategory, string> = {
-  lecture: 'bg-blue-100 text-blue-700',
-  seminar: 'bg-purple-100 text-purple-700',
-  hackathon: 'bg-red-100 text-red-700',
-  club: 'bg-green-100 text-green-700',
-  social: 'bg-amber-100 text-amber-700',
+  lecture: 'bg-blue-50 text-blue-700 border-blue-200',
+  seminar: 'bg-purple-50 text-purple-700 border-purple-200',
+  hackathon: 'bg-red-50 text-red-700 border-red-200',
+  club: 'bg-green-50 text-green-700 border-green-200',
+  social: 'bg-amber-50 text-amber-700 border-amber-200',
 };
 
 /* ------------------------------------------------------------------ */
@@ -194,6 +205,19 @@ export default function Step6_Events() {
   const user = useAuthStore((s) => s.user);
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set());
   const [showCelebration, setShowCelebration] = useState(false);
+  const [query, setQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState<EventCategory | 'all'>('all');
+
+  const filteredEvents = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return EVENTS.filter((e) => {
+      const categoryOk = activeCategory === 'all' ? true : e.category === activeCategory;
+      const queryOk = !q
+        ? true
+        : `${e.title} ${e.location} ${e.category}`.toLowerCase().includes(q);
+      return categoryOk && queryOk;
+    });
+  }, [query, activeCategory]);
 
   const toggleEvent = (id: string) => {
     setSelectedEvents((prev) => {
@@ -241,8 +265,50 @@ export default function Step6_Events() {
             Upcoming Events
           </h1>
           <p className="text-sm text-text-secondary max-w-xs mx-auto">
-            Select events you want to attend. We'll match you with people who are going too.
+            Pick events you’ll attend — we’ll show you people going to the same ones.
           </p>
+        </div>
+
+        {/* Search + filters */}
+        <div className="space-y-3 mb-4">
+          <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-3 shadow-sm">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.currentTarget.value)}
+              placeholder="Search events or locations"
+              className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-3 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+            />
+
+            <div className="mt-3 -mx-1 px-1">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+                {([
+                  { id: 'all', label: 'All' },
+                  { id: 'lecture', label: 'Lectures' },
+                  { id: 'seminar', label: 'Seminars' },
+                  { id: 'hackathon', label: 'Hackathons' },
+                  { id: 'club', label: 'Clubs' },
+                  { id: 'social', label: 'Social' },
+                ] as const).map((c) => {
+                  const isActive = activeCategory === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setActiveCategory(c.id)}
+                      className={[
+                        'shrink-0 min-h-[40px] px-3 rounded-full border text-sm font-semibold transition-colors',
+                        isActive
+                          ? 'bg-primary text-white border-primary'
+                          : 'bg-background text-text-primary border-border hover:bg-highlight',
+                      ].join(' ')}
+                    >
+                      {c.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Selection counter */}
@@ -250,18 +316,18 @@ export default function Step6_Events() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-2 mb-4"
+            className="flex items-center justify-center mb-4"
           >
-            <Sparkles className="w-4 h-4 text-secondary" />
-            <span className="text-sm font-semibold text-secondary">
-              {selectedEvents.size} event{selectedEvents.size !== 1 && 's'} selected
+            <span className="inline-flex items-center gap-2 rounded-full bg-highlight border border-border px-3 py-1.5 text-xs font-semibold text-text-primary">
+              <Sparkles className="w-3.5 h-3.5 text-secondary" />
+              {selectedEvents.size} selected
             </span>
           </motion.div>
         )}
 
         {/* Event grid */}
         <div className="flex-1 overflow-y-auto pb-24 space-y-2.5">
-          {EVENTS.map((event, i) => {
+          {filteredEvents.map((event, i) => {
             const isSelected = selectedEvents.has(event.id);
 
             return (
@@ -273,28 +339,38 @@ export default function Step6_Events() {
                 whileTap={{ scale: 0.98 }}
                 onClick={() => toggleEvent(event.id)}
                 className={[
-                  'w-full flex items-start gap-3 p-3 rounded-[var(--radius-md)]',
-                  'border-2 cursor-pointer select-none text-left',
-                  'transition-all duration-200',
+                  'w-full flex items-start gap-3 p-3 rounded-[var(--radius-lg)]',
+                  'border cursor-pointer select-none text-left',
+                  'transition-all duration-200 shadow-sm',
                   isSelected
-                    ? 'border-primary bg-highlight shadow-sm'
-                    : 'border-border bg-surface hover:border-secondary/30',
+                    ? 'border-primary bg-highlight'
+                    : 'border-border bg-surface hover:border-secondary/30 hover:bg-highlight/40',
                 ].join(' ')}
               >
-                {/* Emoji */}
+                {/* Icon tile */}
                 <div
                   className={[
-                    'shrink-0 w-10 h-10 rounded-[var(--radius-sm)] flex items-center justify-center text-xl',
-                    isSelected ? 'bg-primary/10' : 'bg-highlight',
+                    'shrink-0 w-11 h-11 rounded-xl border flex items-center justify-center text-xl',
+                    isSelected ? 'bg-primary/10 border-primary/20' : 'bg-background border-border',
                   ].join(' ')}
+                  aria-hidden
                 >
-                  {event.emoji}
+                  {event.image_url ? (
+                    <img
+                      src={event.image_url}
+                      alt=""
+                      className="h-full w-full rounded-xl object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    event.emoji
+                  )}
                 </div>
 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <p className="text-sm font-semibold text-text-primary truncate">
+                    <p className="text-sm font-semibold text-text-primary leading-snug">
                       {event.title}
                     </p>
                     {/* Checkmark */}
@@ -305,7 +381,7 @@ export default function Step6_Events() {
                           animate={{ scale: 1 }}
                           exit={{ scale: 0 }}
                           transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                          className="shrink-0 w-5 h-5 rounded-full bg-primary flex items-center justify-center"
+                          className="shrink-0 w-5 h-5 rounded-full bg-primary flex items-center justify-center mt-0.5"
                         >
                           <Check className="w-3 h-3 text-white" />
                         </motion.div>
@@ -313,7 +389,7 @@ export default function Step6_Events() {
                     </AnimatePresence>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-1.5">
                     <span className="flex items-center gap-1 text-xs text-text-secondary">
                       <Calendar className="w-3 h-3 shrink-0" />
                       {event.date}, {event.time}
@@ -324,8 +400,13 @@ export default function Step6_Events() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 mt-1.5">
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium ${CATEGORY_COLORS[event.category]}`}>
+                  <div className="flex items-center gap-2 mt-2">
+                    <span
+                      className={[
+                        'inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border',
+                        CATEGORY_COLORS[event.category],
+                      ].join(' ')}
+                    >
                       {event.category}
                     </span>
                     <span className="flex items-center gap-1 text-[10px] text-text-secondary">
@@ -350,9 +431,12 @@ export default function Step6_Events() {
             <Sparkles className="w-4 h-4" />
             {selectedEvents.size > 0
               ? `Continue with ${selectedEvents.size} event${selectedEvents.size !== 1 ? 's' : ''}`
-              : 'Select at least one event'}
+              : 'Choose at least 1 event'}
           </Button>
         </div>
+
+        {/* Reserve space so sticky footer never overlays content */}
+        <div aria-hidden className="h-28" />
       </div>
 
       {/* ---- Celebration overlay ---- */}
@@ -399,7 +483,7 @@ export default function Step6_Events() {
                   transition={{ delay: 0.55 }}
                   className="text-text-secondary"
                 >
-                  Your profile is set up and looking great.
+                  Saving your profile and setting up matches…
                 </motion.p>
               </div>
 

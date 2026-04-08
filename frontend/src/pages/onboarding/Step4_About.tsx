@@ -1,10 +1,11 @@
-import { useState, type KeyboardEvent } from 'react';
+import { useMemo, useRef, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Heart, Wrench, Target } from 'lucide-react';
+import { User, Heart, Wrench, Target, Camera, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Tag } from '@/components/ui/Tag';
+import { useAuthStore } from '@/store/authStore';
 
 /* ------------------------------------------------------------------ */
 /*  Pre-built tag options                                              */
@@ -109,8 +110,14 @@ function TagPicker({
   };
 
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium text-text-primary">{label}</label>
+    <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-3">
+      <div className="flex items-start justify-between gap-3">
+        <label className="text-sm font-semibold text-text-primary">{label}</label>
+        <span className="text-xs text-text-secondary">
+          {selected.length > 0 ? `${selected.length} selected` : 'Pick a few'}
+        </span>
+      </div>
+
       <div className="flex flex-wrap gap-2">
         <AnimatePresence>
           {options.map((option) => (
@@ -134,14 +141,18 @@ function TagPicker({
             ))}
         </AnimatePresence>
       </div>
+
       {onAddCustom && (
-        <input
-          value={customInput}
-          onChange={(e) => setCustomInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={placeholder ?? 'Type and press Enter to add...'}
-          className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
-        />
+        <div className="space-y-1">
+          <p className="text-xs text-text-secondary">Add your own</p>
+          <input
+            value={customInput}
+            onChange={(e) => setCustomInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder ?? 'Type and press Enter to add...'}
+            className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors"
+          />
+        </div>
       )}
     </div>
   );
@@ -154,11 +165,12 @@ function TagPicker({
 export default function Step4_About() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabId>('profile');
+  const user = useAuthStore((s) => s.user);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   // Profile state
-  const [name, setName] = useState('');
-  const [program, setProgram] = useState('');
-  const [semester, setSemester] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [photoName, setPhotoName] = useState('');
 
   // Interests state
   const [hobbies, setHobbies] = useState<string[]>([]);
@@ -198,7 +210,7 @@ export default function Step4_About() {
 
   /* ---- Completion check ---- */
 
-  const profileFilled = name.trim().length > 0 && program.length > 0 && semester.length > 0;
+  const profileFilled = nickname.trim().length > 0;
   const interestsFilled = hobbies.length > 0 || topics.length > 0 || sports.length > 0;
   const skillsFilled = programming.length > 0 || languages.length > 0 || tools.length > 0;
   const goalsFilled = learning.length > 0 || career.trim().length > 0;
@@ -213,6 +225,15 @@ export default function Step4_About() {
   const otherTabsFilled = interestsFilled || skillsFilled || goalsFilled;
   const canContinue = profileFilled && otherTabsFilled;
 
+  const studentSummary = useMemo(() => {
+    const program = user?.program?.trim() || '';
+    const semester = typeof user?.semester === 'number' && user.semester > 0 ? String(user.semester) : '';
+    return {
+      program: program || 'Imported from Student ID',
+      semester: semester || 'Imported from Student ID',
+    };
+  }, [user?.program, user?.semester]);
+
   const goNext = () => {
     if (canContinue) {
       navigate('/onboarding/preferences');
@@ -223,42 +244,53 @@ export default function Step4_About() {
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="text-center space-y-2 mb-4">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-highlight mx-auto">
+          <Sparkles className="w-6 h-6 text-primary" />
+        </div>
         <h1 className="text-2xl font-bold text-text-primary">About You</h1>
-        <p className="text-sm text-text-secondary">
-          Tell us about yourself so we can find your perfect matches.
+        <p className="text-sm text-text-secondary max-w-sm mx-auto">
+          A few details go a long way. This helps matches feel natural, not random.
         </p>
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 p-1 bg-surface rounded-[var(--radius-md)] border border-border mb-5">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={[
-              'relative flex-1 flex items-center justify-center gap-1.5 py-2 px-1 rounded-[var(--radius-sm)]',
-              'text-xs font-medium transition-all duration-200 cursor-pointer',
-              activeTab === tab.id
-                ? 'bg-primary text-white shadow-sm'
-                : 'text-text-secondary hover:text-text-primary hover:bg-highlight',
-            ].join(' ')}
-          >
-            {tab.icon}
-            <span className="hidden sm:inline">{tab.label}</span>
-            {/* Completion dot */}
-            {tabCompletions[tab.id] && activeTab !== tab.id && (
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-success"
-              />
-            )}
-          </button>
-        ))}
+      <div className="mb-5 -mx-4 px-4">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide py-1">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={[
+                'relative shrink-0 inline-flex items-center gap-2 min-h-[44px] px-3 rounded-full',
+                'text-sm font-semibold transition-all duration-200 cursor-pointer',
+                'border',
+                activeTab === tab.id
+                  ? 'bg-primary text-white border-primary shadow-sm'
+                  : 'bg-surface text-text-primary border-border hover:bg-highlight',
+              ].join(' ')}
+            >
+              <span className={activeTab === tab.id ? 'text-white' : 'text-text-secondary'}>
+                {tab.icon}
+              </span>
+              <span>{tab.label}</span>
+              {tabCompletions[tab.id] && (
+                <span
+                  className={[
+                    'ml-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold',
+                    activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-success text-white',
+                  ].join(' ')}
+                  aria-label={`${tab.label} completed`}
+                >
+                  ✓
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto pb-6">
         <AnimatePresence mode="wait">
           {activeTab === 'profile' && (
             <motion.div
@@ -269,43 +301,62 @@ export default function Step4_About() {
               transition={{ duration: 0.2 }}
               className="space-y-4"
             >
-              <Input
-                label="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name"
-              />
+              <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="relative shrink-0">
+                    <div className="h-14 w-14 rounded-2xl bg-highlight border border-border flex items-center justify-center">
+                      <Camera className="h-6 w-6 text-text-secondary" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => photoInputRef.current?.click()}
+                      className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center shadow-md"
+                      aria-label="Add photo"
+                    >
+                      <Camera className="h-4 w-4" />
+                    </button>
+                  </div>
 
-              {/* Program dropdown */}
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-text-primary">Program</label>
-                <select
-                  value={program}
-                  onChange={(e) => setProgram(e.target.value)}
-                  className={[
-                    'w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-3',
-                    'text-base outline-none cursor-pointer',
-                    'focus:border-secondary focus:ring-2 focus:ring-secondary/20',
-                    'transition-colors duration-150',
-                    !program && 'text-text-secondary',
-                  ].filter(Boolean).join(' ')}
-                >
-                  <option value="" disabled>Select your program...</option>
-                  {PROGRAMS.map((p) => (
-                    <option key={p} value={p}>{p}</option>
-                  ))}
-                </select>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-text-primary">Your public profile</p>
+                    <p className="mt-0.5 text-xs text-text-secondary">
+                      Use a nickname — it’s what people see in events. Photo is optional.
+                    </p>
+                  </div>
+                </div>
+
+                <Input
+                  label="Nickname"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="e.g. Sophie, Alex, Kenji…"
+                />
+
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="user"
+                  className="hidden"
+                  onChange={(e) => setPhotoName(e.currentTarget.files?.[0]?.name ?? '')}
+                />
+                {photoName ? (
+                  <p className="text-xs text-text-secondary">
+                    Photo selected: <span className="font-medium text-text-primary">{photoName}</span>
+                  </p>
+                ) : null}
+
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                  <div className="rounded-[var(--radius-md)] border border-border bg-background p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-text-secondary">Program</p>
+                    <p className="mt-1 text-sm font-semibold text-text-primary">{studentSummary.program}</p>
+                  </div>
+                  <div className="rounded-[var(--radius-md)] border border-border bg-background p-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-wide text-text-secondary">Semester</p>
+                    <p className="mt-1 text-sm font-semibold text-text-primary">{studentSummary.semester}</p>
+                  </div>
+                </div>
               </div>
-
-              <Input
-                label="Semester"
-                type="number"
-                min={1}
-                max={20}
-                value={semester}
-                onChange={(e) => setSemester(e.target.value)}
-                placeholder="e.g. 3"
-              />
             </motion.div>
           )}
 
@@ -318,6 +369,12 @@ export default function Step4_About() {
               transition={{ duration: 0.2 }}
               className="space-y-5"
             >
+              <div className="rounded-[var(--radius-lg)] border border-border bg-highlight p-4">
+                <p className="text-sm font-semibold text-text-primary">Make it easy to start a conversation</p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  Pick a few interests — you’ll get better matches and better openers.
+                </p>
+              </div>
               <TagPicker
                 label="Hobbies"
                 options={HOBBY_OPTIONS}
@@ -343,14 +400,14 @@ export default function Step4_About() {
                 placeholder="Add a sport..."
               />
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-text-primary">About Me</label>
+              <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-2">
+                <label className="text-sm font-semibold text-text-primary">About me</label>
                 <textarea
                   value={aboutMe}
                   onChange={(e) => setAboutMe(e.target.value)}
-                  placeholder="Tell people something fun or interesting about you..."
-                  rows={3}
-                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
+                  placeholder="One line is enough. Example: “New to Darmstadt, looking for a DS study group.”"
+                  rows={4}
+                  className="w-full bg-background border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
                 />
               </div>
             </motion.div>
@@ -365,6 +422,12 @@ export default function Step4_About() {
               transition={{ duration: 0.2 }}
               className="space-y-5"
             >
+              <div className="rounded-[var(--radius-lg)] border border-border bg-highlight p-4">
+                <p className="text-sm font-semibold text-text-primary">Find people who complement you</p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  Add skills to match with people who share tools — or bring what you’re missing.
+                </p>
+              </div>
               <TagPicker
                 label="Programming Languages"
                 options={PROGRAMMING_OPTIONS}
@@ -401,6 +464,12 @@ export default function Step4_About() {
               transition={{ duration: 0.2 }}
               className="space-y-5"
             >
+              <div className="rounded-[var(--radius-lg)] border border-border bg-highlight p-4">
+                <p className="text-sm font-semibold text-text-primary">Make your intent clear</p>
+                <p className="mt-1 text-xs text-text-secondary">
+                  Goals help us match you with the right kind of study partners.
+                </p>
+              </div>
               <TagPicker
                 label="I'm Learning..."
                 options={LEARNING_OPTIONS}
@@ -410,35 +479,38 @@ export default function Step4_About() {
                 placeholder="Add something you're learning..."
               />
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-text-primary">Career Direction</label>
+              <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-2">
+                <label className="text-sm font-semibold text-text-primary">Career direction</label>
                 <Input
                   value={career}
                   onChange={(e) => setCareer(e.target.value)}
-                  placeholder="e.g. ML engineering, frontend development..."
+                  placeholder="e.g. ML engineer, frontend developer…"
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-text-primary">I'm here to...</label>
+              <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-2">
+                <label className="text-sm font-semibold text-text-primary">I’m here to…</label>
                 <textarea
                   value={hereTo}
                   onChange={(e) => setHereTo(e.target.value)}
-                  placeholder="e.g. meet people in my courses and find study partners..."
-                  rows={3}
-                  className="w-full bg-surface border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
+                  placeholder="Example: “Find a study buddy for the next assignment.”"
+                  rows={4}
+                  className="w-full bg-background border border-border rounded-[var(--radius-sm)] px-3 py-2.5 text-base text-text-primary placeholder:text-text-secondary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-colors resize-none"
                 />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Reserve space so sticky footer never overlays content */}
+        <div aria-hidden className="h-32" />
       </div>
 
       {/* Continue */}
       <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
         {!canContinue && (
           <p className="text-xs text-text-secondary text-center mb-2">
-            Fill out Profile + at least one other tab to continue
+            Complete Profile + add at least 1 Interest, Skill, or Goal to continue
           </p>
         )}
         <Button

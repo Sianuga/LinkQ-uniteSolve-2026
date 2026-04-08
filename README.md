@@ -8,6 +8,8 @@ A student platform that connects peers through shared academic contexts and even
 
 ### Frontend (React + Three.js)
 
+Recommended Node version: **Node 22 LTS** (see `.nvmrc`). Using very new Node versions can break native optional dependencies used by the bundler.
+
 ```bash
 cd frontend
 npm install
