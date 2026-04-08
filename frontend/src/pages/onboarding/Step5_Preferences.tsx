@@ -61,6 +61,20 @@ export default function Step5_Preferences() {
   const [selectedSlots, setSelectedSlots] = useState<Set<SlotKey>>(new Set());
   const [studyStyle, setStudyStyle] = useState<StudyStyle | null>(null);
 
+  const applyPreset = (preset: 'weekdayEvenings' | 'weekendAfternoons' | 'morningsOnly') => {
+    const next = new Set<SlotKey>();
+    if (preset === 'weekdayEvenings') {
+      (['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const).forEach((d) => next.add(`${d}-Evening`));
+    }
+    if (preset === 'weekendAfternoons') {
+      (['Sat', 'Sun'] as const).forEach((d) => next.add(`${d}-Afternoon`));
+    }
+    if (preset === 'morningsOnly') {
+      (['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const).forEach((d) => next.add(`${d}-Morning`));
+    }
+    setSelectedSlots(next);
+  };
+
   const toggleSlot = (slot: SlotKey) => {
     setSelectedSlots((prev) => {
       const next = new Set(prev);
@@ -82,7 +96,7 @@ export default function Step5_Preferences() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div className="flex flex-col h-full">
       {/* Header */}
       <div className="text-center space-y-2 mb-6">
         <motion.div
@@ -97,9 +111,44 @@ export default function Step5_Preferences() {
           Study Preferences
         </h1>
         <p className="text-sm text-text-secondary max-w-xs mx-auto">
-          When are you usually free? How do you like to study? This helps us find compatible partners.
+          Pick when you’re free and your preferred study style.
         </p>
       </div>
+
+      {/* Quick picks */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-5"
+      >
+        <h2 className="text-sm font-semibold text-text-primary mb-2">
+          Quick picks
+        </h2>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => applyPreset('weekdayEvenings')}
+            className="min-h-[44px] px-3 rounded-full border border-border bg-surface text-sm font-semibold text-text-primary hover:bg-highlight transition-colors"
+          >
+            Weekday evenings
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('weekendAfternoons')}
+            className="min-h-[44px] px-3 rounded-full border border-border bg-surface text-sm font-semibold text-text-primary hover:bg-highlight transition-colors"
+          >
+            Weekend afternoons
+          </button>
+          <button
+            type="button"
+            onClick={() => applyPreset('morningsOnly')}
+            className="min-h-[44px] px-3 rounded-full border border-border bg-surface text-sm font-semibold text-text-primary hover:bg-highlight transition-colors"
+          >
+            Mornings
+          </button>
+        </div>
+      </motion.div>
 
       {/* Time grid */}
       <motion.div
@@ -112,7 +161,50 @@ export default function Step5_Preferences() {
           Available Times
         </h2>
 
-        <div className="overflow-x-auto -mx-1 scrollbar-hide">
+        {/* Mobile-friendly picker */}
+        <div className="space-y-2 sm:hidden">
+          {DAYS.map((day) => (
+            <div
+              key={day}
+              className="rounded-[var(--radius-lg)] border border-border bg-surface p-3 shadow-sm"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-text-primary">{day}</p>
+                <p className="text-xs text-text-secondary">Tap to toggle</p>
+              </div>
+              <div className="mt-3 grid grid-cols-3 gap-2">
+                {TIME_SLOTS.map((slot) => {
+                  const key: SlotKey = `${day}-${slot}`;
+                  const isActive = selectedSlots.has(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => toggleSlot(key)}
+                      className={[
+                        'min-h-[44px] rounded-[var(--radius-md)] border px-2',
+                        'text-xs font-semibold transition-colors',
+                        isActive
+                          ? 'bg-secondary text-white border-secondary'
+                          : 'bg-background text-text-primary border-border hover:bg-highlight',
+                      ].join(' ')}
+                    >
+                      <div className="flex flex-col items-center leading-tight">
+                        <span>{slot}</span>
+                        <span className={isActive ? 'text-white/80' : 'text-text-secondary'}>
+                          {TIME_SLOT_LABELS[slot]}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop/tablet grid */}
+        <div className="hidden sm:block overflow-x-auto scrollbar-hide">
           <div className="min-w-fit">
             {/* Header row */}
             <div className="grid gap-1.5 mb-1.5" style={{ gridTemplateColumns: '56px repeat(7, 1fr)' }}>
@@ -249,7 +341,16 @@ export default function Step5_Preferences() {
       <div className="flex-1" />
 
       {/* Continue */}
-      <div className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent">
+      <div className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent">
+        {(selectedSlots.size > 0 || studyStyle) && (
+          <div className="mb-2 flex items-center justify-center">
+            <span className="inline-flex items-center gap-2 rounded-full bg-surface border border-border px-3 py-1.5 text-xs font-semibold text-text-primary">
+              {selectedSlots.size > 0 ? `${selectedSlots.size} slot${selectedSlots.size !== 1 ? 's' : ''}` : 'No time selected'}
+              <span className="text-text-secondary">•</span>
+              {studyStyle ? (studyStyle === 'solo' ? 'Solo' : studyStyle === 'pair' ? 'Pair' : 'Group') : 'No style'}
+            </span>
+          </div>
+        )}
         <Button
           size="lg"
           className="w-full"
@@ -259,6 +360,9 @@ export default function Step5_Preferences() {
           Continue
         </Button>
       </div>
+
+      {/* Reserve space so sticky footer never overlays content */}
+      <div aria-hidden className="h-24" />
     </div>
   );
 }

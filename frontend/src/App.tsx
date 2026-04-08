@@ -43,7 +43,6 @@ const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPasswordScreen').th
 
 // B — Onboarding
 const OnboardingVerify = lazy(() => import('@/pages/onboarding/Step1_Verify'));
-const OnboardingAvatar = lazy(() => import('@/pages/onboarding/Step2_Avatar'));
 const OnboardingModules = lazy(() => import('@/pages/onboarding/Step3_Modules'));
 const OnboardingAbout = lazy(() => import('@/pages/onboarding/Step4_About'));
 const OnboardingPreferences = lazy(() => import('@/pages/onboarding/Step5_Preferences'));
@@ -70,14 +69,14 @@ const EditProfile = lazy(() => import('@/pages/profile/EditProfileScreen'));
 const ConnectionRequests = lazy(() => import('@/pages/profile/ConnectionsScreen'));
 
 // F — Messaging
-const Chat = lazy(() => import('@/pages/messaging/ChatScreen'));
+const Chat = lazy(() => import('@/pages/messaging/ChatScreen').then(m => ({ default: m.ChatScreen })));
 
 // G — 3D Lobby
 const EventLobby = lazy(() => import('@/pages/lobby/EventLobbyScreen'));
 
 // H — Utility
 const Notifications = lazy(() => import('@/pages/utility/NotificationsScreen'));
-const Settings = lazy(() => import('@/pages/utility/SettingsScreen'));
+const Settings = lazy(() => import('@/pages/utility/SettingsScreen').then(m => ({ default: m.SettingsScreen })));
 
 // ---------------------------------------------------------------------------
 // App — route tree
@@ -94,7 +93,6 @@ export default function App() {
 
         {/* ---- B. Onboarding ---- */}
         <Route path="/onboarding/verify" element={<OnboardingGuard><OnboardingVerify /></OnboardingGuard>} />
-        <Route path="/onboarding/avatar" element={<OnboardingGuard><OnboardingAvatar /></OnboardingGuard>} />
         <Route path="/onboarding/modules" element={<OnboardingGuard><OnboardingModules /></OnboardingGuard>} />
         <Route path="/onboarding/about" element={<OnboardingGuard><OnboardingAbout /></OnboardingGuard>} />
         <Route path="/onboarding/preferences" element={<OnboardingGuard><OnboardingPreferences /></OnboardingGuard>} />

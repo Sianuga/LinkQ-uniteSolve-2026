@@ -1,19 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, Check, Link2, BookOpen, ChevronDown, Plus } from 'lucide-react';
+import { Loader2, Check, Link2, BookOpen, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
-const UNIVERSITIES = [
-  'TU Darmstadt',
-  'TU Munich',
-  'Heidelberg University',
-  'Humboldt University Berlin',
-  'University of Stuttgart',
-  'RWTH Aachen',
-  'University of Freiburg',
-  'Other',
-];
+const DEMO_MOODLE = {
+  url: 'https://moodle.tu-darmstadt.de',
+  username: 'sophie.meyer',
+  password: 'LinkQ-demo-2026',
+};
 
 const FAKE_COURSES = [
   { name: 'Distributed Systems', code: 'CS-401', semester: 'WiSe 2026' },
@@ -23,18 +18,20 @@ const FAKE_COURSES = [
   { name: 'Data Structures & Algorithms', code: 'CS-120', semester: 'SoSe 2026' },
 ];
 
-type Phase = 'select' | 'importing' | 'done';
+type Phase = 'login' | 'importing' | 'done';
 
 export default function Step3_Modules() {
   const navigate = useNavigate();
-  const [university, setUniversity] = useState('');
-  const [phase, setPhase] = useState<Phase>('select');
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [phase, setPhase] = useState<Phase>('login');
+  const [moodleUrl, setMoodleUrl] = useState(DEMO_MOODLE.url);
+  const [username, setUsername] = useState(DEMO_MOODLE.username);
+  const [password, setPassword] = useState(DEMO_MOODLE.password);
+  const [stayLoggedIn, setStayLoggedIn] = useState(true);
 
   const handleConnect = () => {
-    if (!university) return;
+    if (!moodleUrl || !username || !password) return;
     setPhase('importing');
-    // Simulate OAuth + import delay
+    // Simulate Moodle login + import delay
     setTimeout(() => setPhase('done'), 2200);
   };
 
@@ -53,90 +50,112 @@ export default function Step3_Modules() {
           <BookOpen className="w-7 h-7 text-primary" />
         </motion.div>
         <h1 className="text-2xl font-bold text-text-primary">
-          Connect Your Modules
+          Connect Moodle
         </h1>
         <p className="text-sm text-text-secondary max-w-xs mx-auto">
-          Link your university account to automatically import your enrolled courses.
+          Sign in to import your enrolled courses and lectures automatically.
         </p>
       </div>
 
       <AnimatePresence mode="wait">
-        {/* Phase 1: University selector */}
-        {phase === 'select' && (
+        {/* Phase 1: Fake Moodle login */}
+        {phase === 'login' && (
           <motion.div
-            key="select"
+            key="login"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="space-y-4"
+            className="mx-auto w-full max-w-sm space-y-4"
           >
-            {/* Custom dropdown */}
-            <div className="relative">
-              <label className="text-sm font-medium text-text-primary mb-1.5 block">
-                University
-              </label>
-              <button
-                type="button"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className={[
-                  'w-full flex items-center justify-between',
-                  'bg-surface border rounded-[var(--radius-sm)] px-3 py-3',
-                  'text-sm text-left cursor-pointer',
-                  'transition-colors duration-150',
-                  dropdownOpen ? 'border-secondary ring-2 ring-secondary/20' : 'border-border',
-                ].join(' ')}
-              >
-                <span className={university ? 'text-text-primary' : 'text-text-secondary'}>
-                  {university || 'Select your university...'}
-                </span>
-                <ChevronDown
-                  className={[
-                    'w-4 h-4 text-text-secondary transition-transform duration-200',
-                    dropdownOpen && 'rotate-180',
-                  ].filter(Boolean).join(' ')}
-                />
-              </button>
+            <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm space-y-3">
+              {/* Moodle-ish header */}
+              <div className="flex items-center gap-3 pb-2">
+                <div className="h-10 w-10 rounded-xl bg-highlight flex items-center justify-center shrink-0">
+                  <BookOpen className="h-5 w-5 text-primary" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-text-primary leading-tight">
+                    Moodle login
+                  </p>
+                  <p className="text-xs text-text-secondary truncate">
+                    {moodleUrl.replace(/^https?:\/\//, '')}
+                  </p>
+                </div>
+              </div>
 
-              <AnimatePresence>
-                {dropdownOpen && (
-                  <motion.ul
-                    initial={{ opacity: 0, y: -4, scaleY: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scaleY: 1 }}
-                    exit={{ opacity: 0, y: -4, scaleY: 0.95 }}
-                    transition={{ duration: 0.15 }}
-                    className="absolute z-20 mt-1 w-full bg-surface border border-border rounded-[var(--radius-sm)] shadow-lg overflow-hidden origin-top"
-                  >
-                    {UNIVERSITIES.map((uni) => (
-                      <li key={uni}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setUniversity(uni);
-                            setDropdownOpen(false);
-                          }}
-                          className={[
-                            'w-full text-left px-3 py-2.5 min-h-[44px] text-sm cursor-pointer',
-                            'hover:bg-highlight transition-colors',
-                            university === uni && 'bg-highlight font-medium text-primary',
-                          ].filter(Boolean).join(' ')}
-                        >
-                          {uni}
-                        </button>
-                      </li>
-                    ))}
-                  </motion.ul>
-                )}
-              </AnimatePresence>
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                  Moodle URL
+                </label>
+                <input
+                  value={moodleUrl}
+                  onChange={(e) => setMoodleUrl(e.currentTarget.value)}
+                  inputMode="url"
+                  className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-3 text-sm text-text-primary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                  Username
+                </label>
+                <input
+                  value={username}
+                  onChange={(e) => setUsername(e.currentTarget.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  autoComplete="username"
+                  className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-3 text-sm text-text-primary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-text-primary mb-1.5 block">
+                  Password
+                </label>
+                <input
+                  value={password}
+                  onChange={(e) => setPassword(e.currentTarget.value)}
+                  type="password"
+                  autoComplete="current-password"
+                  className="w-full min-h-[44px] bg-background border border-border rounded-[var(--radius-sm)] px-3 py-3 text-sm text-text-primary outline-none focus:border-secondary focus:ring-2 focus:ring-secondary/20"
+                />
+              </div>
+
+              {/* Controls row */}
+              <div className="flex items-center justify-between gap-3 pt-1">
+                <label className="flex items-center gap-2 text-xs text-text-secondary select-none cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={stayLoggedIn}
+                    onChange={(e) => setStayLoggedIn(e.currentTarget.checked)}
+                    className="h-4 w-4 rounded border-border"
+                  />
+                  Stay logged in
+                </label>
+                <button
+                  type="button"
+                  className="text-xs font-medium text-secondary hover:text-primary transition-colors"
+                  onClick={() => {
+                    // Fake: keep the user on the page; in real Moodle this opens a reset page.
+                    setPassword('LinkQ-demo-2026');
+                  }}
+                >
+                  Forgot password?
+                </button>
+              </div>
+
+              <p className="text-xs text-text-secondary leading-relaxed">
+                Demo only. This does not access Moodle — it simulates login and imports sample courses.
+              </p>
             </div>
 
             <Button
               size="lg"
               className="w-full"
-              disabled={!university}
+              disabled={!moodleUrl || !username || !password}
               onClick={handleConnect}
             >
               <Link2 className="w-4 h-4" />
-              Connect with Module System
+              Connect Moodle
             </Button>
 
             <button
@@ -171,7 +190,7 @@ export default function Step3_Modules() {
                 Importing your courses...
               </p>
               <p className="text-sm text-text-secondary">
-                Connecting to {university}
+                Signing in to Moodle
               </p>
             </div>
 
@@ -207,7 +226,7 @@ export default function Step3_Modules() {
                 <Check className="w-3.5 h-3.5 text-white" />
               </motion.div>
               <p className="text-sm font-medium text-success">
-                {FAKE_COURSES.length} courses imported from {university}
+                {FAKE_COURSES.length} courses imported from Moodle
               </p>
             </div>
 
@@ -247,7 +266,7 @@ export default function Step3_Modules() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="sticky bottom-0 pb-4 pt-2 bg-gradient-to-t from-background via-background to-transparent"
+          className="sticky bottom-0 pt-2 pb-safe bg-gradient-to-t from-background via-background to-transparent"
         >
           <Button size="lg" className="w-full" onClick={goNext}>
             Continue

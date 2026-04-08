@@ -22,6 +22,8 @@ NEXUS transforms campus life into a context-aware network:
 ## Quick Start
 ### Frontend (React + Three.js)
 
+Recommended Node version: **Node 22 LTS** (see `.nvmrc`). Using very new Node versions can break native optional dependencies used by the bundler.
+
 ```bash
 cd frontend
 npm install

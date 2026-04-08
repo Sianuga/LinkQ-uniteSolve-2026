@@ -5,7 +5,6 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 
 const STEP_ROUTES = [
   '/onboarding/verify',
-  '/onboarding/avatar',
   '/onboarding/modules',
   '/onboarding/about',
   '/onboarding/preferences',
@@ -54,7 +53,7 @@ export default function OnboardingLayout() {
 
             <div className="flex-1 text-center">
               <span className="text-xs font-semibold text-text-secondary tracking-wide uppercase">
-                Step {stepNumber} of {totalSteps}
+                Onboarding {stepNumber}/{totalSteps}
               </span>
             </div>
 
@@ -67,7 +66,7 @@ export default function OnboardingLayout() {
       </div>
 
       {/* Step content */}
-      <div className="flex-1 max-w-lg mx-auto w-full px-4 py-6 pb-safe">
+      <div className="flex-1 min-h-0 max-w-lg mx-auto w-full px-4 py-5 pb-safe overflow-y-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -75,7 +74,7 @@ export default function OnboardingLayout() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="h-full"
+            className="min-h-full"
           >
             <Outlet />
           </motion.div>
